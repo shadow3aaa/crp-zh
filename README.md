@@ -1,6 +1,7 @@
 # C++ to Rust Phrasebook
 
-This is the source code for [CRP](https://cel.cs.brown.edu/crp/).
+这是CRP(C++ to Rust Phrasebook)的一个简体中文翻译版本的源码 [CRP](https://cel.cs.brown.edu/crp/).
+点击这里[CRP-ZH](https://shadow3aaa.github.io/crp-zh/)进行阅读
 
 ## Building locally
 
