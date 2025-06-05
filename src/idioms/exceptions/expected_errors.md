@@ -1,9 +1,6 @@
-# Expected errors
+# 预期错误
 
-In C++, `throw` both produces an error (the thrown exception) and initiates
-non-local control flow (unwinding to the nearest `catch` block). In Rust, error
-values (`Option::None` or `Result::Err`) are returned as normal values from a
-function. Rust's `return` statement can be used to return early from a function.
+在 C++ 中，`throw` 既产生一个错误（被抛出的异常），又启动了非本地控制流（展开到最近的 `catch` 块）。在 Rust 中，错误值（`Option::None` 或 `Result::Err`）作为普通值从函数返回。Rust 的 `return` 语句可以用于提前返回。
 
 <div class="comparison">
 
@@ -34,12 +31,7 @@ fn divide(
 
 </div>
 
-The requirement to have the return type indicate that an error is possible means
-that callbacks that are permitted to have errors need to be given an `Option` or
-`Result` return type. Omitting that is like requiring callbacks to be `noexcept`
-in C++. Functions that do not need to indicate errors but that will be used as
-callbacks where errors are permitted will need to wrap their results in
-`Option::Some` or `Result::Ok`.
+要求返回类型指示可能出现错误，这意味着允许出错的回调需要给定 `Option` 或 `Result` 返回类型。省略这一点就像要求回调在 C++ 中必须是 `noexcept`。那些不需要指示错误但会被用作允许出错回调的函数，需要将其结果包装在 `Option::Some` 或 `Result::Ok` 中。
 
 <div class="comparison">
 
@@ -86,37 +78,31 @@ fn use_callback(
 }
 
 fn main() {
-    // need to wrap produce_42 to match the
-    // expected type
+    // 需要包装 produce_42 以匹配
+    // 期望的类型
     let Some(x) =
         use_callback(|| Some(produce_42()))
     else {
-        // handle error
+        // 处理错误
         return;
     };
     let Some(y) = use_callback(fail) else {
-        // handle error
+        // 处理错误
         return;
     };
-    // use x and y
+    // 使用 x 和 y
 }
 ```
 
 </div>
 
-## Handling errors
+## 错误处理
 
-In C++, the only way to handle exceptions is `catch`. In Rust, all of the
-features for dealing with [tagged
-unions](../data_modeling/tagged_unions.md) can be used with `Result` and
-`Option`. The most approach depends on the intention of the program.
+在 C++ 中，处理异常的唯一方式是 `catch`。在 Rust 中，所有用于处理[标记联合体](../data_modeling/tagged_unions.md)的特性都可以用于 `Result` 和 `Option`。具体采用哪种方式取决于程序的意图。
 
-The basic way of handling an error indicated by a `Result` in Rust is by using
-`match`.
+在 Rust 中处理 `Result` 指示的错误的基本方式是使用 `match`。
 
-Using `match` is the most general approach, because it enables handling
-additional cases explicitly and can be used as an expression. `match` connotes
-equal importance of all branches.
+使用 `match` 是最通用的方法，因为它可以显式处理额外的情况，并且可以作为表达式使用。`match` 表示所有分支同等重要。
 
 <div class="comparison">
 
@@ -126,12 +112,12 @@ equal importance of all branches.
 
 int main() {
     std::vector<int> v;
-    // ... populate v ...
+    // ... 填充 v ...
     try {
         auto x = v.at(0);
-        // use x
+        // 使用 x
     } catch (std::out_of_range &e) {
-        // handle error
+        // 处理错误
     }
 }
 ```
@@ -139,13 +125,13 @@ int main() {
 ```rust
 fn main() {
     let mut v = Vec::<i32>::new();
-    // ... populate v ...
+    // ... 填充 v ...
     match v.get(0) {
         Some(x) => {
-            // use x
+            // 使用 x
         }
         None => {
-            // handle error
+            // 处理错误
         }
     }
 }
@@ -153,50 +139,41 @@ fn main() {
 
 </div>
 
-Because handling only a single variant of a Rust enum is so common, the `if let`
-syntax support that use case. The syntax both makes it clear that only the one
-case is important and reduces the levels of indentation.
+由于只处理 Rust 枚举的单一变体非常常见，`if let` 语法支持这种用法。该语法既清楚地表明只有这一种情况重要，又减少了缩进层级。
 
-`if let` is less general than `match`. It can also be used as an expression, but
-can only distinguish one case from the rest. `if let` connotes that the `else`
-case is not the normal case, but that some default handling will occur or some
-default value will be produced.
+`if let` 不如 `match` 通用。它也可以作为表达式使用，但只能区分一种情况和其他情况。`if let` 表示 `else` 分支不是正常情况，而是会有一些默认处理或产生默认值。
 
-Note that with `Result`, `if let` does not enable accessing the error value.
+注意，对于 `Result`，`if let` 不能访问错误值。
 
 ```rust
 fn main() {
     let mut v = Vec::<i32>::new();
-    // ... populate v ...
+    // ... 填充 v ...
     if let Some(x) = v.get(0) {
-        // use x
+        // 使用 x
     } else {
-        // handle error
+        // 处理错误
     }
 }
 ```
 
-When the error handling involves some kind of control flow operation, like
-`break` or `return`, the `let else` syntax is even more concise.
+当错误处理涉及某种控制流操作（如 `break` 或 `return`）时，`let else` 语法更为简洁。
 
-Much like normal `let` statements, `let else` statements can only be used where
-statements are expected. `let else` statements also connote that the else case
-is not the normal case, and that no further (normal) processing will occur.
+与普通的 `let` 语句类似，`let else` 语句只能在需要语句的地方使用。`let else` 也表示 else 分支不是正常情况，并且不会有进一步的（正常）处理。
 
 ```rust
 fn main() {
     let mut v = Vec::<i32>::new();
-    // ... populate v ...
+    // ... 填充 v ...
     let Some(x) = v.get(0) else {
-        // handle error
+        // 处理错误
         return;
     };
-    // use x
+    // 使用 x
 }
 ```
 
-`Result` and `Option` also have some helper methods for handling errors.
-These methods resemble the methods on `std::expected` in C++.
+`Result` 和 `Option` 还有一些用于处理错误的辅助方法。这些方法类似于 C++ 中 `std::expected` 的方法。
 
 <div class="comparison">
 
@@ -219,17 +196,11 @@ fn main() {
 
 </div>
 
-These helper methods and others are described in detail in the documentation for
-[`Option`](https://doc.rust-lang.org/std/option/enum.Option.html#implementations)
-and
-[`Result`](https://doc.rust-lang.org/std/result/enum.Result.html#implementations).
+这些辅助方法及其他内容在 [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html#implementations) 和 [`Result`](https://doc.rust-lang.org/std/result/enum.Result.html#implementations) 的文档中有详细介绍。
 
-## Borrowed results
+## 借用的结果
 
-In the above examples, the successful results are borrowed from the vector. It
-common to need to clone or copy the result into an owned copy, and to want to do
-so without having to match on and reconstruct the value. `Result` and `Option`
-have helper methods for these purposes.
+在上面的例子中，成功的结果是从 vector 中借用的。通常需要将结果克隆或复制为拥有所有权的副本，并希望无需 match 和重构值即可完成。`Result` 和 `Option` 有辅助方法用于这些目的。
 
 ```rust
 fn main() {
@@ -245,12 +216,9 @@ fn main() {
 }
 ```
 
-## Propagating errors
+## 错误传播
 
-In C++, exceptions propagate automatically. In Rust, errors indicated by
-`Result` or `Option` must be explicitly propagated. The `?` operator is a
-convenience for this. There are also several methods for manipulating `Result`
-and `Option` that have a similar effect to propagating the error.
+在 C++ 中，异常会自动传播。在 Rust 中，由 `Result` 或 `Option` 指示的错误必须显式传播。`?` 运算符为此提供了便利。还有一些用于操作 `Result` 和 `Option` 的方法，其效果类似于传播错误。
 
 <div class="comparison">
 
@@ -261,9 +229,9 @@ and `Option` that have a similar effect to propagating the error.
 int accessValue(std::vector<std::size_t> indices,
                  std::vector<int> values,
                  std::size_t i) {
-  // vector::at throws
+  // vector::at 抛出异常
   size_t idx(indices.at(i));
-  // vector::at throws
+  // vector::at 抛出异常
   return values.at(idx);
 }
 ```
@@ -274,18 +242,17 @@ fn access_value(
     values: Vec<i32>,
     i: usize,
 ) -> Option<i32> {
-    // * dereferences the &i32 to copy it
-    // ? propagates the None
+    // * 解引用 &i32 以复制
+    // ? 传播 None
     let idx = *indices.get(i)?;
-    // returns the Option directly
+    // 直接返回 Option
     values.get(idx).copied()
 }
 ```
 
 </div>
 
-The above Rust example is equivalent to the following, which does not use the
-`?` operator. The version using `?` is more idiomatic.
+上面的 Rust 示例等价于下面这个没有使用 `?` 运算符的版本。使用 `?` 的版本更符合惯用写法。
 
 ```rust
 fn access_value(
@@ -293,19 +260,16 @@ fn access_value(
     values: Vec<i32>,
     i: usize,
 ) -> Option<i32> {
-    // matching through the & makes a copy of the i32
+    // 通过 & 匹配并复制 i32
     let Some(&idx) = indices.get(i) else {
         return None;
     };
-    // still returns the Option directly
+    // 仍然直接返回 Option
     values.get(idx).copied()
 }
 ```
 
-The following example is also equivalent. It is not idiomatic (using `?` here is
-more readable), but does demonstrate one of the helper methods.
-`Option::and_then` is similar to [`std::optional::and_then` in
-C++23](https://en.cppreference.com/w/cpp/utility/optional/and_then).
+下面的例子也是等价的。虽然不太惯用（这里用 `?` 更易读），但演示了一个辅助方法。`Option::and_then` 类似于 [C++23 中的 `std::optional::and_then`](https://en.cppreference.com/w/cpp/utility/optional/and_then)。
 
 ```rust
 fn access_value(
@@ -313,7 +277,7 @@ fn access_value(
     values: Vec<i32>,
     i: usize,
 ) -> Option<i32> {
-    // matching through the & makes a copy of the i32
+    // 通过 & 匹配并复制 i32
     indices
         .get(i)
         .and_then(|idx| values.get(*idx))
@@ -321,16 +285,11 @@ fn access_value(
 }
 ```
 
-These helper methods and others are described in detail in the documentation for
-[`Option`](https://doc.rust-lang.org/std/option/enum.Option.html#implementations)
-and
-[`Result`](https://doc.rust-lang.org/std/result/enum.Result.html#implementations).
+这些辅助方法及其他内容在 [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html#implementations) 和 [`Result`](https://doc.rust-lang.org/std/result/enum.Result.html#implementations) 的文档中有详细介绍。
 
-## Uncaught exceptions in `main`
+## `main` 中未捕获的异常
 
-In C++ when an exception is uncaught, it terminates the program with a non-zero
-exit code and an error message. To achieve a similar result using `Result` in
-Rust, `main` can be given a return type of `Result`.
+在 C++ 中，当异常未被捕获时，程序会以非零退出码和错误信息终止。要在 Rust 中用 `Result` 实现类似效果，可以让 `main` 返回 `Result` 类型。
 
 <div class="comparison">
 
@@ -350,9 +309,7 @@ fn main() -> Result<(), &'static str> {
 
 </div>
 
-The result type must be unit `()` and the error type can be any type that
-implements the [`Debug`
-trait](https://doc.rust-lang.org/std/fmt/trait.Debug.html).
+结果类型必须是单元类型 `()`，错误类型可以是实现了 [`Debug` trait](https://doc.rust-lang.org/std/fmt/trait.Debug.html) 的任意类型。
 
 ```rust,no_run
 #[derive(Debug)]
@@ -369,32 +326,23 @@ fn main() -> Result<(), InterestingError> {
 }
 ```
 
-Running this program produces the output `Error: InterestingError { message:
-"oops", other_interesting_value: 9001 }` with an exit code of `1`.
+运行该程序会输出 `Error: InterestingError { message: "oops", other_interesting_value: 9001 }`，退出码为 `1`。
 
-## Limitations to forcing error handling with `Result`
+## 用 `Result` 强制错误处理的局限性
 
-Returning `Result` or `Option` does not give the usual benefits when used with
-APIs that pass pre-allocated buffers by mutable reference. This is because the
-buffer is accessible outside of the `Result` or `Option`, and so the compiler
-cannot force handling of the error case.
+当与通过可变引用传递预分配缓冲区的 API 一起使用时，返回 `Result` 或 `Option` 并不能带来通常的好处。这是因为缓冲区在 `Result` 或 `Option` 之外也可访问，因此编译器无法强制处理错误情况。
 
-For example, in the following example the result of `read_line` can be ignored,
-resulting in logic errors in the program. However, since the buffer is required
-to be initialized, it will not result in memory safety violations or undefined
-behavior.
+例如，在下面的例子中，可以忽略 `read_line` 的结果，导致程序出现逻辑错误。但由于缓冲区必须被初始化，这不会导致内存安全问题或未定义行为。
 
 ```rust
 fn main() {
     let mut buffer = String::with_capacity(1024);
     std::io::stdin().read_line(&mut buffer);
-    // use buffer
+    // 使用 buffer
 }
 ```
 
-Rust will produce a warning in this case, because of the [`#[must_use]`
-attribute](https://doc.rust-lang.org/reference/attributes/diagnostics.html#the-must_use-attribute)
-on `Result`.
+Rust 在这种情况下会发出警告，因为 `Result` 上有 [`#[must_use]` 属性](https://doc.rust-lang.org/reference/attributes/diagnostics.html#the-must_use-attribute)。
 
 ```text
 warning: unused `Result` that must be used
@@ -411,8 +359,4 @@ help: use `let _ = ...` to ignore the resulting value
   |     +++++++
 ```
 
-`Option` does not have a `#[must_use]` attribute, so functions that return an
-`Option` that must be handled (due to the `None` case indicating an error)
-should be annotated with the `#[must_use]` attribute. For example, the `get`
-method on slices returns `Option` and is [annotated as
-`#[must_use]`](https://doc.rust-lang.org/src/core/slice/mod.rs.html#592-595).
+`Option` 没有 `#[must_use]` 属性，因此返回必须处理的 `Option`（因为 `None` 表示错误）的函数应加上 `#[must_use]` 属性。例如，切片的 `get` 方法返回 `Option`，并被[标注为 `#[must_use]`](https://doc.rust-lang.org/src/core/slice/mod.rs.html#592-595)。

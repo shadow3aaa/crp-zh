@@ -1,9 +1,7 @@
-# Default constructors
+# 默认构造函数
 
-C++ has a special concept of default constructors to support several scenarios
-in which they are implicitly called. 
-Rust does not have the same notion of a default constructor. The most similar mechanism is the [`Default`
-trait](https://doc.rust-lang.org/std/default/trait.Default.html).
+C++ 有一个特殊的默认构造函数概念，用于支持多种会隐式调用它的场景。  
+Rust 没有完全相同的默认构造函数机制，最接近的是 [`Default` trait](https://doc.rust-lang.org/std/default/trait.Default.html)。
 
 <div class="comparison">
 
@@ -12,7 +10,7 @@ class Person {
     int age;
 
 public:
-    // Default constructor
+    // 默认构造函数
     Person() : age(0) {}
 }
 ```
@@ -37,21 +35,14 @@ impl Default for Person {
 
 </div>
 
+如果一个结构体有有意义的默认值（类似于 C++ 的默认构造函数），那么该类型应同时提供一个无参数的 `new` 方法和 `Default` trait 的实现。  
+详见 [相关 API 指南](https://rust-lang.github.io/api-guidelines/interoperability.html?highlight=default#types-eagerly-implement-common-traits-c-common-traits)。
 
-If a structure has a useful default value (such as would be constructed by a
-default constructor in C++), then the type should provide
-[both](https://rust-lang.github.io/api-guidelines/interoperability.html?highlight=default#types-eagerly-implement-common-traits-c-common-traits)
-a `new` method that takes no arguments and an implementation of `Default`.
+## 类成员的隐式初始化
 
+在 C++ 中，如果成员没有被构造函数显式初始化，则会被默认初始化。当成员类型是类时，默认初始化会调用其默认构造函数。
 
-## Implicit initialization of class members
-
-In C++, if a member is not explicitly initialized by a constructor, then it is
-default-initialized. When the type of the member is a class, the
-default-initialization invokes the default constructor.
-
-In Rust, if all of the fields of a struct implement the `Default` trait, then an
-implementation for the structure can be provided by the compiler.
+在 Rust 中，如果结构体的所有字段都实现了 `Default` trait，则编译器可以为该结构体自动生成实现。
 
 <div class="comparison">
 
@@ -82,7 +73,7 @@ struct Student {
 
 </div>
 
-The `#[derive(Default)]` macros in Rust are equivalent to writing the following.
+Rust 中的 `#[derive(Default)]` 宏等价于如下手动实现：
 
 ```rust
 struct Person {
@@ -110,17 +101,9 @@ impl Default for Student {
 }
 ```
 
-Unlike C++ where the default initialization value for integers is indeterminate,
-in Rust the default value for the primitive integer and floating point types [is
-zero](https://doc.rust-lang.org/std/primitive.i32.html#impl-Default-for-i32).
+与 C++ 中整数默认初始化值不确定不同，Rust 的原始整数和浮点类型的默认值[为零](https://doc.rust-lang.org/std/primitive.i32.html#impl-Default-for-i32)。
 
-<a name="struct-update"></a> Deriving the `Default` trait has a similar effect
-on code concision as eliding initialization in C++. In situations where all of
-the types implement the `Default` trait, but only some of the fields should have
-their default values, one can use [struct update
-syntax](https://doc.rust-lang.org/book/ch05-01-defining-structs.html#creating-instances-from-other-instances-with-struct-update-syntax)
-to define a constructor method without enumerating the values for all of the
-fields.
+<a name="struct-update"></a> 派生 `Default` trait 在代码简洁性上类似于 C++ 省略初始化的写法。当所有字段类型都实现了 `Default`，但只希望部分字段使用默认值时，可以用 [结构体更新语法](https://doc.rust-lang.org/book/ch05-01-defining-structs.html#creating-instances-from-other-instances-with-struct-update-syntax) 定义构造方法，无需枚举所有字段的值。
 
 ```rust
 #[derive(Default)]
@@ -144,12 +127,11 @@ impl Student {
 }
 ```
 
-## Implicit initialization of array values
+## 数组值的隐式初始化
 
-In C++, arrays without explicit initialization are default-initialized using the
-default constructors.
+在 C++ 中，未显式初始化的数组会用默认构造函数进行默认初始化。
 
-In Rust, the value with which to initialize the array must be provided.
+在 Rust 中，必须显式指定数组的初始化值。
 
 <div class="comparison">
 
@@ -174,7 +156,7 @@ struct Person {
 }
 
 fn main() {
-    // std::array::from_fn provides the index to the callback
+    // std::array::from_fn 提供索引给回调
     let people: [Person; 3] = 
         std::array::from_fn(|_| Default::default());
     // ...
@@ -183,9 +165,7 @@ fn main() {
 
 </div>
 
-If the type happens to be [trivially
-copyable](./copy_and_move_constructors.md#trivially-copyable-types),
-then a shorthand can be used.
+如果类型是[可平凡复制的](./copy_and_move_constructors.md#trivially-copyable-types)，可以使用更简洁的写法：
 
 ```rust
 #[derive(Clone, Copy, Default)]
@@ -199,16 +179,11 @@ fn main() {
 }
 ```
 
-## Container element initialization
+## 容器元素初始化
 
-In C++, the default constructor could be used to implicitly define collection
-types, such as `std::vector`. Before C++11, one value would be default
-constructed, and the elements would be copy constructed from that initial
-element. Since C++11, all elements are default constructed.
+在 C++ 中，默认构造函数可用于隐式定义集合类型，如 `std::vector`。C++11 之前，先构造一个值，再用它拷贝构造所有元素；C++11 及以后，所有元素都用默认构造函数初始化。
 
-As with array initialization, the values must be explicitly specified in Rust.
-The vector can be constructed from an array, enabling the same syntax as with
-arrays.
+在 Rust 中，和数组初始化一样，必须显式指定元素值。可以先构造数组，再转换为向量，实现与数组相同的语法。
 
 <div class="comparison">
 
@@ -244,7 +219,7 @@ fn main() {
 
 </div>
 
-In Rust, the vector can also be constructed from an iterator.
+在 Rust 中，也可以通过迭代器构造向量：
 
 ```rust
 #[derive(Default)]
@@ -258,10 +233,7 @@ fn main() {
 }
 ```
 
-If the type implements the `Clone` trait, then the array can be constructed
-using the `vec!` macro. See the chapter on [copy
-constructors](./copy_and_move_constructors.md) for more
-details on `Clone`.
+如果类型实现了 `Clone` trait，则可以用 `vec!` 宏构造数组。详见[拷贝构造函数章节](./copy_and_move_constructors.md)。
 
 ```rust
 #[derive(Clone, Default)]
@@ -275,13 +247,11 @@ fn main() {
 }
 ```
 
-## Implicit initialization of local variables
+## 局部变量的隐式初始化
 
-In C++, the default constructor is used to perform default-initialization of
-local variables that are not explicitly initialized.
+在 C++ 中，默认构造函数用于对未显式初始化的局部变量进行默认初始化。
 
-
-In Rust, initialization of local variables is always explicit.
+在 Rust 中，局部变量的初始化总是显式的。
 
 <div class="comparison">
 
@@ -313,10 +283,9 @@ fn main() {
 
 </div>
 
-## Implicit initialization of the base class object
+## 基类对象的隐式初始化
 
-In C++, the default constructor is used to initialize the base class object if
-no other constructor is specified.
+在 C++ 中，如果未指定其他构造函数，默认构造函数会用于初始化基类对象。
 
 ```cpp
 class Base {
@@ -328,24 +297,19 @@ public:
 
 class Derived : Base {
 public:
-  // Calls the default constructor for Base
+  // 调用 Base 的默认构造函数
   Derived() {}
 };
 ```
 
-Since Rust does not have inheritance, there is no equivalent to this case.
-See the chapter on [implementation
-reuse](../data_modeling/inheritance_and_reuse.md) or the section on [traits
-in the Rust book](https://doc.rust-lang.org/book/ch10-02-traits.html) for
-alternatives.
+Rust 没有继承，因此没有对应场景。  
+可参考[实现复用章节](../data_modeling/inheritance_and_reuse.md)或 [Rust 书中关于 trait 的部分](https://doc.rust-lang.org/book/ch10-02-traits.html) 了解替代方案。
 
 ## `std::unique_ptr`
 
-There are some additional cases where the `Default` trait is used in Rust, but
-default constructors are not used for initialization in C++.
+在 Rust 中，`Default` trait 还有一些 C++ 默认构造函数未涉及的用法。
 
-Rust's equivalent of smart pointers implement `Default` by delegating to the
-`Default` implementation of the contained type.
+Rust 的智能指针类型通过委托被包裹类型的 `Default` 实现自身的 `Default`。
 
 ```rust
 #[derive(Default)]
@@ -359,27 +323,21 @@ fn main() {
 }
 ```
 
-This differs from the treatment of `std::unique_ptr` in C++ because unlike `Box`,
-`std::unique_ptr` is nullable, and so the default constructor for
-`std:unique_ptr` produces a pointer that owns nothing. The equivalent type in
-Rust is `Option<Box<Person>>`, for which the `Default` implementation produces
-`None`.
+这与 C++ 的 `std::unique_ptr` 不同，后者是可空的，默认构造会得到一个空指针。而 Rust 的等价类型是 `Option<Box<Person>>`，其 `Default` 实现会生成 `None`。
 
-## Other uses of `Default`
+## `Default` 的其他用法
 
-[`Option::unwrap_or_default`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_default)
-makes use of `Default`, which makes getting a default value when the `Option`
-does not contain a value more convenient.
+[`Option::unwrap_or_default`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_default) 利用 `Default`，方便地在 `Option` 为 `None` 时获取默认值。
 
 ```rust
 fn go(x: Option<i32>) {
     let a: i32 = x.unwrap_or_default();
-    // if x was None, then a is 0
+    // 如果 x 是 None，则 a 为 0
 
     // ...
 }
 ```
 
-In C++, `std::optional` does not have an equivalent method.
+C++ 的 `std::optional` 没有等价的方法。
 
 {{#quiz default_constructors.toml}}

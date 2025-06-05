@@ -1,13 +1,8 @@
-# Inheritance and implementation reuse
+# 继承与实现复用
 
-Rust does not have inheritance and so the primary means of reuse of
-implementations in Rust are composition, aggregation, and
-[generics](./templates.md).
+Rust 没有继承机制，因此 Rust 中实现复用的主要方式是组合、聚合和[泛型](./templates.md)。
 
-However, Rust traits do have support for default methods which resemble one
-simple case of using inheritance for reuse of implementations. For example, in
-the following example two virtual methods are used to support a method whose
-implementation is provided by the abstract class.
+不过，Rust 的 trait 支持默认方法，这类似于用继承来复用实现的简单场景。例如，下面的例子中，两个虚函数用于支持一个由抽象类提供实现的方法。
 
 <div class="comparison">
 
@@ -91,28 +86,12 @@ fn main() {
 
 </div>
 
-In practice, the `resetDevice()` method in the `Device` class might be made
-non-virtual in C++ if it is not expected that it will be overridden. In order to
-make it align with the Rust example, we have made it virtual here, since Rust
-traits can be used either for [dynamic
-dispatch](./abstract_classes.md) or [static
-dispatch](./concepts.md) (with [no vtable overhead in the
-static dispatch
-case](./abstract_classes.md#vtables-and-rust-trait-object-types)).
+实际上，如果 `Device` 类中的 `resetDevice()` 方法不需要被重写，在 C++ 中它可以被声明为非虚函数。为了与 Rust 示例保持一致，这里将其声明为虚函数，因为 Rust 的 trait 既可以用于[动态分发](./abstract_classes.md)，也可以用于[静态分发](./concepts.md)（[静态分发情况下没有 vtable 开销](./abstract_classes.md#vtables-and-rust-trait-object-types)）。
 
-Rust traits differ from abstract classes in few more ways. For example,
-Rust traits cannot define data members and cannot define private or protected
-methods. This limits the effectiveness of using traits to implement the template
-method pattern.
+Rust 的 trait 与抽象类还有其他一些区别。例如，Rust 的 trait 不能定义数据成员，也不能定义私有或受保护的方法。这限制了 trait 在实现模板方法模式时的能力。
 
-Rust traits also cannot be privately implemented. Anywhere that both a trait
-and a type that implements that trait are visible, the methods of the trait are
-visible as methods on the type.
+Rust 的 trait 也不能被私有实现。只要 trait 和实现该 trait 的类型都可见，trait 的方法就会作为类型的方法可见。
 
-Traits can, however, inherit from each other, including multiple inheritance. As
-in modern C++, inheritance hierarchies in Rust tend to be shallow. In situations
-with complex multiple inheritance, however, the diamond problem cannot arise in
-Rust because traits cannot override other traits implementations. Therefore, all
-paths to a common parent trait resolve to the same implementation.
+不过，trait 之间可以相互继承，包括多重继承。与现代 C++ 类似，Rust 中的继承层次通常较浅。在涉及复杂多重继承的场景下，Rust 不会出现菱形继承问题，因为 trait 不能重写其他 trait 的实现。因此，所有通向同一个父 trait 的路径都会解析为同一个实现。
 
 {{#quiz inheritance_and_reuse.toml}}

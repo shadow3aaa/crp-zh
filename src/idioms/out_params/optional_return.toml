@@ -1,8 +1,7 @@
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt = """
-Which of the following is the most idiomatic translation of C++ function into
-Rust?
+以下哪一项是将 C++ 函数最符合惯用法地翻译为 Rust 的方式？
 
 ```cpp
 #include <cstdint>

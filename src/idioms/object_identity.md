@@ -1,33 +1,18 @@
-# Object identity
+# 对象标识
 
-In C++ the pointer to an object is sometimes used to represent its identity in
-terms of the logic of a program.
+在 C++ 中，对象的指针有时被用来表示其在程序逻辑中的身份。
 
-In some cases, this is a standard optimization, such as when implementing the
-copy assignment operator.
+在某些情况下，这是一种标准优化，例如实现拷贝赋值运算符时。
 
-In other cases the pointer value is used as a logical identity to distinguish
-between specific instances of an object that otherwise have the same properties.
-For example, representing a labeled graph where there may be distinct nodes that
-have the same label.
+在其他情况下，指针值被用作逻辑身份，以区分那些属性相同但实例不同的对象。例如，在表示带标签的图时，可能存在具有相同标签但不同的节点实例。
 
-In Rust, some of these cases are not applicable, and others cases are typically
-handled by instead by implementing a synthetic notion of identity for the
-values.
+在 Rust 中，这些用法有些并不适用，其他情况则通常通过为值实现一种“合成身份”来处理。
 
-## Overloading copy assignment and equality comparison operators
+## 重载拷贝赋值与相等比较运算符
 
-For example, when implementing the copy-assignment operator, one might
-short-circuit when the copied object and the assignee are the same.
-Note that in this use the pointer values are not stored.
+例如，在实现拷贝赋值运算符时，可以在被赋值对象和赋值源对象为同一对象时直接返回。注意，这种用法下指针值并不会被存储。
 
-This kind of optimization is unnecessary when implementing [Rust's equivalent to
-the copy assignment
-operator](./constructors/copy_and_move_constructors.md#assignment-operators)
-`Clone::clone_from`. The type of `Clone::clone_from` prevents the same object
-from being passed as both arguments, because one of the arguments is a mutable
-reference, which is exclusive, and so prevents the other reference argument from
-referring to the same object.
+在实现 [Rust 的拷贝赋值等价物](./constructors/copy_and_move_constructors.md#assignment-operators) `Clone::clone_from` 时，这类优化是不必要的。`Clone::clone_from` 的类型签名保证了同一个对象不会同时作为两个参数传入，因为其中一个参数是独占的可变引用，这样就阻止了另一个引用参数指向同一对象。
 
 <div class="comparison">
 
@@ -35,13 +20,13 @@ referring to the same object.
 struct Person
 {
     std::string name;
-    // many other expensive-to-copy fields
+    // 许多其他复制开销较大的字段
 
     Person& operator=(const Person& other) {
-        // compare object identity first
+        // 首先比较对象标识
         if (this != &other) {
             this.name = other.name;
-            // copy the other expensive-to-copy fields
+            // 复制其他复制开销较大的字段
         }
 
         return *this;
@@ -60,13 +45,11 @@ impl Clone for Person {
     }
 
     fn clone_from(&mut self, source: &Self) {
-        // self and source cannot be the same here,
-        // because that would mean there are a
-        // mutable and an immutable reference to
-        // the same memory location. Therefore, a
-        // check for assignment to self is not
-        // needed, even for the purpose of
-        // optimization.
+        // self 和 source 不可能相同，
+        // 因为这意味着同一内存位置同时有
+        // 可变引用和不可变引用。
+        // 因此，这里无需做自赋值检查，
+        // 即使是出于优化目的。
 
         self.name.clone_from(&source.name);
     }
@@ -75,13 +58,9 @@ impl Clone for Person {
 
 </div>
 
-In cases in C++ where most comparisons are between an object and itself (e.g.,
-the object's primary use is to be stored in a hash set), and comparison of
-unequal objects is expensive, comparing object identity might be used as
-optimization for the equality comparison operator overload.
+在 C++ 中，如果大多数比较都是对象与自身的比较（例如对象主要用于哈希集合），且不相等对象的比较开销很大，则可以通过比较对象标识来优化相等比较运算符的重载。
 
-For supporting similar operations in Rust,
-[`std::ptr::eq`](https://doc.rust-lang.org/std/ptr/fn.eq.html) can be used.
+在 Rust 中，如需支持类似操作，可以使用 [`std::ptr::eq`](https://doc.rust-lang.org/std/ptr/fn.eq.html)。
 
 <div class="comparison">
 
@@ -89,17 +68,17 @@ For supporting similar operations in Rust,
 struct Person
 {
     std::string name;
-    // many other expensive-to-compare fields
+    // 许多其他比较开销较大的字段
 };
 
 
 bool operator==(const Person& lhs, const Person& rhs) {
-    // compare object identity first
+    // 首先比较对象标识
     if (&lhs == &rhs) {
         return true;
     }
 
-    // compare the other expensive-to-compare fields
+    // 比较其他比较开销较大的字段
 
     return true;
 }
@@ -108,7 +87,7 @@ bool operator==(const Person& lhs, const Person& rhs) {
 ```rust
 struct Person {
     name: String,
-    // many other expensive-to-compare fields
+    // 许多其他比较开销较大的字段
 }
 
 impl PartialEq for Person {
@@ -116,7 +95,7 @@ impl PartialEq for Person {
         if std::ptr::eq(self, other) {
             return true;
         }
-        // compare other expensive-to-compare fields
+        // 比较其他比较开销较大的字段
 
         true
     }
@@ -127,23 +106,13 @@ impl Eq for Person {}
 
 </div>
 
-## Distinguishing between values in a relational structure
+## 在关系结构中区分值
 
-The other use is when relationships between values are represented using a data
-structure external to the values, such as when representing a labeled graph in
-which multiple nodes might share the same label, but have edges between
-different sets of other nodes. This differs from the earlier case because the
-pointer value is preserved.
+另一种用法是，当值之间的关系通过外部数据结构表示时，例如在表示带标签的图时，多个节点可能有相同的标签，但它们与其他节点的连接关系不同。这与前面的情况不同，因为这里会保留指针值。
 
-One real-world example of this is in the LLVM codebase, where occurrences of
-declarations, statements, and expressions in the AST are distinguished by object
-identity. For example, variable expressions (`class DeclRefExpr`) contain the
-[pointer to the occurrence of the declaration to which the variable
-refers](https://github.com/llvm/llvm-project/blob/ddc48fefe389789f64713b5924a03fb2b7961ef3/clang/include/clang/AST/Expr.h#L1265C1-L1275C16).
+一个现实中的例子是在 LLVM 代码库中，AST 中声明、语句和表达式的出现通过对象标识来区分。例如，变量表达式（`class DeclRefExpr`）包含了[指向其所引用声明的指针](https://github.com/llvm/llvm-project/blob/ddc48fefe389789f64713b5924a03fb2b7961ef3/clang/include/clang/AST/Expr.h#L1265C1-L1275C16)。
 
-Similarly, when comparing whether two variable declarations represent
-declarations of the same variable, [a pointer to some canonical `VarDecl` is
-used](https://github.com/llvm/llvm-project/blob/aa33c095617400a23a2b814c4defeb12e7761639/clang/lib/AST/Stmt.cpp#L1476-L1485):
+类似地，在比较两个变量声明是否代表同一个变量声明时，会[使用指向某个规范 `VarDecl` 的指针](https://github.com/llvm/llvm-project/blob/aa33c095617400a23a2b814c4defeb12e7761639/clang/lib/AST/Stmt.cpp#L1476-L1485)：
 
 ```cpp
 VarDecl *VarDecl::getCanonicalDecl();
@@ -160,24 +129,13 @@ bool CapturedStmt::capturesVariable(const VarDecl *Var) const {
 }
 ```
 
-This kind of use is often discouraged in C++ because of the risk of
-use-after-free bugs, but might be used in performance sensitive applications
-where either storing the memory to represent the mapping or the additional
-indirection to resolve an entity's value from its identity is cost prohibitive.
+这种用法在 C++ 中通常不被推荐，因为容易引发悬垂指针等 use-after-free 问题，但在对性能要求极高的场景下，如果存储映射关系或通过间接方式解析实体身份的开销过高，可能会采用这种方式。
 
-In Rust it is generally preferred to represent the identity of the objects with
-synthetic identifiers. This is in part as a technique for modeling
-self-referential data structures.
+在 Rust 中，通常推荐用合成标识符来表示对象身份。这也是建模自引用数据结构的一种技术。
 
-As an example, one popular Rust graph library
-[petgraph](https://docs.rs/petgraph/latest/petgraph/) uses `u32` as its default
-node identity type. This incurs the cost of an extra call to dereference the
-synthetic identifier to the label of the represented node as well as the extra
-memory required to store the mapping from nodes to labels.
+例如，流行的 Rust 图结构库 [petgraph](https://docs.rs/petgraph/latest/petgraph/) 默认使用 `u32` 作为节点标识类型。这会带来一次额外的查找以通过标识符获取节点标签，以及存储节点到标签映射所需的额外内存开销。
 
-A simplified graph representation using the same synthetic identifier technique
-would look like the following, which represents the node identities by their
-index in the vectors that represent the labels and the edges.
+使用相同合成标识符技术的简化图结构如下，通过节点在标签和边的向量中的索引来表示节点身份：
 
 ```rust
 enum Color {
@@ -186,17 +144,14 @@ enum Color {
 }
 
 struct Graph {
-    /// Maps from node id to node labels, which here are colors.
+    /// 从节点 id 到节点标签（此处为颜色）的映射
     nodes_labels: Vec<Color>,
 
-    /// Maps from node id to adjacent nodes ids.
+    /// 从节点 id 到相邻节点 id 的映射
     edges: Vec<Vec<usize>>,
 }
 ```
 
-If performance requirements make the use of synthetic identifiers unacceptable,
-then it may be necessary to use prevent the value from being moved. The [`Pin`
-and `PhantomPinned` structs](https://doc.rust-lang.org/std/pin/index.html) can
-be used to achieve an effect similar to deleting the move constructor in C++.
+如果性能需求无法接受合成标识符的开销，则可能需要防止值被移动。可以使用 [`Pin` 和 `PhantomPinned` 结构体](https://doc.rust-lang.org/std/pin/index.html) 来实现类似于 C++ 中删除移动构造函数的效果。
 
 {{#quiz object_identity.toml}}

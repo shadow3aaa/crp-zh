@@ -1,7 +1,7 @@
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt = """
-Consider the following C++ program.
+请考虑以下 C++ 程序。
 
 ```cpp
 template<typename T>
@@ -20,13 +20,12 @@ void printArea(T &shape) {
 }
 ```
 
-Which of the following snippets represents the most idiomatic translation of the
-`Scaled` template class into Rust?
+下列哪一段代码最符合惯用 Rust 风格地翻译 `Scaled` 模板类？
 """
 prompt.distractors = [
-# Omitting the trait.
+# 省略了 trait。
 #
-# In C++ you don't need an interface for working with templates.
+# 在 C++ 中，使用模板时不需要接口。
 """
 ```rust
 struct Scaled<T> {
@@ -41,9 +40,9 @@ impl<T> Scaled<T> {
 }
 ```
 """,
-# Putting the trait bound in the wrong place.
+# trait 约束放错了位置。
 #
-# This is where the concept requirement could reasonably go in C++.
+# 在 C++ 中，概念约束可以合理地放在这里。
 """
 ```rust
 trait Shape {
@@ -65,10 +64,9 @@ impl<T> Shape for Scaled<T> {
 }
 ```
 """,
-# Putting the trait bound on the struct.
+# trait 约束放在了结构体上。
 #
-# This constrains what can be used with Scaled without removing the need for
-# the bound in other places.
+# 这会限制 Scaled 能用的类型，但在其他地方仍然需要约束。
 """
 ```rust
 trait Shape {
@@ -107,9 +105,6 @@ impl<T: Shape> Shape for Scaled<T> {
 ```
 """
 context = """
-Rust needs to know that the type of `Scaled::shape` supports the `area` method,
-so a trait bound on the type parameter is necessary. Trait implementations are
-all or nothing, so the requirement applies to the whole implementation, not the
-individual method.
+Rust 需要知道 `Scaled::shape` 的类型支持 `area` 方法，因此类型参数上必须有 trait 约束。Trait 的实现是“全有或全无”的，所以约束作用于整个实现块，而不是单独的方法。
 """
 id = "3cb5759b-5fe0-491e-ac87-4ba455b26e8f"

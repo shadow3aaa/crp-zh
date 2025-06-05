@@ -1,20 +1,8 @@
-# User-defined conversions
+# 用户自定义类型转换
 
-In C++ user-defined conversions are created using [converting
-constructors](https://en.cppreference.com/w/cpp/language/converting_constructor)
-or [conversion
-functions](https://en.cppreference.com/w/cpp/language/cast_operator). Because
-converting constructors are opt-out (via the `explicit` specifier), implicit
-conversions occur with regularity in C++ code. In the following example both the
-assignments and the function calls make use of implicit conversions as provided
-by a converting constructor.
+在 C++ 中，用户自定义类型转换可以通过[转换构造函数](https://en.cppreference.com/w/cpp/language/converting_constructor)或[转换函数](https://en.cppreference.com/w/cpp/language/cast_operator)实现。由于转换构造函数默认是隐式的（可通过 `explicit` 关键字禁用），因此在 C++ 代码中隐式转换经常发生。如下例中，赋值和函数调用都利用了转换构造函数提供的隐式转换。
 
-Rust makes significantly less use of implicit conversions. Instead most
-conversions are explicit. The
-[`std::convert`](https://doc.rust-lang.org/std/convert/index.html) module
-provides several traits for working with user-defined conversions. In Rust, the
-below example makes use of explicit conversions by implementing the [`From`
-trait](https://doc.rust-lang.org/std/convert/trait.From.html).
+Rust 极少使用隐式转换，大多数转换都是显式的。[`std::convert`](https://doc.rust-lang.org/std/convert/index.html) 模块为用户自定义转换提供了多个 trait。在 Rust 中，下例通过实现 [`From` trait](https://doc.rust-lang.org/std/convert/trait.From.html)来实现显式转换。
 
 <div class="comparison">
 
@@ -55,11 +43,11 @@ fn process(w: Widget) {}
 
 fn main() {
     let w1: Widget = 1.into();
-    // For construction this is more idiomatic:
+    // 更符合习惯的写法：
     let w1b = Widget::from(1);
 
     let w2: Widget = (4, 5).into();
-    // For construction this is more idiomatic:
+    // 更符合习惯的写法：
     let w2b = Widget::from((4, 5));
 
     process(1.into());
@@ -69,23 +57,13 @@ fn main() {
 
 </div>
 
-The `into` method used above is provided via a [blanket
-implementations](https://doc.rust-lang.org/book/ch10-02-traits.html#using-trait-bounds-to-conditionally-implement-methods)
-for the [`Into trait`](https://doc.rust-lang.org/std/convert/trait.Into.html)
-for types that implement the `From` trait. Because of the existence of the
-[blanket
-implementation](https://doc.rust-lang.org/std/convert/trait.Into.html#impl-Into%3CU%3E-for-T),
-it is generally preferred to implement the `From` trait instead of the `Into`
-trait, and let the `Into` trait be provided by that blanket implementation.
+上例中的 `into` 方法是通过 [`Into trait`](https://doc.rust-lang.org/std/convert/trait.Into.html) 的[通用实现](https://doc.rust-lang.org/book/ch10-02-traits.html#using-trait-bounds-to-conditionally-implement-methods)提供的，只要类型实现了 `From` trait。由于有[通用实现](https://doc.rust-lang.org/std/convert/trait.Into.html#impl-Into%3CU%3E-for-T)，通常推荐只实现 `From` trait，而让 `Into` trait 由通用实现自动提供。
 
-## Conversion functions
+## 转换函数
 
-C++ conversion functions enable conversions in the other direction, from the
-defined class to another type.
+C++ 的转换函数支持将自定义类型转换为其他类型。
 
-To achieve the same in Rust, the `From` trait can be implemented in the other
-direction. At least one of the source type or the target type must be defined in
-the same crate as the trait implementation.
+在 Rust 中，可以反向实现 `From` trait 来达到同样的目的。实现 trait 时，源类型或目标类型至少有一个必须定义在当前 crate 中。
 
 <div class="comparison">
 
@@ -139,20 +117,13 @@ fn main() {
 
 </div>
 
-Conversion functions are is often used to implement the safe bool pattern in
-C++, [which is addressed in a different way in
-Rust](./promotions_and_conversions.md#safe-bools).
+转换函数在 C++ 中常用于实现 safe bool 模式，[而在 Rust 中有不同的处理方式](./promotions_and_conversions.md#safe-bools)。
 
+## 借用转换
 
-## Borrowing conversions
+`From` 和 `Into` trait 的方法会取得被转换值的所有权。在 C++ 中，如果不希望转移所有权，可以让转换函数接收和返回引用。
 
-The methods in the `From` and `Into` traits take ownership of the values to be
-converted. When this is not desired in C++, the conversion function can just
-take and return references.
-
-To achieve the same in Rust the [`AsRef`
- trait](https://doc.rust-lang.org/std/convert/trait.AsRef.html) or [`AsMut`
- trait](https://doc.rust-lang.org/std/convert/trait.AsMut.html) are used.
+在 Rust 中，可以使用 [`AsRef` trait](https://doc.rust-lang.org/std/convert/trait.AsRef.html) 或 [`AsMut` trait](https://doc.rust-lang.org/std/convert/trait.AsMut.html) 实现类似功能。
 
 <div class="comparison">
 
@@ -207,11 +178,7 @@ fn main() {
 
 </div>
 
-It is common to use `AsRef` or `AsMut` as a trait bound in function definitions.
-Using generics with an `AsRef` or `AsMut` bound allows clients to call the
-functions with anything that can be cheaply viewed as the type that the function
-wants to work with. Using this technique, the above definition of `process`
-would be defined as in the following example.
+在函数定义中，常用 `AsRef` 或 `AsMut` 作为 trait bound。用泛型配合 `AsRef` 或 `AsMut`，可以让调用者传入任何可以高效视为目标类型的值。用这种技巧，上例中的 `process` 可以这样定义：
 
 ```rust
 # struct Person {
@@ -237,21 +204,13 @@ fn main() {
 }
 ```
 
-This technique is often used with functions that take file system paths, so that
-literal strings can more easily be used as paths.
+这种技巧常用于处理文件路径的函数，使得字符串字面量也能方便地作为路径传递。
 
-## Fallible conversions
+## 可失败的转换
 
-In C++ when conversions might fail it is possible (though usually discouraged)
-to throw an exception from the converting constructor or converting function.
+在 C++ 中，如果转换可能失败，可以（虽然通常不推荐）在转换构造函数或转换函数中抛出异常。
 
-Error handling in Rust [does not use exceptions](./exceptions.md). Instead
-the [`TryFrom` trait](https://doc.rust-lang.org/std/convert/trait.TryFrom.html)
-and [`TryInto` trait](https://doc.rust-lang.org/std/convert/trait.TryInto.html)
-are used for fallible conversions. These traits differ from `From` and `Into` in
-that they return a `Result`, which may indicate a failing case. When a
-conversion may fail one should implement `TryFrom` and rely on the client to
-call `unwrap` on the result, rather than panic in a `From` implementation.
+Rust 的错误处理[不使用异常](./exceptions.md)。对于可失败的转换，使用 [`TryFrom` trait](https://doc.rust-lang.org/std/convert/trait.TryFrom.html) 和 [`TryInto` trait](https://doc.rust-lang.org/std/convert/trait.TryInto.html)。这两个 trait 与 `From` 和 `Into` 的区别在于它们返回 `Result`，可以表示失败情况。如果转换可能失败，应实现 `TryFrom`，并让调用者决定是否调用 `unwrap`，而不是在 `From` 实现中 panic。
 
 <div class="comparison">
 
@@ -322,26 +281,16 @@ fn main() {
 
 </div>
 
-Just like with `From` and `Into`, there is a [blanket
-implementation](https://doc.rust-lang.org/std/convert/trait.TryInto.html#impl-TryInto%3CU%3E-for-T)
-for `TryInto` for everything that implements `TryFrom`.
+与 `From` 和 `Into` 类似，[TryInto trait](https://doc.rust-lang.org/std/convert/trait.TryInto.html#impl-TryInto%3CU%3E-for-T) 也有通用实现，适用于所有实现了 `TryFrom` 的类型。
 
-## Implicit conversions
+## 隐式转换
 
-Rust does have one kind of user-defined implicit conversion, called [deref
-coercions](https://doc.rust-lang.org/std/ops/trait.Deref.html#deref-coercion),
-provided by the [`Deref`
-trait](https://doc.rust-lang.org/std/ops/trait.Deref.html) and
-[`DerefMut`trait](https://doc.rust-lang.org/std/ops/trait.DerefMut.html). These
-coercions exist for making pointer-like types more ergonomic to use.
+Rust 只有一种用户自定义的隐式转换，称为 [deref 强制转换](https://doc.rust-lang.org/std/ops/trait.Deref.html#deref-coercion)，由 [`Deref` trait](https://doc.rust-lang.org/std/ops/trait.Deref.html) 和 [`DerefMut` trait](https://doc.rust-lang.org/std/ops/trait.DerefMut.html) 提供。这种转换让指针类型的使用更加简洁。
 
-An [example](https://doc.rust-lang.org/book/ch15-02-deref.html) of implementing
-the traits for a custom pointer-like type is given in the Rust book.
+在 Rust 官方书籍中有[实现自定义指针类型 deref 的示例](https://doc.rust-lang.org/book/ch15-02-deref.html)。
 
-## Summary
+## 总结
 
-A summary of when to use which kind of conversion interface is given in the
-documentation for the [`std::convert`
-module](https://doc.rust-lang.org/std/convert/index.html).
+关于各种转换接口的使用场景，可参考 [`std::convert` 模块](https://doc.rust-lang.org/std/convert/index.html)的文档。
 
 {{#quiz user-defined_conversions.toml}}

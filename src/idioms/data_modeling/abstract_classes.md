@@ -1,18 +1,8 @@
-# Abstract classes, interfaces, and dynamic dispatch
+# 抽象类、接口与动态分发
 
-In C++ when an interface will be used with dynamic dispatch to resolve invoked
-methods, the interface is defined using an abstract class. Types that implement
-the interface inherit from the abstract class. In Rust the interface is given by
-a *trait*, which is then implemented for the types that support that trait.
-Programs can then be written over *trait objects* that use that trait as their
-base type.
+在 C++ 中，当接口需要通过动态分发来解析被调用的方法时，接口通常使用抽象类来定义。实现该接口的类型通过继承抽象类来实现。在 Rust 中，接口由 *trait*（特征）定义，然后为支持该特征的类型实现该 trait。程序可以基于 *trait object*（特征对象）来编写，以该 trait 作为其基类型。
 
-The following example defines an interface, two implementations of that
-interface, and a function that takes an argument that satisfies the interface.
-In C++ the interface is defined with an abstract class with pure virtual
-methods, and in Rust the interface is defined with a trait. In both languages,
-the function (`printArea` in C++ and `print_area` in Rust) invokes a method
-using dynamic dispatch.
+下面的示例定义了一个接口、该接口的两个实现，以及一个接受满足该接口参数的函数。在 C++ 中，接口通过带有纯虚函数的抽象类定义；在 Rust 中，接口通过 trait 定义。在这两种语言中，函数（C++ 中为 `printArea`，Rust 中为 `print_area`）都通过动态分发调用方法。
 
 <div class="comparison">
 
@@ -20,14 +10,14 @@ using dynamic dispatch.
 #include <iostream>
 #include <memory>
 
-// Define an abstract class for an interface
+// 定义一个抽象类作为接口
 struct Shape {
   Shape() = default;
   virtual ~Shape() = default;
   virtual double area() = 0;
 };
 
-// Implement the interface for a concrete class
+// 为具体类实现接口
 struct Triangle : public Shape {
   double base;
   double height;
@@ -40,7 +30,7 @@ struct Triangle : public Shape {
   }
 };
 
-// Implement the interface for a concrete class
+// 为具体类实现接口
 struct Rectangle : public Shape {
   double width;
   double height;
@@ -53,7 +43,7 @@ struct Rectangle : public Shape {
   }
 };
 
-// Use an object via a reference to the interface
+// 通过接口引用使用对象
 void printArea(Shape &shape) {
   std::cout << shape.area() << std::endl;
 }
@@ -63,8 +53,7 @@ int main() {
 
   printArea(triangle);
 
-  // Use an object via an owned pointer to the
-  // interface
+  // 通过拥有指针使用接口对象
   std::unique_ptr<Shape> shape;
   if (true) {
     shape = std::make_unique<Rectangle>(1.0, 1.0);
@@ -73,13 +62,13 @@ int main() {
         std::move(triangle));
   }
 
-  // Convert to a reference to the interface
+  // 转换为接口引用
   printArea(*shape);
 }
 ```
 
 ```rust
-// Define an interface
+// 定义一个接口
 trait Shape {
     fn area(&self) -> f64;
 }
@@ -89,7 +78,7 @@ struct Triangle {
     height: f64,
 }
 
-// Implement the interface for a concrete type
+// 为具体类型实现接口
 impl Shape for Triangle {
     fn area(&self) -> f64 {
         0.5 * self.base * self.height
@@ -101,14 +90,14 @@ struct Rectangle {
     height: f64,
 }
 
-// Implement the interface for a concrete type
+// 为具体类型实现接口
 impl Shape for Rectangle {
     fn area(&self) -> f64 {
         self.width * self.height
     }
 }
 
-// Use a value via a reference to the interface
+// 通过接口引用使用值
 fn print_area(shape: &dyn Shape) {
     println!("{}", shape.area());
 }
@@ -121,8 +110,7 @@ fn main() {
 
     print_area(&triangle);
 
-    // Use a value via an owned pointer to the
-    // interface
+    // 通过拥有指针使用接口值
     let shape: Box<dyn Shape> = if true {
         Box::new(Rectangle {
             width: 1.0,
@@ -132,71 +120,36 @@ fn main() {
         Box::new(triangle)
     };
 
-    // Convert to a reference to the interface
+    // 转换为接口引用
     print_area(shape.as_ref());
 }
 ```
 
 </div>
 
-There are several places where the Rust implementation differs slightly from the
-C++ implementation.
+Rust 的实现与 C++ 有一些细微差别。
 
-In Rust, a trait's methods are always visible whenever the trait itself is
-visible. Additionally, the fact that a type implements a trait is always visible
-whenever both the trait and the type are visible. These properties of Rust
-explain the lack of visibility declarations in places where one might find them
-in C++.
+在 Rust 中，只要 trait 可见，其方法也总是可见的。此外，只要 trait 和类型都可见，类型实现 trait 的事实也是可见的。这些 Rust 的特性解释了在某些 C++ 需要声明可见性的地方，Rust 不需要类似声明。
 
-In C++, to associate methods with a type rather than value of that type, you use
-the `static` keyword. In Rust, non-static methods take an explicit `self` parameter.
-This syntactic choice makes it possible to indicate (in way similar to other parameters) whether the
-method mutates the object (by taking `&mut self` instead of `&self`) and whether
-it takes ownership of the object (by taking `self` instead of `&self`).
+在 C++ 中，如果要将方法与类型本身（而不是类型的值）关联，需要使用 `static` 关键字。而在 Rust 中，非静态方法需要显式的 `self` 参数。这种语法选择使得可以像其他参数一样，明确指示方法是否会修改对象（通过 `&mut self` 而不是 `&self`），以及是否获取对象所有权（通过 `self` 而不是 `&self`）。
 
-Rust methods do not need to be declared as virtual. Because of differences in
-vtable representation, all methods for a type are available for dynamic
-dispatch. Types of values that use vtables are indicated with the `dyn` keyword.
-This is further described [below](#vtables-and-rust-trait-object-types).
+Rust 的方法不需要声明为 virtual。由于 vtable 表示的差异，所有类型的方法都可以用于动态分发。使用 vtable 的值类型通过 `dyn` 关键字标识。详见[下文](#vtables-and-rust-trait-object-types)。
 
-Additionally, Rust does not have an equivalent for the virtual destructor
-declaration because in Rust every vtable includes the drop behavior (whether
-given by a user defined `Drop` implementation or not) required for the value.
+此外，Rust 没有虚析构函数声明的等价物，因为在 Rust 中，每个 vtable 都包含了销毁行为（无论是用户自定义的 `Drop` 实现还是默认行为）。
 
-## Vtables and Rust trait object types
+## Vtable 与 Rust 特征对象类型
 
-C++ and Rust both requires some kind of indirection to perform dynamic dispatch
-against an interface. In C++ this indirection takes the form of a pointer to the
-abstract class (instead of the derived concrete class), making use of a vtable
-to resolve the virtual method.
+C++ 和 Rust 都需要某种间接方式来对接口进行动态分发。在 C++ 中，这种间接性表现为指向抽象类的指针（而不是派生的具体类），并利用 vtable 来解析虚函数。
 
-In the above Rust example, the type `dyn Shape` is the type of a trait object
-for the `Shape` trait. A trait object includes a vtable along with the
-underlying value.
+在上面的 Rust 示例中，`dyn Shape` 类型就是 `Shape` trait 的特征对象类型。特征对象包含了 vtable 以及底层值。
 
-In C++ all objects whose class inherits from a class with a virtual method have
-a vtable in their representation, whether dynamic dispatch is used or not.
-Pointers or references to objects are the same size as pointers to objects
-without virtual methods, but every object includes its vtable.
+在 C++ 中，所有继承自带有虚函数类的对象，其表示中都包含 vtable，无论是否实际使用动态分发。指向对象的指针或引用与没有虚函数的对象指针大小相同，但每个对象都包含自己的 vtable。
 
-In Rust, vtables are present only when values are represented as trait objects.
-The reference to the trait object is twice the size of a normal reference since
-it includes both the pointer to the value and the pointer to the vtable. In the
-Rust example above, the local variable `triangle` in `main` does not have a
-vtable in its representation, but when the reference to it is converted to a
-reference to a trait object (so that it can be passed to `print_area`), that
-does include a pointer to the vtable.
+在 Rust 中，只有当值被表示为特征对象时才包含 vtable。特征对象的引用比普通引用大一倍，因为它包含了指向值的指针和指向 vtable 的指针。在上面的 Rust 示例中，`main` 函数中的局部变量 `triangle` 并不包含 vtable，但当其引用被转换为特征对象引用（以便传递给 `print_area`）时，就包含了 vtable 指针。
 
-Additionally, just as abstract classes in C++ cannot be used as the type of a
-local variable, the type of a parameter of a function, or the type of a return
-value of a function, trait object types in Rust cannot be used in corresponding
-contexts. In Rust, this is enforced by the type `dyn Shape` not implementing the
-`Sized` marker trait, preventing it from being used in contexts that require
-knowing the size of a type statically.
+此外，正如 C++ 中抽象类不能作为局部变量、函数参数或返回值类型一样，Rust 中的特征对象类型在对应场景下也不能使用。在 Rust 中，这是通过 `dyn Shape` 不实现 `Sized` 标记 trait 来强制的，从而禁止其用于需要静态已知大小的场景。
 
-The following example shows some places where a trait object type can and cannot
-be used due to not implementing `Sized`. The uses forbidden in Rust would also
-be forbidden in C++ because `Shape` is an abstract class.
+下面的示例展示了由于未实现 `Sized`，特征对象类型在某些场景下可以或不可以使用。Rust 中禁止的用法在 C++ 中同样会被禁止，因为 `Shape` 是抽象类。
 
 ```rust
 # trait Shape {
@@ -215,61 +168,42 @@ be forbidden in C++ because `Shape` is an abstract class.
 # }
 #
 fn main() {
-    // Local variables must have a known size.
+    // 局部变量必须有已知大小。
     // let v: dyn Shape = Triangle { base: 1.0, height: 1.0 };
 
-    // References always have a known size.
+    // 引用总是有已知大小。
     let shape: &dyn Shape = &Triangle {
         base: 1.0,
         height: 1.0,
     };
-    // Boxes also always have a known size.
+    // Box 也总是有已知大小。
     let boxed_shape: Box<dyn Shape> = Box::new(Triangle {
         base: 1.0,
         height: 1.0,
     });
 
-    // Types like Option<T> the value of type T directly, and so also need to
-    // know the size of T.
+    // 类似 Option<T> 这样的类型直接存储 T 的值，因此也需要知道 T 的大小。
     // let v: Option<dyn Shape> = Some(Triangle { base: 1.0, height: 1.0 });
 }
 
-// Parameter types must have a known size.
+// 参数类型必须有已知大小。
 // fn print_area(shape: dyn Shape) { }
 fn print_area(shape: &dyn Shape) {}
 ```
 
-The decision to include the vtable in the reference instead of in the value is
-one part of what makes it reasonable to use traits both for polymorphism via
-dynamic dispatch and for [polymorphism via static dispatch, where one would use
-concepts in C++](./concepts.md).
+将 vtable 包含在引用中而不是值中，是 Rust 能够同时用 trait 支持动态分发多态和[静态分发多态（C++ 中通常用 concepts 实现）](./concepts.md)的原因之一。
 
-## Limitations of trait objects in Rust
+## Rust 中特征对象的限制
 
-In Rust, not all traits can be used as the base trait for trait objects. The
-most commonly encountered restriction is that traits that require knowledge of
-the object's size via a `Sized` supertrait are not `dyn`-compatible. There are
-[additional
-restrictions](https://doc.rust-lang.org/reference/items/traits.html#dyn-compatibility).
+在 Rust 中，并非所有 trait 都能作为特征对象的基 trait。最常见的限制是，要求通过 `Sized` 超 trait 获得对象大小信息的 trait 不能用于 `dyn`。还有[其他限制](https://doc.rust-lang.org/reference/items/traits.html#dyn-compatibility)。
 
-## Trait objects and lifetimes
+## 特征对象与生命周期
 
-Objects which are used with dynamic dispatch may contain pointers or references
-to other objects. In C++ the lifetimes of those references must be tracked
-manually by the programmer.
+使用动态分发的对象可能包含指向其他对象的指针或引用。在 C++ 中，这些引用的生命周期需要程序员手动管理。
 
-Rust checks the bounds on the lifetimes of references that the trait objects may
-contain. If the bounds are not given explicitly, they are determined according
-to the [lifetime elision
-rules](https://doc.rust-lang.org/reference/lifetime-elision.html#r-lifetime-elision.trait-object).
-The bound is part of the type of the trait object.
+Rust 会检查特征对象可能包含的引用的生命周期界限。如果没有显式给出，则会根据[生命周期省略规则](https://doc.rust-lang.org/reference/lifetime-elision.html#r-lifetime-elision.trait-object)推断。生命周期界限是特征对象类型的一部分。
 
-Usually the elision rules pick the correct lifetime bound. Sometimes, the rules
-result in surprising error messages from the compiler. In those situations or
-when the compiler cannot determine which lifetime bound to assign, the bound may
-be given manually. The following example shows explicitly what the inferred
-lifetimes are for a structure storing a trait object and for the `print_area`
-function.
+通常，省略规则会推断出正确的生命周期界限。有时，这些规则会导致编译器给出令人困惑的错误信息。在这种情况下，或者编译器无法确定应分配哪个生命周期界限时，可以手动指定。下面的示例明确展示了结构体存储特征对象和 `print_area` 函数推断出的生命周期。
 
 ```rust
 # trait Shape {
@@ -289,8 +223,7 @@ function.
 #
 struct Scaled {
     scale: f64,
-    // 'static is the lifetime that would be inferred by the lifetime elision
-    // rule [lifetime-elision.trait-object.default].
+    // 'static 是生命周期省略规则 [lifetime-elision.trait-object.default] 推断出的生命周期。
     shape: Box<dyn Shape + 'static>,
 }
 
@@ -300,10 +233,7 @@ impl Shape for Scaled {
     }
 }
 
-// These are the lifetimes that would be inferred by the lifetime elision rule
-// [lifetime-elision.function.implicit-lifetime-parameters] for the reference
-// and [lifetime-elision.trait-object.containing-type-unique] for the trait
-// bound.
+// 这些是生命周期省略规则 [lifetime-elision.function.implicit-lifetime-parameters]（针对引用）和 [lifetime-elision.trait-object.containing-type-unique]（针对 trait 约束）推断出的生命周期。
 fn print_area<'a>(shape: &'a (dyn Shape + 'a)) {
     println!("{}", shape.area());
 }

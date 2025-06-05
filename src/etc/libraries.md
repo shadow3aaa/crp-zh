@@ -1,43 +1,30 @@
-# Libraries
+# 库
 
-C++ programs tend to either use libraries that come with operating system
-distributions or that are vendored.
+C++ 程序通常使用操作系统发行版自带的库，或者将库直接集成到项目中。
 
-Rust programs tend to rely on a central registry of Rust libraries ("crates")
-called [crates.io](https://crates.io/) (along with a central documentation
-repository created from the in-code documentation of those crates called
-[docs.rs](https://docs.rs/)). Dependencies on crates are managed using the
-[Cargo package manager](https://doc.rust-lang.org/cargo/index.html).
+Rust 程序则更倾向于依赖一个名为 [crates.io](https://crates.io/) 的 Rust 库（“crate”）中央注册表（以及一个由这些 crate 的代码内文档生成的中央文档库 [docs.rs](https://docs.rs/)）。对 crate 的依赖通过 [Cargo 包管理器](https://doc.rust-lang.org/cargo/index.html) 进行管理。
 
-[Lib.rs](https://lib.rs/) is a good resource for finding popular crates organized by category.
+[Lib.rs](https://lib.rs/) 是一个很好的资源，可以按类别查找流行的 crate。
 
-## Some specific alternatives
+## 一些具体的替代方案
 
-| C++ library                   | Rust alternative                                            |
-|-------------------------------|-------------------------------------------------------------|
-| STL UTF-16 and UTF-32 strings | [widestring](https://docs.rs/widestring/latest/widestring/) |
-| STL random                    | [rand](https://github.com/rust-random/rand)                 |
-| STL regex                     | [regex](https://github.com/rust-lang/regex)                 |
+| C++ 库                        | Rust 替代库                                               |
+|-------------------------------|-----------------------------------------------------------|
+| STL UTF-16 和 UTF-32 字符串   | [widestring](https://docs.rs/widestring/latest/widestring/) |
+| STL 随机数                    | [rand](https://github.com/rust-random/rand)               |
+| STL 正则表达式                | [regex](https://github.com/rust-lang/regex)               |
 | Boost.Test                    | [cargo test](https://doc.rust-lang.org/book/ch11-01-writing-tests.html) |
-| pybind11                      | [PyO3](https://pyo3.rs/)                                    |
-| OpenSSL                       | [rustls](https://github.com/rustls/rustls)                  |
+| pybind11                      | [PyO3](https://pyo3.rs/)                                  |
+| OpenSSL                       | [rustls](https://github.com/rustls/rustls)                |
 <!-- | STL `multiset`                |                                                             |
 | STL `multimap`                |                                                             | -->
 
-If there is a C++ library that you use where you cannot find a Rust alternative,
-please leave feedback using the link below, letting us know the name and purpose
-of the library.
+如果你使用的某个 C++ 库找不到对应的 Rust 替代库，请通过下方的反馈链接告知我们该库的名称及用途。
 
-## Supply chain management
+## 供应链管理
 
-In situations where managing the library supply chain is important, Cargo can be
-used either with [custom self-managed or organization-managed
-registries](https://doc.rust-lang.org/cargo/reference/registries.html) or with
-[vendored versions of dependencies fetched from
-crates.io](https://doc.rust-lang.org/cargo/commands/cargo-vendor.html).
+在需要管理库供应链的场景下，Cargo 可以配合 [自定义的自管或组织托管注册表](https://doc.rust-lang.org/cargo/reference/registries.html) 或 [从 crates.io 获取的依赖库的本地化版本](https://doc.rust-lang.org/cargo/commands/cargo-vendor.html) 使用。
 
-Both approaches provide mechanisms for reviewing dependencies as part supply
-chain security.
+这两种方式都为依赖项审查和供应链安全提供了机制。
 
-Solutions for supply chain security that do not involve vendoring or custom
-registries are [in progress](https://github.com/rust-lang/rfcs/pull/3724).
+不涉及本地化或自定义注册表的供应链安全解决方案[正在推进中](https://github.com/rust-lang/rfcs/pull/3724)。

@@ -1,17 +1,12 @@
-# Optional return values
+# 可选返回值
 
-One idiom in C++ for optionally producing a result from a method or function is
-to use a reference parameter along with a boolean or integer return value to
-indicate whether the result was produced. This might be done for the same
-reasons as for using [out parameters for multiple return
-values](./multiple_return.md):
+在 C++ 中，一种用于可选地从方法或函数产生结果的惯用法是，使用引用参数配合布尔值或整数返回值来指示结果是否被产生。这样做的原因与[用于多返回值的 out 参数](./multiple_return.md)类似：
 
-- compatibility with versions of C++ earlier than C++11,
-- working in a codebase that uses C-style of C++, and
-- performance concerns.
+- 兼容早于 C++11 的 C++ 版本，
+- 适用于采用 C 风格的 C++ 代码库，
+- 性能方面的考虑。
 
-The idiomatic Rust approach for optionally returning a value is to return a
-value of type [`Option`](https://doc.rust-lang.org/std/option/index.html).
+Rust 中用于可选返回值的惯用做法是返回 [`Option`](https://doc.rust-lang.org/std/option/index.html) 类型的值。
 
 <div class="comparison">
 
@@ -76,25 +71,18 @@ fn main() {
 
 </div>
 
-When there is useful information to provide in the failing case, the [`Result`
-type](https://doc.rust-lang.org/std/result/) can be used instead. The [chapter
-on error handling](../exceptions.md) describes the use of `Result`.
+当在失败情况下有有用的信息需要返回时，可以使用 [`Result` 类型](https://doc.rust-lang.org/std/result/)。详见[错误处理章节](../exceptions.md)对 `Result` 的介绍。
 
-## Returning a pointer
+## 返回指针
 
-When the value being returned is a pointer, another common idiom in C++ is to
-use `nullptr` to represent the optional case. In the Rust translation of that
-idiom, `Option` is also used, along with a reference type, such as `&` or `Box`.
-See [the chapter on using `nullptr` as a sentinel
-value](../null/sentinel_values.md#nullptr) for more details.
+当返回值是指针时，C++ 中的另一种常见惯用法是用 `nullptr` 表示可选情况。在 Rust 中，这一惯用法的对应实现也是用 `Option`，配合引用类型（如 `&` 或 `Box`）。详见[将 `nullptr` 作为哨兵值章节](../null/sentinel_values.md#nullptr)。
 
-## Problems with the direct transliteration
+## 直接翻译的弊端
 
-It is possible to transliterate the original example that uses out parameters to
-Rust, but the resulting code is not idiomatic.
+可以将使用 out 参数的原始示例直接翻译为 Rust，但这样得到的代码并不符合 Rust 的惯用风格。
 
 ```rust
-// NOT IDIOIMATIC RUST
+// 非惯用 Rust
 fn safe_divide(dividend: u32, divisor: u32, quotient: &mut u32) -> bool {
     if divisor != 0 {
         *quotient = dividend / divisor;
@@ -105,7 +93,7 @@ fn safe_divide(dividend: u32, divisor: u32, quotient: &mut u32) -> bool {
 }
 
 fn go(dividend: u32, divisor: u32) {
-    let mut quotient: u32 = 0; // initliazed to arbitrary value
+    let mut quotient: u32 = 0; // 初始化为任意值
     if safe_divide(dividend, divisor, &mut quotient) {
         println!("{}", quotient);
     } else {
@@ -119,13 +107,11 @@ fn main() {
 }
 ```
 
-This shares the same problems as with using out-parameters for [multiple return
-values](./multiple_return.md#problems-with-the-direct-transliteration).
+这与[多返回值 out 参数直接翻译](./multiple_return.md#problems-with-the-direct-transliteration)存在相同的问题。
 
-## Similarities with C++ since C++17
+## C++17 及之后的相似做法
 
-C++17 and later offer `std::optional`, which can be used to express optional
-return values in a way similar to the idiomatic Rust example.
+C++17 及之后版本提供了 `std::optional`，可以用来表达可选返回值，其用法与 Rust 的惯用示例类似。
 
 ```cpp
 #include <iostream>
@@ -154,9 +140,9 @@ int main() {
 }
 ```
 
-## Helpful `Option` utilities
+## 有用的 `Option` 工具方法
 
-Rust provides several syntactic sugars for simplifying use of functions that return `Option`. If a failure should be propagated to the caller, then use the `?` operator:
+Rust 提供了多种语法糖来简化对返回 `Option` 的函数的使用。如果需要将失败情况传递给调用者，可以使用 `?` 运算符：
 
 ```rust
 # fn safe_divide(dividend: u32, divisor: u32) -> Option<u32> {
@@ -174,8 +160,7 @@ fn go(dividend: u32, divisor: u32) -> Option<()> {
 }
 ```
 
-If `None` should not be propagated, it is sometimes clearer to use [`let-else`
-syntax](https://doc.rust-lang.org/rust-by-example/flow_control/let_else.html):
+如果不需要传递 `None`，有时使用 [`let-else` 语法](https://doc.rust-lang.org/rust-by-example/flow_control/let_else.html)会更清晰：
 
 ```rust
 # fn safe_divide(dividend: u32, divisor: u32) -> Option<u32> {
@@ -200,13 +185,11 @@ fn go(dividend: u32, divisor: u32) {
 # }
 ```
 
-If there is a default value that should be used in the `None` case, the
-[`Option::unwrap_or`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or),
-[`Option::unwrap_or_else`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_else),
-[`Option::unwrap_or_default`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_default),
-or
-[`Option::unwrap`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap)
-methods can be used:
+如果在 `None` 情况下需要使用默认值，可以使用
+[`Option::unwrap_or`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or)、
+[`Option::unwrap_or_else`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_else)、
+[`Option::unwrap_or_default`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_default) 或
+[`Option::unwrap`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap) 方法：
 
 ```rust
 # fn safe_divide(dividend: u32, divisor: u32) -> Option<u32> {
@@ -223,16 +206,16 @@ fn expensive_computation() -> u32 {
 }
 
 fn go(dividend: u32, divisor: u32) {
-    // If None, returns the given value.
+    // 如果为 None，返回给定值。
     let result = safe_divide(dividend, divisor).unwrap_or(0);
 
-    // If None, returns the result of calling the given function.
+    // 如果为 None，返回调用给定函数的结果。
     let result2 = safe_divide(dividend, divisor).unwrap_or_else(expensive_computation);
 
-    // If None, returns Default::default(), which is 0 for u32.
+    // 如果为 None，返回 Default::default()，对于 u32 即为 0。
     let result3 = safe_divide(dividend, divisor).unwrap_or_default();
 
-    // If None, panics. Prefer the other methods!
+    // 如果为 None，panic。更推荐使用其他方法！
     // let result3 = safe_divide(dividend, divisor).unwrap();
 }
 #
@@ -242,34 +225,23 @@ fn go(dividend: u32, divisor: u32) {
 # }
 ```
 
-In performance-sensitive code where you have manually checked that the result is
-guaranteed to be `Some`,
-[`Option::unwrap_unchecked`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_unchecked)
-can be used, but is an unsafe method.
+在对性能敏感的代码中，如果你已经手动确保结果一定为 `Some`，可以使用
+[`Option::unwrap_unchecked`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_unchecked)，但这是一个不安全的方法。
 
-There are [additional utility
-methods](https://doc.rust-lang.org/std/option/#boolean-operators) that enable
-concise handling of `Option` values, which this book covers in the chapter on
-[exceptions and error handling](../exceptions.md).
+还有[更多的工具方法](https://doc.rust-lang.org/std/option/#boolean-operators)可以简洁地处理 `Option` 值，详见本书[异常与错误处理章节](../exceptions.md)。
 
-## An alternative approach
+## 替代方案
 
-An alternative approach in Rust to returning optional values is to require that
-the caller of a function prove that the value with which they call a function
-will not result in the failing case.
+Rust 中另一种返回可选值的方式是，要求函数调用者证明其传入的参数不会导致失败情况。
 
-For the above safe division example, this involves the caller guaranteeing that
-the provided divisor is non-zero. In the following example this is done with a
-dynamic check. In other contexts the evidence needed may be available
-statically, provided from callers further upstream, or used more than once. In
-those cases, this approach reduces both runtime cost and code complexity.
+对于上述安全除法的例子，这意味着调用者要保证传入的除数不为零。如下例中通过动态检查实现。在其他场景下，所需的证明可能可以静态获得，由更上游的调用者提供，或被多次使用。在这些情况下，这种方式可以减少运行时开销和代码复杂度。
 
 ```rust
 use std::convert::TryFrom;
 use std::num::NonZero;
 
 fn safe_divide(dividend: u32, divisor: NonZero<u32>) -> u32 {
-    // This is more efficient because the overflow check is skipped.
+    // 更高效，因为省略了溢出检查。
     dividend / divisor
 }
 

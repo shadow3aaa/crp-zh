@@ -1,137 +1,79 @@
-# Type equivalents
+# 类型等价
 
-The type equivalents listed in this document are equivalent for the purposes of
-programming in Rust as one would program in C++. They are not necessarily
-equivalent in terms of being useful for interacting with C or C++ programs via
-an FFI. For types that are useful for interoperability with C or C++, see the
-[Rust `std::ffi` module
-documentation](https://doc.rust-lang.org/std/ffi/index.html) and the [FFI
-documentation in the Rustonomicon](https://doc.rust-lang.org/nomicon/ffi.html).
+本文件中列出的类型等价关系，是针对在 Rust 中以类似 C++ 的方式编程时的等价性。它们不一定适用于通过 FFI 与 C 或 C++ 程序交互的场景。若需与 C 或 C++ 互操作的类型，请参阅 [Rust `std::ffi` 模块文档](https://doc.rust-lang.org/std/ffi/index.html) 以及 [Rustonomicon 中的 FFI 文档](https://doc.rust-lang.org/nomicon/ffi.html)。
 
-## Primitive types
+## 基本类型
 
-### Integer types
+### 整数类型
 
-In C++, many of the integer types (like `int` and `long`) have implementation
-defined widths. In Rust, integer types are always specified with their widths,
-much like the types in `<cstdint>` in C++. When it isn't clear what integer type
-to use, [it is common to default to `i32`, which is the type that Rust defaults
-to for integer
-literals](https://doc.rust-lang.org/book/ch03-02-data-types.html#integer-types).
+在 C++ 中，许多整数类型（如 `int` 和 `long`）的宽度由实现定义。而在 Rust 中，整数类型总是带有明确的宽度，类似于 C++ 中 `<cstdint>` 里的类型。当不确定使用哪种整数类型时，[通常默认使用 `i32`，这也是 Rust 整数字面量的默认类型](https://doc.rust-lang.org/book/ch03-02-data-types.html#integer-types)。
 
-| C++ type   | Rust type |
-|------------|-----------|
-| `uint8_t`  | `u8`      |
-| `uint16_t` | `u16`     |
-| `uint32_t` | `u32`     |
-| `uint64_t` | `u64`     |
-| `int8_t`   | `i8`      |
-| `int16_t`  | `i16`     |
-| `int32_t`  | `i32`     |
-| `int64_t`  | `i64`     |
-| `size_t`   | `usize`   |
-|            | `isize`   |
+| C++ 类型    | Rust 类型 |
+|-------------|-----------|
+| `uint8_t`   | `u8`      |
+| `uint16_t`  | `u16`     |
+| `uint32_t`  | `u32`     |
+| `uint64_t`  | `u64`     |
+| `int8_t`    | `i8`      |
+| `int16_t`   | `i16`     |
+| `int32_t`   | `i32`     |
+| `int64_t`   | `i64`     |
+| `size_t`    | `usize`   |
+|             | `isize`   |
 
-In C++ `size_t` is conventionally used only for sizes and offsets. The same is
-true in Rust for `usize`, which is the pointer-sized integer type. The `isize`
-type is the signed equivalent of `usize` and has no direct equivalent in C++.
-The `isize` type is typically only used to represent pointer offsets.
+在 C++ 中，`size_t` 通常只用于表示大小和偏移量。Rust 中的 `usize` 也是指针宽度的整数类型，使用方式相同。`isize` 是 `usize` 的有符号对应类型，在 C++ 中没有直接等价类型，通常仅用于表示指针偏移。
 
-### Floating point types
+### 浮点类型
 
-As with integer types in C++, the floating point types `float`, `double`, and
-`long double` have implementation defined widths. C++23 introduced types
-guaranteed to be IEEE 754 floats of specific widths. Of those, `float32_t` and
-`float64_t` correspond to what is usually expected from `float` and `double`.
-Rust's floating point types are analogous to these.
+与 C++ 中的整数类型类似，`float`、`double` 和 `long double` 的宽度由实现定义。C++23 引入了保证为特定位宽 IEEE 754 浮点数的类型，其中 `float32_t` 和 `float64_t` 分别对应通常的 `float` 和 `double`。Rust 的浮点类型与这些类似。
 
-| C++ type     | Rust type |
-|--------------|-----------|
-| `float16_t`  |           |
-| `float32_t`  | `f32`     |
-| `float64_t`  | `f64`     |
-| `float128_t` |           |
+| C++ 类型      | Rust 类型 |
+|---------------|-----------|
+| `float16_t`   |           |
+| `float32_t`   | `f32`     |
+| `float64_t`   | `f64`     |
+| `float128_t`  |           |
 
-The Rust types analogous to `float16_t` and `float128_t` (`f16` and `f128`) are
-[not yet available in stable
-Rust](https://github.com/rust-lang/rust/issues/116909).
+Rust 中与 `float16_t` 和 `float128_t` 对应的类型（`f16` 和 `f128`）[尚未在稳定版 Rust 中提供](https://github.com/rust-lang/rust/issues/116909)。
 
-### Raw memory types
+### 原始内存类型
 
-In C++ pointers to or arrays of `char`, `unsigned char`, or `byte` are used to
-represent raw memory. In Rust, arrays (`[u8; N]`), vectors (`Vec<u8>`), or
-slices (`&[u8]`) of `u8` are used to accomplish the same goal. However,
-accessing the underlying memory of another Rust value in that way requires
-unsafe Rust. There are [libraries](../etc/libraries.md) for creating safe wrappers
-around that kind of access for purposes such as serialization or interacting
-with hardware.
+在 C++ 中，`char`、`unsigned char` 或 `byte` 的指针或数组常用于表示原始内存。在 Rust 中，`[u8; N]` 数组、`Vec<u8>` 向量或 `&[u8]` 切片用于实现同样的目的。但以这种方式访问其他 Rust 值的底层内存需要使用 unsafe Rust。对于序列化或硬件交互等用途，有[相关库](../etc/libraries.md)可用于安全封装这类访问。
 
-### Character and string types
+### 字符与字符串类型
 
-The C++ `char` or `wchar_t` types have implementation defined widths. Rust does
-not have an equivalent to these types. When working with string encodings in
-Rust one would use unsigned integer types where one would use the fixed width
-character types in C++.
+C++ 的 `char` 或 `wchar_t` 类型宽度由实现定义。Rust 没有直接等价的类型。在 Rust 中处理字符串编码时，通常用无符号整数类型来代替 C++ 中的定宽字符类型。
 
-| C++ type   | Rust type |
-|------------|-----------|
-| `char8_t`  | `u8`      |
-| `char16_t` | `u16`     |
+| C++ 类型    | Rust 类型 |
+|-------------|-----------|
+| `char8_t`   | `u8`      |
+| `char16_t`  | `u16`     |
 
-The Rust `char` type represents a Unicode scalar value. Thus, a Rust `char` is
-the same size as a `u32`. For working with characters in Rust strings (which are
-guaranteed to be valid UTF-8), the `char` type is appropriate. For representing
-a byte, one should instead use `u8`.
+Rust 的 `char` 类型表示一个 Unicode 标量值，因此其大小等同于 `u32`。在 Rust 字符串（保证为有效 UTF-8）中处理字符时，`char` 类型是合适的选择。若需表示字节，则应使用 `u8`。
 
-The Rust standard library includes a type for UTF-8 strings and string slices:
-`String` and `&str`, respectively. Both types guarantee that represented strings
-are valid UTF-8. The Rust `char` type is appropriate for representing elements
-of a `String`.
+Rust 标准库包含用于 UTF-8 字符串和字符串切片的类型：`String` 和 `&str`。这两种类型都保证字符串为有效的 UTF-8。`char` 类型适合用于表示 `String` 的元素。
 
-Because `str` (without the reference) is a slice, it is unsized and therefore
-must be used behind a pointer-like construct, such as a reference or box. For
-this reason, string slices are often described as `&str` instead of `str` in
-documentation, even though they can also be used as `Box<str>`, `Rc<str>`, etc.
+由于 `str`（不带引用）是切片类型，因此本身是无大小的，必须通过引用或 Box 等指针类型使用。因此文档中常用 `&str` 表示字符串切片，尽管也可以用 `Box<str>`、`Rc<str>` 等。
 
-Rust also includes types for platform-specific string representations and slices
-of those strings:
-[`std::ffi::OsString`](https://doc.rust-lang.org/std/ffi/struct.OsString.html)
-and `&std::ffi::OsStr`. While these strings use the OS-specific representation,
-to use one with the Rust FFI, it must still be converted to a
-[`CString`](https://doc.rust-lang.org/std/ffi/struct.CString.html).
+Rust 还包含用于平台相关字符串表示及其切片的类型：[`std::ffi::OsString`](https://doc.rust-lang.org/std/ffi/struct.OsString.html) 和 `&std::ffi::OsStr`。这些字符串采用操作系统特定的表示方式，但若要与 Rust FFI 一起使用，仍需转换为 [`CString`](https://doc.rust-lang.org/std/ffi/struct.CString.html)。
 
-Unlike C++ which has `std::u16string`, Rust has no specific representation for
-UTF-16 strings. Something like `Vec<u16>` can be used, but the type will not
-guarantee that its contents are a valid UTF-16 string. Rust does provide a
-mechanisms for converting `String` to and from a UTF-16 encoding
-([`String::encode_utf16`](https://doc.rust-lang.org/std/string/struct.String.html#method.encode_utf16)
-and
-[`String::from_utf16`](https://doc.rust-lang.org/std/string/struct.String.html#method.from_utf16),
-among others) as well as similar mechanisms for accessing the underlying UTF-8
-encoding
-(https://doc.rust-lang.org/std/string/struct.String.html#method.from_utf8).
+与 C++ 的 `std::u16string` 不同，Rust 没有专门的 UTF-16 字符串类型。可以使用 `Vec<u16>`，但该类型无法保证内容为有效的 UTF-16 字符串。Rust 提供了将 `String` 与 UTF-16 编码互转的机制（[`String::encode_utf16`](https://doc.rust-lang.org/std/string/struct.String.html#method.encode_utf16) 和 [`String::from_utf16`](https://doc.rust-lang.org/std/string/struct.String.html#method.from_utf16) 等），也有类似机制用于访问底层 UTF-8 编码（https://doc.rust-lang.org/std/string/struct.String.html#method.from_utf8）。
 
-| Purpose             | Rust type                          |
-|---------------------|------------------------------------|
-| representing text   | `String` and `&str`                |
-| representing bytes  | vectors, arrays, or slices of `u8` |
-| interacting with OS | `OsString` and `&OsStr`            |
-| representing UTF-8  | `String`                           |
-| representing UTF-16 | use [a library](../etc/libraries.md) |
+| 用途               | Rust 类型                              |
+|--------------------|----------------------------------------|
+| 表示文本           | `String` 和 `&str`                     |
+| 表示字节           | `u8` 的向量、数组或切片                |
+| 与操作系统交互     | `OsString` 和 `&OsStr`                 |
+| 表示 UTF-8         | `String`                               |
+| 表示 UTF-16        | 使用[相关库](../etc/libraries.md)      |
 
-### Boolean types
+### 布尔类型
 
-The `bool` type in Rust is analogous to the `bool` type in C++. Unlike C++, Rust
-makes [guarantees about the size, alignment, and bit pattern used to represent
-values of the `bool`
-type](https://doc.rust-lang.org/reference/types/boolean.html).
+Rust 的 `bool` 类型与 C++ 的 `bool` 类型类似。但与 C++ 不同，Rust [对 `bool` 类型的大小、对齐和位模式有明确保证](https://doc.rust-lang.org/reference/types/boolean.html)。
 
 ### `void`
 
-In C++ `void` indicates that a function does not return a value. Because Rust is
-expression-oriented, all functions return values. In the place of `void`, Rust
-uses the unit type `()`. When a function does not have a return type declared,
-`()` is the return type.
+在 C++ 中，`void` 表示函数不返回值。由于 Rust 是表达式导向的，所有函数都有返回值。Rust 用单元类型 `()` 代替 `void`。当函数未声明返回类型时，默认返回 `()`。
 
 <div class="comparison">
 
@@ -153,10 +95,7 @@ fn process() {
 
 </div>
 
-Since the unit type has only one value (also written `()`), values of the type
-provide no information. This also means that the return value can be left
-implicit, as in the above example. The following example makes the unit type
-usage explicit.
+由于单元类型只有一个值（也写作 `()`），该类型的值不携带任何信息。因此返回值可以省略，如上例所示。如下例则显式使用了单元类型：
 
 ```rust
 fn process() -> () {
@@ -165,108 +104,74 @@ fn process() -> () {
 }
 ```
 
-The syntax of the unit type and syntax of the unit value resemble that of an
-empty tuple. Essentially, that is what the type is. The following example shows
-some equivalent types, though without the special syntax or language
-integration.
+单元类型的语法和单元值的语法类似于空元组，本质上它就是这样一种类型。下面的例子展示了一些等价类型，但没有特殊语法或语言集成：
 
 ```rust
-struct Pair<T1, T2>(T1, T2); // the same as (T1, T2)
-struct Single<T>(T); // a tuple with just one value (T1)
-struct Unit; // the same as ()
-// can also be written as
-// struct Unit();
-
+struct Pair<T1, T2>(T1, T2); // 等价于 (T1, T2)
+struct Single<T>(T); // 只有一个值的元组 (T1)
+struct Unit; // 等价于 ()
+             // 也可以写作 struct Unit();
 fn main() {
     let pair = Pair(1,2.0);
     let single = Single(1);
     let unit = Unit;
-    // can also be written as
-    // let unit = Unit();
+    // 也可以写作 let unit = Unit();
 }
 ```
 
-Using a unit type instead of `void` enables expressions with unit type (such as
-function calls that would return `void` in C++) to be used in contexts that
-expect a value. This is especially helpful with defining and using generic
-functions, instead of needing something like `std::is_void` to special-case the
-handling when a type is `void`.
+用单元类型代替 `void`，使得返回单元类型的表达式（如 C++ 中返回 `void` 的函数调用）可以在需要值的上下文中使用。这对于定义和使用泛型函数尤其有用，无需像 `std::is_void` 那样对 `void` 类型做特殊处理。
 
-## Pointers
+## 指针
 
-The following table maps the ownership-managing classes from C++ to equivalents
-types in Rust.
+下表将 C++ 的所有权管理类与 Rust 中的等价类型进行了对应。
 
-| Use                                                       | C++ type                         | Rust type                                                                                                                                                                    |
-|-----------------------------------------------------------|----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Owned                                                     | `T`                              | `T`                                                                                                                                                                          |
-| Single owner, dynamic storage                             | `std::unique_ptr<T>`             | `Box<T>`                                                                                                                                                                     |
-| Shared owner, dynamic storage, immutable, not thread-safe | `std::shared_ptr<T>`             | `std::rc::Rc<T>`                                                                                                                                                             |
-| Shared owner, dynamic storage, immutable, thread-safe     | `std::shared_ptr<T>`             | `std::sync::Arc<T>`                                                                                                                                                          |
-| Shared owner, dynamic storage, mutable, not thread-safe   | `std::shared_ptr<T>`             | [`std::rc::Rc<std::cell::RefCell<T>>`](https://doc.rust-lang.org/book/ch15-05-interior-mutability.html#having-multiple-owners-of-mutable-data-by-combining-rct-and-refcellt) |
-| Shared owner, dynamic storage, mutable, thread-safe       | `std::shared_ptr<std::mutex<T>>` | [`std::sync::Arc<std::mutex::Mutex<T>>`](https://doc.rust-lang.org/book/ch16-03-shared-state.html)                                                                           |
-| Const reference                                           | `const &T`                       | `&T`                                                                                                                                                                         |
-| Mutable reference                                         | `&T`                             | `&mut T`                                                                                                                                                                     |
-| Const observer pointer                                    | `const *T`                       | `&T`                                                                                                                                                                         |
-| Mutable observer pointer                                  | `*T`                             | `&mut T`                                                                                                                                                                     |
+| 用途                                               | C++ 类型                         | Rust 类型                                                                                                                                                                    |
+|----------------------------------------------------|----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 拥有所有权                                         | `T`                              | `T`                                                                                                                                                                          |
+| 单一所有者，动态存储                               | `std::unique_ptr<T>`             | `Box<T>`                                                                                                                                                                     |
+| 共享所有者，动态存储，不可变，非线程安全           | `std::shared_ptr<T>`             | `std::rc::Rc<T>`                                                                                                                                                             |
+| 共享所有者，动态存储，不可变，线程安全             | `std::shared_ptr<T>`             | `std::sync::Arc<T>`                                                                                                                                                          |
+| 共享所有者，动态存储，可变，非线程安全             | `std::shared_ptr<T>`             | [`std::rc::Rc<std::cell::RefCell<T>>`](https://doc.rust-lang.org/book/ch15-05-interior-mutability.html#having-multiple-owners-of-mutable-data-by-combining-rct-and-refcellt) |
+| 共享所有者，动态存储，可变，线程安全               | `std::shared_ptr<std::mutex<T>>` | [`std::sync::Arc<std::mutex::Mutex<T>>`](https://doc.rust-lang.org/book/ch16-03-shared-state.html)                                                                           |
+| 常量引用                                           | `const &T`                       | `&T`                                                                                                                                                                         |
+| 可变引用                                           | `&T`                             | `&mut T`                                                                                                                                                                     |
+| 常量观察指针                                       | `const *T`                       | `&T`                                                                                                                                                                         |
+| 可变观察指针                                       | `*T`                             | `&mut T`                                                                                                                                                                     |
 
-In C++, the thread safety of `std::shared_ptr` is more nuanced than it appears
-in this table (e.g., some uses may require `std::atomic`). However, in safe Rust
-the compiler will prevent the incorrect use of the shared owner types.
+在 C++ 中，`std::shared_ptr` 的线程安全性比表格中所示更为复杂（例如某些用法可能需要 `std::atomic`）。但在安全的 Rust 中，编译器会阻止对共享所有权类型的不正确使用。
 
-Unlike with C++ references, Rust can have references-to-references. Rust
-references are more like observer pointers than they are like C++ references.
+与 C++ 引用不同，Rust 可以有引用的引用。Rust 的引用更像观察指针，而不是 C++ 的引用。
 
 ### `void*`
 
-Rust does not have anything directly analogous to `void*` in C++. The upcoming chapter
-on `RTTI`<!--LINKME--> will cover some use cases where the goal is dynamic
-typing. The [FFI chapter of the
-Rustonomicon](https://doc.rust-lang.org/nomicon/ffi.html#representing-opaque-structs)
-covers some use cases where the goal is interoperability with C programs that
-use `void*`.
+Rust 没有与 C++ 的 `void*` 直接对应的类型。关于动态类型的场景将在后续的 `RTTI` 章节中介绍。关于与 C 程序互操作时 `void*` 的用法，可参见 [Rustonomicon 的 FFI 章节](https://doc.rust-lang.org/nomicon/ffi.html#representing-opaque-structs)。
 
-## Containers
+## 容器
 
-Both C++ and Rust containers own their elements. However, in both the element
-type may be a non-owning type, such as a pointer in C++ or a reference in Rust.
+C++ 和 Rust 的容器都拥有其元素。但在两者中，元素类型都可以是非拥有类型，如 C++ 中的指针或 Rust 中的引用。
 
-| C++ type                  | Rust type                                                                                             |
-|---------------------------|-------------------------------------------------------------------------------------------------------|
-| `std::vector<T>`          | [`Vec<T>`](https://doc.rust-lang.org/std/vec/struct.Vec.html)                                         |
-| `std::array<T, N>`        | [`[T; N]`](https://doc.rust-lang.org/std/primitive.array.html)                                        |
-| `std::list<T>`            | [`std::collections::LinkedList<T>`](https://doc.rust-lang.org/std/collections/struct.LinkedList.html) |
-| `std::queue<T>`           | [`std::collections::VecDeque<T>`](https://doc.rust-lang.org/std/collections/struct.VecDeque.html)     |
-| `std::deque<T>`           | [`std::collections::VecDeque<T>`](https://doc.rust-lang.org/std/collections/struct.VecDeque.html)     |
-| `std::stack<T>`           | [`Vec<T>`](https://doc.rust-lang.org/std/vec/struct.Vec.html)                                         |
-| `std::map<K,V>`           | [`std::collections::BTreeMap<K,V>`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html)   |
-| `std::unordered_map<K,V>` | [`std::collections::HashMap<K,V>`](https://doc.rust-lang.org/std/collections/struct.HashMap.html)     |
-| `std::set<K>`             | [`std::collections::BTreeSet<K>`](https://doc.rust-lang.org/std/collections/struct.BTreeSet.html)     |
-| `std::unordered_set<K>`   | [`std::collections::HashSet<K>`](https://doc.rust-lang.org/std/collections/struct.HashSet.html)       |
-| `std::priority_queue<T>`  | [`std::collections::BinaryHeap<T>`](https://doc.rust-lang.org/std/collections/struct.BinaryHeap.html) |
-| `std::span<T>`            | [`&[T]`](https://doc.rust-lang.org/std/primitive.slice.html)                                          |
+| C++ 类型                   | Rust 类型                                                                                             |
+|----------------------------|-------------------------------------------------------------------------------------------------------|
+| `std::vector<T>`           | [`Vec<T>`](https://doc.rust-lang.org/std/vec/struct.Vec.html)                                         |
+| `std::array<T, N>`         | [`[T; N]`](https://doc.rust-lang.org/std/primitive.array.html)                                        |
+| `std::list<T>`             | [`std::collections::LinkedList<T>`](https://doc.rust-lang.org/std/collections/struct.LinkedList.html) |
+| `std::queue<T>`            | [`std::collections::VecDeque<T>`](https://doc.rust-lang.org/std/collections/struct.VecDeque.html)     |
+| `std::deque<T>`            | [`std::collections::VecDeque<T>`](https://doc.rust-lang.org/std/collections/struct.VecDeque.html)     |
+| `std::stack<T>`            | [`Vec<T>`](https://doc.rust-lang.org/std/vec/struct.Vec.html)                                         |
+| `std::map<K,V>`            | [`std::collections::BTreeMap<K,V>`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html)   |
+| `std::unordered_map<K,V>`  | [`std::collections::HashMap<K,V>`](https://doc.rust-lang.org/std/collections/struct.HashMap.html)     |
+| `std::set<K>`              | [`std::collections::BTreeSet<K>`](https://doc.rust-lang.org/std/collections/struct.BTreeSet.html)     |
+| `std::unordered_set<K>`    | [`std::collections::HashSet<K>`](https://doc.rust-lang.org/std/collections/struct.HashSet.html)       |
+| `std::priority_queue<T>`   | [`std::collections::BinaryHeap<T>`](https://doc.rust-lang.org/std/collections/struct.BinaryHeap.html) |
+| `std::span<T>`             | [`&[T]`](https://doc.rust-lang.org/std/primitive.slice.html)                                          |
 
-For maps and sets instead of the container being parameterized over the hash or
-comparison function used, the types require that the key types implement the
-`std::hash::Hash` (unordered) or `std::cmp::Ord` (ordered) traits. To use the containers
-with different hash or comparison functions, one must use a wrapper type with a
-different implementation of the required trait.
+对于映射和集合，容器类型不再通过哈希或比较函数参数化，而是要求键类型实现 `std::hash::Hash`（无序）或 `std::cmp::Ord`（有序） trait。若需使用不同哈希或比较函数，需用包装类型实现所需 trait。
 
-Some C++ container types provided by the STL have no equivalent in Rust. Many of
-those have equivalents available in third-party [libraries](../etc/libraries.md).
+C++ STL 提供的一些容器类型在 Rust 中没有等价物，但许多可以通过第三方[库](../etc/libraries.md)获得。
 
-One significant different in the use of these types between C++ in Rust is with
-the `Vec<T>` and array `[T; N]` types, from which slice references `&[T]` or
-`&mut [T]` to part or all of the data can be cheaply created. For this reason,
-when defining a function that does not modify the length of a vector and does
-not need to statically know the number of elements in an array, it is more
-idiomatic to take a parameter as `&[T]` or `&mut [T]` than as a reference to the
-owned type.
+C++ 与 Rust 在这些类型的使用上有一个显著区别：Rust 的 `Vec<T>` 和数组 `[T; N]` 可以方便地创建切片引用 `&[T]` 或 `&mut [T]`，用于部分或全部数据。因此，定义不修改向量长度且不需静态知道数组元素数量的函数时，更惯用的做法是将参数类型设为 `&[T]` 或 `&mut [T]`，而不是对拥有类型的引用。
 
-In C++ it is better to take begin and end iterators than a `span` when possible,
-since iterators are more general. The same is true with Rust and taking a
-generic type that implements `IntoIter<&T>` or `IntoIter<&mut T>` instead of
-`&[T]`.
+在 C++ 中，若可能，最好传递起止迭代器而不是 `span`，因为迭代器更通用。Rust 也是如此，优先接受实现了 `IntoIter<&T>` 或 `IntoIter<&mut T>` 的泛型类型，而不是 `&[T]`。
 
 <div class="comparison">
 

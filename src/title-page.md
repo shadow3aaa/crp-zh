@@ -1,29 +1,23 @@
-# C++ to Rust Phrasebook
+# C++ 到 Rust 语法手册
 
-This book is designed to help C++ programmers learn Rust. It provides translations of common C++ patterns into idiomatic Rust. Each pattern is described through concrete code examples along with high-level discussion of engineering trade-offs.
+本书旨在帮助 C++ 程序员学习 Rust。它将常见的 C++ 编程模式翻译为地道的 Rust 实现。每个模式都通过具体的代码示例和高层次的工程权衡讨论进行说明。
 
-The book can be read front-to-back, but it is designed to be used random-access. 
-When you are writing Rust code and think, "I know how to do this in C++ but not Rust," then
-look for the corresponding chapter in this book.
+本书既可以从头到尾阅读，也适合随时查阅。当你在编写 Rust 代码时想到“我知道在 C++ 里怎么做，但在 Rust 里不会”，可以查找本书中对应的章节。
 
-This book was hand-written by expert C++ and Rust programmers at Brown University's [Cognitive Engineering Lab](https://cel.cs.brown.edu/). Our goal is to provide accurate information with a tasteful degree of detail. No text in this book was written by AI.
+本书由布朗大学 [Cognitive Engineering Lab](https://cel.cs.brown.edu/) 的 C++ 和 Rust 专家手工编写。我们的目标是提供准确且适度详细的信息。本书内容均为人工撰写，无任何 AI 生成文本。
 
-If you would like updates on when we add new chapters to this book, you can [drop your email here](https://forms.gle/rcrdZihmT81LWy6F6).
+如果你希望在本书新增章节时收到通知，可以[在这里留下你的邮箱](https://forms.gle/rcrdZihmT81LWy6F6)。
 
-## Other resources
+## 其他资源
 
-If you have zero Rust experience, you might consider first reading [The Rust Programming
-Language](https://rust-book.cs.brown.edu/) or getting a quick overview at [Learn X in Y Minutes](https://learnxinyminutes.com/rust/).
+如果你完全没有 Rust 经验，建议先阅读 [The Rust Programming Language](https://rust-book.cs.brown.edu/)，或在 [Learn X in Y Minutes](https://learnxinyminutes.com/rust/) 快速了解。
 
-If you are primarily an embedded systems programmer using C or C++, this book is
-a complement to [The Embedded Rust Book](https://docs.rust-embedded.org/book/).
+如果你主要是使用 C 或 C++ 的嵌入式系统开发者，本书可作为 [The Embedded Rust Book](https://docs.rust-embedded.org/book/) 的补充。
 
-Compared to resources like the [Rustonomicon](https://doc.rust-lang.org/nomicon/) and [Learn Rust With Entirely Too Many Linked Lists](https://rust-unofficial.github.io/too-many-lists/), this book is less about "Rust behind the scenes" and more about explicitly describing how Rust works in terms of C++.
+与 [Rustonomicon](https://doc.rust-lang.org/nomicon/) 和 [Learn Rust With Entirely Too Many Linked Lists](https://rust-unofficial.github.io/too-many-lists/) 等资源相比，本书更注重明确描述 Rust 如何对应 C++，而不是讲解 Rust 的底层机制。
 
-## Feedback on this book
+## 关于本书的反馈
 
-At the bottom of every page there is a link
-to a form where you can submit feedback: typos, factual errors, or any other issues you spot.
+每一页底部都有一个链接，你可以通过表单提交反馈，包括错别字、事实错误或其他任何问题。
 
-If you answer the quizzes at the end of each chapter, we will save your
-responses anonymously for research purposes.
+如果你回答了每章末尾的小测验，我们会匿名保存你的答题结果用于研究目的。

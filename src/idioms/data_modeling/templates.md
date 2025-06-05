@@ -1,16 +1,10 @@
-# Template classes, functions, and methods
+# 模板类、函数与方法
 
-The most common uses of templates in C++ are to define classes, methods, traits,
-or functions that work for any type (or at least for any type that provides
-certain methods). This use case is common in the STL for container classes (such
-as `<vector>`) and for the algorithms library (`<algorithm>`).
+C++ 中模板最常见的用途是定义可用于任意类型（或至少是提供某些方法的类型）的类、方法、特性或函数。这种用法在 STL 的容器类（如 `<vector>`）和算法库（`<algorithm>`）中非常常见。
 
-The following example defines a template for a directed graph represented as an
-adjacency list, where the graph is generic in the type of the labels on the
-nodes. Though the example shows a template class, the same comparisons with Rust
-apply to template methods and template functions.
+下面的例子定义了一个以邻接表表示的有向图模板，其中图的节点标签类型是泛型的。虽然示例展示的是模板类，但与 Rust 的比较同样适用于模板方法和模板函数。
 
-The same kind of reusable code can be created in Rust using generic types.
+在 Rust 中，可以使用泛型类型实现同样可复用的代码。
 
 <div class="comparison">
 
@@ -90,50 +84,44 @@ impl<Label> DirectedGraph<Label> {
 
 </div>
 
-In the use case demonstrated in the above example, there are few practical
-differences between using C++ template to define a class and using and Rust's
-generics to define a struct. Whenever one would use a template that takes a
-`typename` or `class` parameter in C++, one can instead take a type parameter in
-Rust.
+在上述示例中，使用 C++ 模板定义类和使用 Rust 泛型定义结构体在实际应用上几乎没有区别。无论在 C++ 中使用 `typename` 或 `class` 参数的模板，还是在 Rust 中使用类型参数，效果都是类似的。
 
-## Operations on the parameterized type
+## 针对参数化类型的操作
 
-The differences become more apparent when one attempts to perform operations on
-the values. The following code listing adds a method to get the smallest node in
-the graph to both the Rust and the C++ examples.
+当尝试对值进行操作时，两者的差异会更加明显。下面的代码为 Rust 和 C++ 的例子都添加了一个获取图中最小节点的方法。
 
 <div class="comparison">
 
 ```cpp
 #include <optional>
-$#include <stdexcept>
-$#include <vector>
+#include <stdexcept>
+#include <vector>
 
 template <typename Label>
 class DirectedGraph {
-$  std::vector<std::vector<size_t>> adjacencies;
-$  std::vector<Label> nodeLabels;
-$
+  std::vector<std::vector<size_t>> adjacencies;
+  std::vector<Label> nodeLabels;
+
 public:
-$  size_t addNode(Label label) {
-$    adjacencies.push_back(std::vector<size_t>());
-$    nodeLabels.push_back(label);
-$    return numNodes() - 1;
-$  }
-$
-$  void addEdge(size_t from, size_t to) {
-$    size_t numNodes = this->numNodes();
-$    if (from >= numNodes || to >= numNodes) {
-$      throw std::invalid_argument(
-$          "Node index out of range");
-$    }
-$    adjacencies[from].push_back(to);
-$  }
-$
-$  size_t numNodes() const {
-$    return adjacencies.size();
-$  }
-$
+  size_t addNode(Label label) {
+    adjacencies.push_back(std::vector<size_t>());
+    nodeLabels.push_back(label);
+    return numNodes() - 1;
+  }
+
+  void addEdge(size_t from, size_t to) {
+    size_t numNodes = this->numNodes();
+    if (from >= numNodes || to >= numNodes) {
+      throw std::invalid_argument(
+          "Node index out of range");
+    }
+    adjacencies[from].push_back(to);
+  }
+
+  size_t numNodes() const {
+    return adjacencies.size();
+  }
+
   std::optional<size_t> smallestNode() {
     if (nodeLabels.empty()) {
       return std::nullopt;
@@ -197,8 +185,7 @@ impl<Label> DirectedGraph<Label> {
     where
         Label: Ord,
     {
-        // Matches the C++, but is not the idomatic
-        // implementation!
+        // 这与 C++ 实现一致，但不是最惯用的实现方式！
         if self.node_labels.is_empty() {
             None
         } else {
@@ -218,27 +205,13 @@ impl<Label> DirectedGraph<Label> {
 
 </div>
 
-The major difference between these implementations is that in the C++ version
-`operator>` is used on the values without knowing whether the operator is
-defined for the type. In the Rust version, there is a constraint requiring that
-the `Label` type implement the `Ord` trait. (See the chapter on [concepts,
-interfaces, and static dispatch](./concepts.md) for more
-details on Rust traits and how they relate to C++ concepts.)
+这两种实现的主要区别在于，C++ 版本直接对值使用 `operator>`，而不关心该类型是否定义了该操作符。而 Rust 版本则要求 `Label` 类型实现 `Ord` trait。（关于 Rust trait 及其与 C++ 概念的关系，详见[概念、接口与静态分发](./concepts.md)章节。）
 
-Unlike C++ templates, generic definitions in Rust are type checked at the point
-of definition rather than at the point of use. This means that for operations to
-be used on values with the type of a type parameter, the parameter has to be
-constrained to types that implement some trait. As can be seen in the above
-example, much like with C++ concepts and `requires`, the constraint can be
-required for individual methods rather than for the whole generic class.
+与 C++ 模板不同，Rust 的泛型定义会在定义时进行类型检查，而不是在使用时。这意味着如果要对类型参数的值进行操作，必须对参数加以 trait 约束。如上例所示，类似于 C++ 的 concepts 和 `requires`，约束可以只要求在特定方法上，而不是整个泛型类。
 
-It is best practice in Rust to put the trait bounds on the specific things that
-require the bounds, in order to make the overall use of the types more flexible.
+Rust 的最佳实践是将 trait 约束放在真正需要的地方，以提升类型的灵活性。
 
-As an aside, a more idiomatic implementation of `smallest_node` makes use of
-Rust's iterators. This style of implementation may take some getting used to for
-programmers more accustomed to implementations in the style used in the earlier
-example.
+顺带一提，更惯用的 Rust `smallest_node` 实现会利用迭代器。这种风格可能需要 C++ 程序员适应。
 
 ```rust
 # pub struct DirectedGraph<Label> {
@@ -295,8 +268,7 @@ impl<Label> DirectedGraph<Label> {
 }
 ```
 
-An even more idiomatic implementation would make use of the [itertools
-crate](https://docs.rs/itertools/latest/itertools/trait.Itertools.html#method.position_min).
+更惯用的实现还可以利用 [itertools crate](https://docs.rs/itertools/latest/itertools/trait.Itertools.html#method.position_min)。
 
 ```rust,ignore
 use itertools::*;
@@ -351,11 +323,9 @@ impl<Label> DirectedGraph<Label> {
 }
 ```
 
-## `constexpr` template parameters
+## `constexpr` 模板参数
 
-Rust also supports the equivalent of constexpr template parameters. For example,
-one can define a generic function that returns an array consecutive integers
-starting from a specific value and whose size is determined at compile time.
+Rust 也支持类似于 C++ `constexpr` 模板参数的功能。例如，可以定义一个泛型函数，返回一个从指定值开始、长度在编译期确定的连续整数数组。
 
 <div class="comparison">
 
@@ -383,41 +353,23 @@ fn make_sequential_array<const N: usize>(
 
 </div>
 
-The corresponding idiomatic Rust function uses the helper `std::array::from_fn`
-to construct the array. `from_fn` itself takes as type parameters the element
-type and the constant. Those arguments are elided because Rust can infer them,
-because both are part of the type of the produced array.
+对应的 Rust 惯用写法使用了辅助函数 `std::array::from_fn` 来构造数组。`from_fn` 本身的类型参数包括元素类型和常量，这些参数可以省略，因为 Rust 能根据返回数组的类型自动推断。
 
-## Rust's `Self` type
+## Rust 的 `Self` 类型
 
-Within a Rust struct defintion, `impl` block, or `impl` trait block, there is a
-`Self` type that is in scope. The `Self` type is the type of the class being
-defined with all of the generic type parameters filled in. It can be useful to
-refer to this type especially in cases where there are many parameters that
-would otherwise have to be listed out.
+在 Rust 的结构体定义、`impl` 块或 `impl` trait 块中，`Self` 类型始终在作用域内。`Self` 表示当前正在定义的类型，且所有泛型参数都已填充。尤其在参数较多时，引用该类型会很方便。
 
-The `Self` type is necessary when defining generic traits to refer to the
-concrete implementing type. Because Rust does not have inheritance between
-concrete types and does not have method overriding, this is sufficient to avoid
-the need to pass the implementing type as a type parameter.
+在定义泛型 trait 时，`Self` 类型是必须的，用于指代具体实现类型。由于 Rust 没有具体类型之间的继承，也没有方法重写，这样的设计足以避免需要将实现类型作为类型参数传递。
 
-For examples of this, see the chapter on the [curiously reoccurring template
-pattern](../../patterns/crtp.md#method-chaining).
+相关示例可参考[奇异递归模板模式](../../patterns/crtp.md#method-chaining)章节。
 
-## A note on type checking and type errors
+## 关于类型检查与类型错误的说明
 
-The checking of generic types at the point of definition rather than at the
-point of template expansion impacts when errors are detected and how they are
-reported. Some of this difference cannot be achieved by consistently using C++
-concepts to declare the operations required.
+泛型类型在定义时而非模板展开时进行检查，这影响了错误检测的时机和错误报告的方式。即使在 C++ 中始终使用 concepts 声明所需操作，也无法完全实现 Rust 的这种行为。
 
-For example, one might accidentally make the `nodeLabels` member a vector of
-`size_t` instead of a vector of the label parameter. If all of the test cases
-for the graph used label types that were convertible to integers, the error
-would not be detected.
+例如，可能会不小心将 `nodeLabels` 成员声明为 `size_t` 向量，而不是标签参数类型的向量。如果所有测试用例的标签类型都能隐式转换为整数，这个错误就不会被发现。
 
-A similar Rust program fails to compile, even without a function that
-instantiates the generic structure with a concrete type.
+而类似的 Rust 程序即使没有实例化泛型结构体，也会在编译时失败，并给出有用的错误信息。
 
 <div class="comparison">
 
@@ -427,7 +379,7 @@ instantiates the generic structure with a concrete type.
 
 template <typename Label>
 class DirectedGraph {
-  // The mistake is here: size_t should be Label
+  // 错误在这里：size_t 应为 Label
   std::vector<std::vector<size_t>> adjacencies;
   std::vector<size_t> nodeLabels;
 
@@ -466,7 +418,7 @@ BOOST_AUTO_TEST_CASE(test_add_node_float) {
 
 ```rust,ignore
 pub struct DirectedGraph<Label> {
-    // The mistake is here: size_t should be Label
+    // 错误在这里：size_t 应为 Label
     adjacencies: Vec<Vec<usize>>,
     node_labels: Vec<usize>,
 }
@@ -503,7 +455,7 @@ impl<Label> DirectedGraph<Label> {
 
 </div>
 
-Despite the error, the C++ example compiles and passes the tests.
+尽管存在错误，C++ 示例仍能编译并通过测试。
 
 ```text
 Running 2 test cases...
@@ -511,8 +463,7 @@ Running 2 test cases...
 *** No errors detected
 ```
 
-Even without test cases, the Rust example fails to compile and produces a
-message useful for identifying the error.
+即使没有测试用例，Rust 示例也无法编译，并会给出有助于定位错误的提示信息。
 
 ```text
 error[E0308]: mismatched types
@@ -530,29 +481,16 @@ error[E0308]: mismatched types
              found type parameter `Label`
 ```
 
-## Lifetimes parameters
+## 生命周期参数
 
-Rust's generics are also used for classes, methods, traits, and functions that
-are generic in the lifetimes of the references they manipulate. Unlike other
-type parameters, the using a function with different lifetimes does not cause
-additional copies of the function to be generated in the compiled code, because
-lifetimes do not impact the runtime representation.
+Rust 的泛型也可用于对引用的生命周期进行泛型化。与其他类型参数不同，使用不同生命周期的函数不会导致编译出的代码有多份，因为生命周期不会影响运行时表现。
 
-The chapter on concepts includes [examples of how lifetimes interact with Rust's
-generics](./concepts.md#generics-and-lifetimes).
+关于生命周期与 Rust 泛型的交互，详见[概念章节相关内容](./concepts.md#generics-and-lifetimes)。
 
-## Conditional compilation
+## 条件编译
 
-One significant difference between C++ templates and Rust generics is that C++
-templates are actually a more general purpose macro language, supporting things
-like conditional compilation (e.g., when used in conjunction with `if
-constexpr`, `requires`, or `std::enable_if`). Rust supports these use cases with
-its macro system, which differs significantly from C++. The most common use of
-the macro system, conditional compilation, is provided by [the `cfg` attribute
-and `cfg!` macro](https://doc.rust-lang.org/rust-by-example/attribute/cfg.html).
+C++ 模板与 Rust 泛型的一个重要区别在于，C++ 模板实际上是一种更通用的宏语言，支持条件编译（如结合 `if constexpr`、`requires` 或 `std::enable_if` 使用）。Rust 则通过宏系统支持这些用例，其实现方式与 C++ 有很大不同。最常见的条件编译方式是通过 [`cfg` 属性和 `cfg!` 宏](https://doc.rust-lang.org/rust-by-example/attribute/cfg.html)。
 
-The separation of conditional compilation from generics in Rust involves similar
-design considerations as the omission of [template
-specialization](./template_specialization.md) from Rust.
+Rust 将条件编译与泛型分离，这与 Rust 不支持[模板特化](./template_specialization.md)的设计考虑类似。
 
 {{#quiz templates.toml}}

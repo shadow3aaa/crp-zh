@@ -1,14 +1,10 @@
-# Enums
+# 枚举（Enums）
 
-In C++, enums are often used to model a fixed set of alternatives, especially when
-each of those enumerators corresponds to a specific integer value, such as is needed
-when working with hardware, system calls, or protocol implementations.
+在 C++ 中，枚举常用于建模一组固定的备选项，尤其是在每个枚举值都对应特定整数值的场景，例如硬件操作、系统调用或协议实现。
 
-For example, the various modes for a GPIO pin could be modeled as an enum, which
-would restrict methods using the mode to valid values.
+例如，GPIO 引脚的各种模式可以用枚举来建模，这样可以限制相关方法只接受有效的模式值。
 
-While Rust enums are [more general](./tagged_unions.md),
-they can still be used for this sort of modeling.
+虽然 Rust 的枚举[更为通用](./tagged_unions.md)，但它们同样适用于此类建模。
 
 <div class="comparison">
 
@@ -66,37 +62,29 @@ fn set_pin_mode(pin: Pin, mode: Mode) {
 
 </div>
 
-The `#[repr(u8)]` attribute ensures that the representation of the enum is the
-same as a byte (like declaring the underlying type of an enum in C++). The enum
-values can then be freely converted to the underlying type with the `as`.
+`#[repr(u8)]` 属性确保枚举的内存布局与字节类型一致（类似于 C++ 中声明枚举的底层类型）。这样，枚举值就可以通过 `as` 关键字自由转换为底层类型。
 
-In C++ the standard way to convert from an integer to an enum is a static cast.
-However, this [requires that the user check the validity of the cast
-themselves](https://eel.is/c++draft/expr.static.cast#10). Often the conversion
-is done by a function that checks that the value to convert is a valid enum
-value.
+在 C++ 中，将整数转换为枚举的标准方式是使用 static_cast。然而，这[要求用户自行检查转换的有效性](https://eel.is/c++draft/expr.static.cast#10)。通常，这种转换会通过一个函数来实现，该函数会检查待转换值是否为有效的枚举值。
 
-In Rust the standard way to perform the conversion is to implement the `TryFrom`
-trait for the type and then use the `try_from` method or `try_into` method.
+在 Rust 中，标准做法是为该类型实现 `TryFrom` trait，然后使用 `try_from` 或 `try_into` 方法进行转换。
 
 <div class="comparison">
 
 ```cpp
-$#include <cstdint>
-$
-$enum Pin : uint8_t {
-$  Pin1 = 0x01,
-$  Pin2 = 0x02,
-$  Pin3 = 0x04
-$};
-$
+#include <cstdint>
+
+enum Pin : uint8_t {
+  Pin1 = 0x01,
+  Pin2 = 0x02,
+  Pin3 = 0x04
+};
+
 struct InvalidPin {
     uint8_t pin;
 };
 
 Pin to_pin(uint8_t pin) {
-  // The values are not contiguous, so we can't
-  // just check the bounds and then cast.
+  // 这些值不是连续的，因此不能只检查范围后直接转换。
   switch (pin) {
   case 0x1: { return Pin1; }
   case 0x2: { return Pin2; }
@@ -112,7 +100,7 @@ int main() {
     return 0;
   }
 
-  // use pin p
+  // 使用 pin p
 }
 ```
 
@@ -149,35 +137,26 @@ fn main() {
     return;
   };
 
-  // use pin p
+  // 使用 pin p
 }
 ```
 
 </div>
 
-See [Exceptions and error handling](../exceptions.md) for examples of how
-to ergonomically handle the result of `try_from`.
+关于如何优雅地处理 `try_from` 的结果，请参见[异常与错误处理](../exceptions.md)。
 
-If low-level performance is more of a concern than memory safety,
-`std::mem::transmute` is analogous to a C++ reinterpret cast, but requires
-unsafe Rust because its use can result in undefined behavior. Uses of
-`std::mem::transmute` for this purpose should not be hidden behind an interface
-that can be called from safe Rust unless the interface can actually guarantee
-that the call will never happen with an invalid value.
+如果对底层性能的需求高于内存安全，可以使用 `std::mem::transmute`，它类似于 C++ 的 reinterpret_cast，但需要使用 unsafe Rust，因为不当使用可能导致未定义行为。将 `std::mem::transmute` 用于此目的时，不应将其隐藏在可从安全 Rust 调用的接口之后，除非该接口能够实际保证不会传入无效值。
 
-## Enums and methods
+## 枚举与方法
 
-In C++ enums cannot have methods. Instead, to model an enum with methods one
-must define a wrapper class for the enum and define the methods on that wrapper
-class. In Rust, methods can be defined on an enum with an `impl` block, just
-like any other type.
+在 C++ 中，枚举不能拥有方法。若要为枚举建模方法，必须为枚举定义一个包装类，并在该包装类上定义方法。而在 Rust 中，可以像为其他类型一样，通过 `impl` 块为枚举定义方法。
 
 <div class="comparison">
 
 ```cpp
 #include <cstdint>
 
-// Actual enum
+// 实际的枚举
 enum PinImpl : uint8_t {
   Pin1 = 0x01,
   Pin2 = 0x02,
@@ -186,16 +165,14 @@ enum PinImpl : uint8_t {
 
 class LastPin{};
 
-// Wrapper type
+// 包装类型
 struct Pin {
   PinImpl pin;
 
-  // Conversion constructor so that PinImpl can be
-  // used as a Pin.
+  // 转换构造函数，使 PinImpl 可作为 Pin 使用。
   Pin(PinImpl p) : pin(p) {}
 
-  // Conversion method so wrapper type can be
-  // used with switch statement.
+  // 转换方法，使包装类型可用于 switch 语句。
   operator PinImpl() {
     return this->pin;
   }

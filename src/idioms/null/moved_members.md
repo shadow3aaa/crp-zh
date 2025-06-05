@@ -1,9 +1,6 @@
-# Moved members
+# 成员的移动
 
-Moving values out of variables or fields in Rust is more explicit than it is in
-C++. A value that might be moved with nothing left behind needs to be
-represented using an `Option<Box<T>>` type in Rust, while in C++ it would just
-be a `std::unique_ptr<T>`.
+在 Rust 中，将值从变量或字段中移出比在 C++ 中更加显式。一个可能被移动且不会留下任何内容的值，在 Rust 中需要用 `Option<Box<T>>` 类型来表示，而在 C++ 中只需用 `std::unique_ptr<T>`。
 
 <div class="comparison">
 
@@ -38,21 +35,11 @@ fn read(mailbox: Arc<Mutex<Option<i32>>>) {
 
 </div>
 
-Additionally, when taking ownership of a value from within a mutable reference,
-something has to be left in its place. This can be done using
-[`std::mem::swap`](https://doc.rust-lang.org/std/mem/fn.swap.html), and many
-container-like types have methods for making common ownership-swapping more
-ergonomic, like
-[`Option::take`](https://doc.rust-lang.org/std/option/enum.Option.html#method.take)
-as seen in the earlier example,
-[`Option::replace`](https://doc.rust-lang.org/std/option/enum.Option.html#method.replace)
-or
-[`Vec::swap`](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.swap_remove).
+此外，当你需要从一个可变引用中取得所有权时，必须在原位置留下某些内容。这可以通过 [`std::mem::swap`](https://doc.rust-lang.org/std/mem/fn.swap.html) 实现，许多类似容器的类型也提供了更方便的所有权交换方法，例如前面例子中的 [`Option::take`](https://doc.rust-lang.org/std/option/enum.Option.html#method.take)、[`Option::replace`](https://doc.rust-lang.org/std/option/enum.Option.html#method.replace) 或 [`Vec::swap`](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.swap_remove)。
 
-## Deleting moved objects
+## 删除已移动的对象
 
-Another common use of null pointers in modern C++ is as values for the members
-of moved objects so that the destructor can still safely be called. E.g.,
+现代 C++ 中另一个常见的空指针用法，是作为已移动对象成员的值，以便析构函数仍然可以安全调用。例如：
 
 ```cpp
 $#include <cstdlib>
@@ -84,8 +71,4 @@ $
 };
 ```
 
-Rust's notion of moving objects does not involve leaving behind an object on
-which a destructor will be called, and so this use of null does not have a
-corresponding idiom. See the chapter on [copy and move
-constructors](../constructors/copy_and_move_constructors.md) for more
-details.
+Rust 对象的移动不会留下一个需要调用析构函数的对象，因此这种空指针的用法在 Rust 中没有对应的惯用法。更多细节请参见 [拷贝与移动构造函数](../constructors/copy_and_move_constructors.md) 章节。

@@ -1,21 +1,14 @@
-# Separate construction and initialization
+# 构造与初始化分离
 
-The approach to take in Rust depends on the reason for separating construction
-and initialization.
+在 Rust 中，是否需要将构造和初始化分离，取决于你的具体需求。
 
-- For incremental initialization, use a [builder pattern](#rust-builder-pattern).
-- Using virtual methods during construction is [not applicable to
-  Rust](#using-virtual-methods-during-initialization).
-- For pre-allocating storage or re-using allocated objects, the techniques and
-  limitations described in the chapter on [pre-allocated
-  buffers](../out_params/pre-allocated_buffers.md) apply.
+- 如果需要渐进式初始化，请使用[构建者模式](#rust-构建者模式)。
+- 构造过程中使用虚方法在 Rust 中[不适用](#初始化过程中使用虚方法)。
+- 如果需要预分配存储或复用已分配的对象，请参考[预分配缓冲区](../out_params/pre-allocated_buffers.md)章节中的技术和限制。
 
-## Rust builder pattern
+## Rust 构建者模式
 
-Implementing the builder pattern in Rust involves defining a second "builder"
-type to represent the partially constructed value, where each field of type `T`
-has type `Option<T>` in the builder. This differs from C++ where either null
-values or uninitialized memory can be used to construct an object incrementally.
+在 Rust 中实现构建者模式，通常需要定义一个额外的“构建者”类型，用于表示部分构造的值。此时，每个字段的类型 `T` 在构建者中都变为 `Option<T>`。这与 C++ 不同，C++ 可以通过空值或未初始化内存来渐进式构造对象。
 
 <div class="comparison">
 
@@ -34,10 +27,9 @@ struct Person {
 
 int main() {
   Person person;
-  // Can initialize incrementally without a builder.
+  // 可以不通过构建者进行渐进式初始化。
   //
-  // Initilizes with age indeterminate and pet as
-  // nullptr.
+  // 此时 age 未定义，pet 为 nullptr。
   person.age = 42;
   person.pet = std::make_shared<Pet>("Mittens");
 }
@@ -97,9 +89,7 @@ fn main() {
 
 </div>
 
-This pattern is sufficiently common that there are libraries to support it, such
-as the [`derive_builder` crate](https://crates.io/crates/derive_builder). Using
-that crate, the above example is much shorter.
+这种模式在 Rust 中非常常见，因此有相关库支持，例如 [`derive_builder` crate](https://crates.io/crates/derive_builder)。使用该 crate，上述示例可以大大简化：
 
 ```rust,ignore
 #[derive(Builder)]
@@ -109,38 +99,23 @@ struct Person {
 }
 ```
 
-The resulting API also includes additional features, such as the `build` method
-returning a `Result::Err` with an informative error, rather than just `None`,
-when not all of required fields are set.
+生成的 API 还包含更多特性，例如 `build` 方法在未设置所有必需字段时会返回带有详细错误信息的 `Result::Err`，而不仅仅是 `None`。
 
-### An alternative: updating based on a default value
+### 替代方案：基于默认值更新
 
-If there is a reasonable default value for a type, then instead of the builder
-pattern, the `Default` trait can be implemented. [Values can be constructed
-based on the default value proved by the `Default`
-implementation](./default_constructors.md#struct-update).
+如果某个类型有合理的默认值，可以实现 `Default` trait。这样可以[基于 `Default` 实现提供的默认值来构造对象](./default_constructors.md#struct-update)，而无需构建者模式。
 
-### Why builders are more common in Rust than in C++
+### 为什么构建者模式在 Rust 中比 C++ 更常见
 
-The builder pattern is used more often in C++ than in Rust because
+构建者模式在 Rust 中比 C++ 更常见，原因包括：
 
-1. Rust models ownership of pointers orthogonally to optionality, and
-2. Rust requires handling all variants of a tagged union.
+1. Rust 对指针的所有权和可选性进行了正交建模；
+2. Rust 要求显式处理枚举（tagged union）的所有变体。
 
-This encourages using the type system to model invariants more explicitly, which
-means that if different invariants hold before and after construction is
-completed, different structs need to be defined to represent those different
-states.
+这促使开发者用类型系统更明确地表达不变量。如果对象在构造前后有不同的不变量，就需要定义不同的结构体来表示这些状态。
 
-In particular, while a value is in the middle of being incrementally
-constructed, the fields are optional. Once fully constructed, the fields are no
-longer optional.
+具体来说，在渐进式构造过程中，字段是可选的；而一旦完全构造，字段就不再是可选的。
 
-## Using virtual methods during initialization
+## 初始化过程中使用虚方法
 
-Separate initialization is sometimes used in C++ to overcome the limitation that
-calling virtual methods during construction in is undefined behavior. The
-difference in mechanics in construction in Rust make this kind of workaround
-unnecessary. The code that usually runs as part of a constructor in C++ is
-defined as a static method in Rust. The kind of partially-constructed state that
-exists during the execution of the constructor in C++ does not exist in Rust.
+在 C++ 中，分离初始化有时是为了解决构造过程中调用虚方法会导致未定义行为的问题。而 Rust 的构造机制不同，不需要类似的变通方法。C++ 中通常在构造函数中运行的代码，在 Rust 中通常定义为静态方法。C++ 构造函数执行期间存在的“部分构造”状态，在 Rust 中并不存在。

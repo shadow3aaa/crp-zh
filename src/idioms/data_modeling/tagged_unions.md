@@ -1,12 +1,10 @@
-# Tagged unions and `std::variant`
+# 标记联合与 `std::variant`
 
-## C-style tagged unions
+## C 风格标记联合
 
-Because unions cannot be used for type punning in C++, they are usually used
-with a tag to discriminate between which variant of the union is active.
+由于 C++ 中的 union 不能用于类型重解释（type punning），它们通常与一个标签（tag）一起使用，用于区分当前激活的是哪个 union 成员。
 
-Rust's equivalent to union types are always tagged. They are a generalization of
-Rust enums, where additional data may be associated with the enum variants.
+Rust 中等价的 union 类型总是带有标签的。它们是 Rust 枚举（enum）的泛化，可以为枚举变体关联额外的数据。
 
 <div class="comparison">
 
@@ -64,9 +62,7 @@ impl Shape {
 
 </div>
 
-When matching on an enum, Rust requires that all variants of the enum be
-handled. In situations where `default` would be used with a C++ `switch` on the
-tag, a wildcard can be used in the Rust `match`.
+在对枚举进行匹配时，Rust 要求必须处理所有枚举变体。在 C++ 中使用 `switch` 时会用 `default`，在 Rust 的 `match` 中可以使用通配符 `_`。
 
 <div class="comparison">
 
@@ -75,7 +71,7 @@ $#include <iostream>
 $
 $enum Tag { Rectangle, Triangle, Circle };
 $
-struct Shape {
+$struct Shape {
 $  Tag tag;
 $  union {
 $    struct {
@@ -129,10 +125,7 @@ impl Shape {
 
 </div>
 
-Rust does not support C++-style fallthrough where some behavior can be done
-before falling through to the next case. However, in Rust one can match on
-multiple enum variants simultaneously, so long as the simultaneous match
-patterns bind the same names with the same types.
+Rust 不支持 C++ 风格的 case 穿透（fallthrough），即在进入下一个 case 前可以执行一些操作。但在 Rust 中，可以同时匹配多个枚举变体，只要这些模式绑定的名字和类型一致。
 
 ```rust
 # enum Shape {
@@ -153,21 +146,13 @@ impl Shape {
 }
 ```
 
-## Accessing the value without checking the discriminant
+## 不检查判别值直接访问成员
 
-Unlike with C-style unions, Rust always requires matching on the discriminant
-before accessing the values. If the variant is already known, e.g., due to an
-earlier check, then the code can usually be refactored to encode the knowledge
-in the type so that the second check (and corresponding error handling) can be
-omitted.
+与 C 风格联合不同，Rust 总是要求在访问值前先匹配判别值（discriminant）。如果变体已知（例如之前已经检查过），通常可以通过重构代码，将这种知识编码到类型中，这样就可以省略第二次检查（以及相关的错误处理）。
 
-A C++ program like the following requires more restructuring of the types to
-achieve the same goal in Rust.
+如下 C++ 程序，若要在 Rust 中实现同样的目标，需要对类型做更多的重构。
 
-The corresponding Rust program requires defining separate types for each variant
-of the `Shape` enum so that the fact that all of the value are of a given type
-can be expressed in the type system by having an array of `Triangle` instead of
-an array of `Shape`.
+对应的 Rust 程序需要为 `Shape` 枚举的每个变体定义单独的类型，这样就可以通过让数组的类型为 `Triangle` 而不是 `Shape`，在类型系统中表达所有值都是某一变体。
 
 <div class="comparison">
 
@@ -228,7 +213,7 @@ int main() {
 ```
 
 ```rust
-// Define a separate struct for each variant.
+// 为每个变体定义单独的结构体。
 struct Rectangle { width: f64, height: f64 }
 struct  Triangle { base: f64, height: f64 }
 
@@ -257,12 +242,11 @@ fn get_shapes() -> Vec<Shape> {
 fn main() {
     let shapes = get_shapes();
 
-    // This iterator only iterates over triangles
-    // and demonstrates that by iterating over
-    // the Triangle type instead of the Shape type.
+    // 该迭代器只遍历三角形，
+    // 并且类型就是 Triangle 而不是 Shape。
     let triangles = shapes
         .iter()
-        // Keep only the triangles
+        // 只保留三角形
         .filter_map(|shape| match shape {
             Shape::Triangle(t) => Some(t),
             _ => None,
@@ -270,9 +254,8 @@ fn main() {
 
     let mut total_base = 0.0;
     for triangle in triangles {
-        // Because the iterator produces Triangles
-        // instead of Shapes, base can be accessed
-        // directly.
+        // 因为迭代器产生的是 Triangle，
+        // 所以可以直接访问 base 字段。
         total_base += triangle.base;
     }
 }
@@ -280,16 +263,13 @@ fn main() {
 
 </div>
 
-This kind of use is common enough in Rust that the variants are often designed
-to have their own types from the start.
+这种用法在 Rust 中很常见，因此变体通常一开始就设计为拥有自己的类型。
 
-This approach is also possible in C++. It is more commonly used along with
-`std::variant` in C++17 or later.
+这种做法在 C++ 中同样可行，且在 C++17 及以后版本中常与 `std::variant` 一起使用。
 
-## `std::variant` (since C++17)
+## `std::variant`（自 C++17 起）
 
-When programming in C++ standards since C++17, `std::variant` can be used to
-represent a tagged union in a way that has more in common with Rust enums.
+在 C++17 及以后标准中，可以用 `std::variant` 来表示带标签的联合体，这种方式与 Rust 的枚举更为相似。
 
 ```cpp
 #include <variant>
@@ -320,14 +300,9 @@ double area(const Shape &shape) {
 }
 ```
 
-Because Rust doesn't depend on templates for this language feature, error
-messages when a variant is missed or when a new variant is added are easier to
-read, which removes one of the barriers to using tagged unions more frequently.
-Compare the errors in C++ (using gcc) and Rust when the `Triangle` case is
-omitted.
+由于 Rust 不依赖模板实现该语言特性，因此当遗漏变体或新增变体时，错误信息更易读，这消除了使用标记联合体的障碍之一。对比 C++（gcc）和 Rust 在遗漏 `Triangle` 分支时的错误信息。
 
-The following two programs have the same error: each fails to handle a case of
-`Shape`.
+下面两个程序有相同的错误：都没有处理 `Shape` 的所有情况。
 
 <div class="comparison">
 
@@ -378,7 +353,7 @@ impl Shape {
 
 </div>
 
-However, the error messages differ significantly.
+但两者的错误信息有很大不同。
 
 <div class="comparison">
 
@@ -393,21 +368,21 @@ example.cc: In instantiation of ‘area(const Shape&)::<lambda(auto:27&&)> [with
    97 |                                         std::forward<_Args>(__args)...);
       |                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /usr/include/c++/14.2.1/variant:1060:24:   required from ‘static constexpr decltype(auto) std::__detail::__variant::__gen_vtable_impl<std::__detail::__variant::_Multi_array<_Result_type (*)(_Visitor, _Variants ...)>, std::integer_sequence<long unsigned int, __indices ...> >::__visit_invoke(_Visitor&&, _Variants ...) [with _Result_type = std::__detail::__variant::__deduce_visit_result<double>; _Visitor = area(const Shape&)::<lambda(auto:27&&)>&&; _Variants = {const std::variant<Rectangle, Triangle>&}; long unsigned int ...__indices = {1}]’
- 1060 |           return std::__invoke(std::forward<_Visitor>(__visitor),
+  1060 |           return std::__invoke(std::forward<_Visitor>(__visitor),
       |                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 1061 |               __element_by_index_or_cookie<__indices>(
+  1061 |               __element_by_index_or_cookie<__indices>(
       |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 1062 |                 std::forward<_Variants>(__vars))...);
+  1062 |                 std::forward<_Variants>(__vars))...);
       |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /usr/include/c++/14.2.1/variant:1820:5:   required from ‘constexpr decltype(auto) std::__do_visit(_Visitor&&, _Variants&& ...) [with _Result_type = __detail::__variant::__deduce_visit_result<double>; _Visitor = area(const Shape&)::<lambda(auto:27&&)>; _Variants = {const variant<Rectangle, Triangle>&}]’
- 1820 |                   _GLIBCXX_VISIT_CASE(1)
+  1820 |                   _GLIBCXX_VISIT_CASE(1)
       |                   ^~~~~~~~~~~~~~~~~~~
 /usr/include/c++/14.2.1/variant:1882:34:   required from ‘constexpr std::__detail::__variant::__visit_result_t<_Visitor, _Variants ...> std::visit(_Visitor&&, _Variants&& ...) [with _Visitor = area(const Shape&)::<lambda(auto:27&&)>; _Variants = {const variant<Rectangle, Triangle>&}; __detail::__variant::__visit_result_t<_Visitor, _Variants ...> = double]’
- 1882 |             return std::__do_visit<_Tag>(
+  1882 |             return std::__do_visit<_Tag>(
       |                    ~~~~~~~~~~~~~~~~~~~~~^
- 1883 |               std::forward<_Visitor>(__visitor),
+  1883 |               std::forward<_Visitor>(__visitor),
       |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 1884 |               static_cast<_Vp>(__variants)...);
+  1884 |               static_cast<_Vp>(__variants)...);
       |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 example.cc:17:20:   required from here
    17 |   return std::visit(
@@ -433,7 +408,6 @@ example.cc: In lambda function:
 example.cc:23:7: warning: control reaches end of non-void function [-Wreturn-type]
 ```
 
-
 ```text
 error[E0004]: non-exhaustive patterns: `&Shape::Triangle { .. }` not covered
  --> example.rs:8:15
@@ -449,7 +423,7 @@ note: `Shape` defined here
 2 |     Rectangle { width: f64, height: f64 },
 3 |     Triangle { base: f64, height: f64 },
   |     -------- not covered
-  = note: the matched value is of type `&Shape`
+= note: the matched value is of type `&Shape`
 help: ensure that all possible cases are being handled by adding a match arm with a wildcard pattern or an explicit pattern as shown
   |
 12~             } => width * height,
@@ -459,22 +433,11 @@ help: ensure that all possible cases are being handled by adding a match arm wit
 
 </div>
 
-## Using unsafe Rust to avoid checking the discriminant
+## 使用 unsafe Rust 避免判别值检查
 
-In situations where rewriting code to use the [above
-approach](#accessing-the-value-without-checking-the-discriminant) is not
-possible, one can check the discriminant anyway and then use the [`unreachable!`
-macro](https://doc.rust-lang.org/std/macro.unreachable.html) to avoid handling
-the impossible case. However, that still involves actually checking the
-discriminant. If the cost of checking the discriminant must be avoided, then the
-[unsafe function
-`unreachable_unchecked`](https://doc.rust-lang.org/std/hint/fn.unreachable_unchecked.html)
-can be used to both avoid handling the case and to indicate to the compiler that
-the optimizer should assume that the case cannot be reached, so the discriminant
-check can be optimized away.
+如果无法重构代码采用[上述方式](#accessing-the-value-without-checking-the-discriminant)，可以先检查判别值，然后用 [`unreachable!` 宏](https://doc.rust-lang.org/std/macro.unreachable.html) 来避免处理不可能的分支。但这仍然涉及实际的判别值检查。如果必须避免判别值检查的开销，可以使用 [unsafe 函数 `unreachable_unchecked`](https://doc.rust-lang.org/std/hint/fn.unreachable_unchecked.html)，既避免了分支处理，也告诉编译器该分支不可达，从而让优化器消除判别值检查。
 
-Much like how in the C++ example accessing an inactive variant is undefined
-behavior, reaching `unreachable_unchecked` is also undefined behavior.
+类似于 C++ 示例中访问未激活变体是未定义行为，执行到 `unreachable_unchecked` 也是未定义行为。
 
 ```rust
 # enum Shape {

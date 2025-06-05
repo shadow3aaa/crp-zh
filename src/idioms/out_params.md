@@ -1,10 +1,5 @@
-# Out parameters
+# 输出参数
 
-There are several idioms in C++ that involve the use of out parameters: passing
-pointers or references to functions for the function to mutate to provide its
-results.
+在 C++ 中，有多种习惯用法涉及输出参数：通过指针或引用将变量传递给函数，由函数修改这些变量以返回结果。
 
-The chapters in this section address idiomatic ways to achieve the same goals
-that out parameters are used for in C++. Many of the Rust idioms resemble the
-recommended alternatives to out parameters when programming against newer C++
-standards.
+本节的各章节将介绍在 Rust 中实现与 C++ 输出参数相同目标的惯用方式。许多 Rust 的惯用法与现代 C++ 推荐的输出参数替代方案类似。

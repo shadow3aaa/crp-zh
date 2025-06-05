@@ -1,8 +1,7 @@
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt = """
-Why is the check for self-assignment in `clone_from` not idiomatic Rust?
-
+为什么在 `clone_from` 中检查自赋值不是 Rust 的惯用做法？
 ```rust
 struct LargeStruct {
     field1: String,
@@ -33,39 +32,36 @@ impl Clone for LargeStruct {
 """
 prompt.distractors = [
 """
-Because `std::ptr::mem` is unsafe Rust.
+因为 `std::ptr::mem` 是不安全的 Rust。
 """,
 """
-Because the compiler will add the check when optimizing anyway.
+因为编译器在优化时会自动添加该检查。
 """
 ]
 answer.answer = """
-Because because `self` is a mutable reference, the borrow checker ensures that
-`source` can't be a reference to the same memory location.
+因为 `self` 是一个可变引用，借用检查器保证了 `source` 不可能是指向同一内存位置的引用。
 """
 id = "9f8a464a-6fbb-4352-815a-7a42d162f9fd"
 
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt = """
-Which are reasons why in Rust synthetic identifiers are usually used instead of
-memory location for object identity?
+在 Rust 中，为什么通常使用合成标识符而不是内存地址来表示对象身份？
 """
 prompt.distractors = [
 """
-There is no way to access memory locations in Rust.
+在 Rust 中无法访问内存地址。
 """,
 """
-Comparing memory locations requires unsafe Rust.
+比较内存地址需要使用不安全的 Rust。
 """
 ]
 answer.answer = [
 """
-Synthetic identifiers are easier to use for forming self-referential structures.
+合成标识符更容易用于构建自引用结构。
 """,
 """
-Synthetic identifiers avoid the complexity of using `Pin` to prevent values from
-being moved.
+合成标识符避免了使用 `Pin` 防止值被移动的复杂性。
 """
 ]
 id = "d60a321a-3b38-4425-8a9a-6b95fe0e3837"

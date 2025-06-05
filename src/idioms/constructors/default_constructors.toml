@@ -1,7 +1,7 @@
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt = """
-Does this program compile? If not, why not?
+这个程序能编译吗？如果不能，原因是什么？
 
 ```rust
 struct Widget {
@@ -15,42 +15,35 @@ fn main() {
 ```
 """
 answer.answer = """
-It does not compile because `w` is not explicitly initialized before it is used.
+不能编译，因为 `w` 在使用前没有被显式初始化。
 """
 prompt.distractors = [
-# Thinking Rust has implicit initialization with an implicit default
-# constructor, like C++.
+# 认为 Rust 有类似 C++ 的隐式初始化和隐式默认构造函数。
 """
-It does compile.
+能编译。
 """,
-# Thinking Rust has implicit default initialization, but needs an explicit
-# default constructor defined by Default.
+# 认为 Rust 有隐式默认初始化，但需要显式实现 Default。
 """
-It does not compile because `Widget` does not implement the `Default` trait.
+不能编译，因为 `Widget` 没有实现 `Default` trait。
 """,
-# Thinking Rust has implicit default initialization, but needs an explicit
-# default constructor defined by new.
+# 认为 Rust 有隐式默认初始化，但需要显式实现 new 方法。
 """
-It does not compile because `Widget` does not implement a `new` method.
+不能编译，因为 `Widget` 没有实现 `new` 方法。
 """,
-# Thinking Rust has implicit default initialization, but needs an explicit
-# default constructor defined by both Default and new (since the text talks
-# about how one should implement both).
+# 认为 Rust 有隐式默认初始化，但需要同时实现 Default 和 new（因为正文提到应实现二者）。
 """
-It does not compile because `Widget` does not implement both the `Default`
-trait and a `new` method.
+不能编译，因为 `Widget` 没有同时实现 `Default` trait 和 `new` 方法。
 """
 ]
 context = """
-Rust does not have implicit default initialization like C++ does. Variables must
-be explicitly initialized before use, or the program will fail to compile.
+Rust 不像 C++ 那样有隐式默认初始化。变量在使用前必须显式初始化，否则程序无法编译。
 """
 id = "5019323d-1534-4c70-a8e7-b015f87be228"
 
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt = """
-Which is the most idiomatic translation of the following C++ program?
+以下 C++ 程序最地道的 Rust 翻译是哪一个？
 
 ```cpp
 struct Vec2 {
@@ -112,8 +105,6 @@ impl Default for Vec2 {
 ```
 """
 context = """
-When there is a reasonable default value, it is most idiomatic in Rust to
-provide [both a `new` method and an implementation of the `Default`
-trait.](https://rust-lang.github.io/api-guidelines/interoperability.html?highlight=default#types-eagerly-implement-common-traits-c-common-traits)
+当存在合理的默认值时，Rust 最地道的做法是同时提供 [`new` 方法和实现 `Default` trait。](https://rust-lang.github.io/api-guidelines/interoperability.html?highlight=default#types-eagerly-implement-common-traits-c-common-traits)
 """
 id = "a436177e-821d-45d1-8e46-4fafc3d78cd3"

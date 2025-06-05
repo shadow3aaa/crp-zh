@@ -1,13 +1,7 @@
-# Encapsulation
+# 封装
 
-In C++ the encapsulation boundary is the class. In Rust the encapsulation
-boundary is the module, which may contain several types along with standalone
-functions. In larger projects, the crate may also act as an encapsulation
-boundary.
+在 C++ 中，封装的边界是类。而在 Rust 中，封装的边界是模块，模块可以包含多个类型以及独立的函数。在大型项目中，crate 也可以作为封装的边界。
 
-This difference means that in Rust one is more likely to have multiple, tightly
-coupled types that work together which are defined in one module and
-encapsulated as a whole.
+这种差异意味着，在 Rust 中，人们更倾向于在一个模块中定义多个紧密耦合、协同工作的类型，并将其作为一个整体进行封装。
 
-This section provides ways to translate between C++ and Rust's notions of
-encapsulation both mechanically and conceptually.
+本节将介绍如何在机械实现和概念层面上，将 C++ 和 Rust 的封装思想进行对比与转换。

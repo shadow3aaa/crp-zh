@@ -1,14 +1,8 @@
-# Zero-length arrays
+# 零长度数组
 
-In C++ codebases that are written in a C style or that make use of C libraries,
-null pointers may be used to represent empty arrays.
+在采用 C 风格编写或使用 C 库的 C++ 代码库中，空数组通常用空指针（null pointer）来表示。
 
-In Rust, arrays of arbitrary size are represented as
-[slices](https://doc.rust-lang.org/book/ch04-03-slices.html). These slices can
-have zero length. Since [Rust vectors are convertible to
-slices](https://doc.rust-lang.org/std/vec/struct.Vec.html#impl-Deref-for-Vec%3CT,+A%3E),
-defining functions that work with slices enables them to be used with vectors as
-well.
+在 Rust 中，任意大小的数组通过 [切片（slice）](https://doc.rust-lang.org/book/ch04-03-slices.html) 表示。切片可以具有零长度。而且 [Rust 的向量（Vec）可以自动转换为切片](https://doc.rust-lang.org/std/vec/struct.Vec.html#impl-Deref-for-Vec%3CT,+A%3E)，因此如果函数以切片作为参数，也可以直接传递向量。
 
 <div class="comparison">
 

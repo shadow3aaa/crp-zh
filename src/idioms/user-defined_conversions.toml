@@ -1,8 +1,7 @@
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt = """
-Which Rust program is the most idiomatic translation of the following C++
-program?
+以下哪个 Rust 程序是对下述 C++ 程序最地道的翻译？
 
 ```cpp
 #include <cmath>
@@ -112,8 +111,6 @@ impl TryFrom<f64> for NotNaN {
 ```
 """
 context = """
-There is a blanket implementation for `TryInto` for every type that implements
-`TryFrom`, so it is better to implement `TryFrom` and rely on the blanket
-implementation for `TryInto`.
+对于每个实现了 `TryFrom` 的类型，Rust 都有一个通用的 `TryInto` 实现。因此，更推荐实现 `TryFrom`，并依赖于通用的 `TryInto` 实现。
 """
 id = "d6790d33-5130-47ba-ba96-c6718978131f"

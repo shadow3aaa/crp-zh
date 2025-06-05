@@ -1,10 +1,5 @@
-# Attribution notices
+# 版权声明
 
-This book makes use of the Standard C++ Foundation logo under their posted
-[terms of use](https://isocpp.org/home/terms-of-use).
+本书使用了标准 C++ 基金会的徽标，遵循其发布的[使用条款](https://isocpp.org/home/terms-of-use)。
 
-This book makes use of the Rust logo, including a modified version of the logo,
-under the Creative Commons CC-BY license, as posted in the [rust-artwork
-repository](https://github.com/rust-lang/rust-artwork) and under the posted
-[terms of use](https://rustfoundation.org/policy/rust-trademark-policy/) for the
-trademark.
+本书使用了 Rust 徽标，包括其修改版本，遵循知识共享 CC-BY 许可，该许可发布在 [rust-artwork 代码库](https://github.com/rust-lang/rust-artwork)中，并遵循其发布的商标[使用条款](https://rustfoundation.org/policy/rust-trademark-policy/)。

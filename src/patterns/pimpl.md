@@ -1,1 +1,1 @@
-# Pointer-to-implementation (PImpl)
+# 实现指针（PImpl）

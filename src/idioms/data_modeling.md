@@ -1,54 +1,27 @@
-# Data modeling
+# 数据建模
 
-In C++ the mechanisms available for data modeling are classes, enums, and
-unions.
+在 C++ 中，可用于数据建模的机制有类（classes）、枚举（enums）和联合体（unions）。
 
-Rust, on the other hand, uses records
-([structs](https://doc.rust-lang.org/book/ch05-00-structs.html)) and algebraic
-data types ([enums](https://doc.rust-lang.org/book/ch06-00-enums.html)).
+而 Rust 则使用记录类型（[结构体 structs](https://doc.rust-lang.org/book/ch05-00-structs.html)）和代数数据类型（[枚举 enums](https://doc.rust-lang.org/book/ch06-00-enums.html)）。
 
-Although Rust supports one major piece of object oriented design, polymorphism
-using interfaces, Rust also has language features for modeling things using
-algebraic data types (which in simple cases are like a much more ergonomic
-`std::variant`).
+虽然 Rust 支持面向对象设计中的一个重要特性——通过接口实现的多态，但 Rust 也有用于通过代数数据类型建模事物的语言特性（在简单情况下，这类似于更易用的 `std::variant`）。
 
-This section gives examples of common constructions used when programming in C++
-and how to achieve the same effects using Rust's features.
+本节将给出在 C++ 编程中常见的构造示例，以及如何使用 Rust 的特性实现相同效果。
 
-## Fixed operations, varying data
+## 固定操作，变化数据
 
-In situations where one needs to model a fixed set of operations that clients
-will use, but the data that implements those operations are not fixed ahead of
-time, the approach in C++ and the approach in Rust are the same. In both cases
-interfaces that defines the required operations are defined. Concrete types,
-possibly defined by the client, implement those interfaces.
+当需要建模一组固定的操作（由客户端使用），但实现这些操作的数据类型并非预先确定时，C++ 和 Rust 的做法是相同的。在这两种情况下，都会定义接口来规定所需的操作。具体类型（可能由客户端定义）实现这些接口。
 
-This way of modeling data can make use of either
-[dynamic](./data_modeling/abstract_classes.md) or [static
-dispatch](./data_modeling/concepts.md), each of which is covered in its
-own section.
+这种数据建模方式可以采用[动态分发](./data_modeling/abstract_classes.md)或[静态分发](./data_modeling/concepts.md)，每种方式在各自的小节中有详细介绍。
 
-## Fixed data, varying operations
+## 固定数据，变化操作
 
-In situations where there is a fixed set of data but the operations that the
-data must support vary, there are a few approaches in C++. Which approaches are
-available to use depend on the version of the standard in use.
+当存在一组固定的数据，但数据需要支持的操作是变化的，在 C++ 中有几种实现方式。可用的方式取决于所使用的标准版本。
 
-In older versions of the standard, one might use manually defined tagged unions.
-In newer versions, `std::variant` is available to improve the safety and
-ergonomics of tagged unions. [Both of these approaches map to the same approach
-in Rust](./data_modeling/tagged_unions.md).
+在较早的标准版本中，可能会手动定义带标签的联合体（tagged unions）。在较新的标准中，`std::variant` 的引入提升了带标签联合体的安全性和易用性。[这两种方式在 Rust 中都对应同一种实现方式](./data_modeling/tagged_unions.md)。
 
-Additionally, despite it not being strictly necessary to model a fixed set of
-variants, the visitor pattern is sometimes used for this situation, especially
-when using versions of the C++ standard before the introduction of
-`std::variant`. In most of these cases the idiomatic Rust solution is the same
-as what one would do when converting a C++ solution that uses tagged unions. The
-chapter on the visitor pattern<!-- LINKME --> describes when to use a
-Rust version of the visitor pattern or when to use Rust's enums (which are
-closer to `std::variant` than to C++ enums) to model the data.
+此外，尽管并不严格要求用来建模固定变体集合，但访问者模式（visitor pattern）有时也会用于这种场景，尤其是在 C++ 标准引入 `std::variant` 之前。在大多数情况下，Rust 的惯用解决方案与将 C++ 的带标签联合体方案迁移到 Rust 时的做法一致。访问者模式章节<!-- LINKME -->会介绍何时应在 Rust 中使用访问者模式，何时应使用 Rust 的枚举（其更接近于 `std::variant` 而非 C++ 的枚举）来建模数据。
 
-## Varying data and operations
+## 数据和操作均可变化
 
-When both data and operations may be extended by a client, the visitor pattern
-is used in both C++ and in Rust<!-- LINKME -->.
+当数据和操作都可能被客户端扩展时，C++ 和 Rust 都会使用访问者模式<!-- LINKME -->。

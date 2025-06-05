@@ -1,18 +1,10 @@
-# Setter and getter methods
+# Setter 和 Getter 方法
 
-Setters and getters work similarly in C++ and Rust, but are used less frequently
-in Rust.
+Setter 和 Getter 在 C++ 和 Rust 中的工作方式类似，但在 Rust 中使用频率较低。
 
-It would [not be
-unusual](https://docs.rs/bevy/0.16.0/bevy/math/struct.Vec2.html) to see the
-following representation of a two-dimensional vector in C++, which hides its
-implementation and provides setters and getters to access the fields. This
-choice would typically be made in case a representation change (such as using
-polar instead of rectangular coordinates) needed to be made later without
-breaking clients.
+在 C++ 中，看到如下对二维向量的表示方式并不罕见，这种方式隐藏了实现细节，并通过 setter 和 getter 方法访问字段。这样做通常是为了在以后需要更改表示方式（比如从直角坐标改为极坐标）时，不会破坏客户端代码。
 
-On the other hand, in Rust such a type would almost always be defined with
-public fields.
+而在 Rust 中，这类类型几乎总是定义为公有字段。
 
 <div class="comparison">
 
@@ -26,30 +18,27 @@ public:
   double getX() { return x; }
   double getY() { return y; }
 
-  // ... vector operations ...
+  // ... 向量操作 ...
 };
 ```
 
 ```rust
 pub struct Vec2 {
-    // public fields instead of getters
+    // 使用公有字段而不是 getter
     pub x: f64,
     pub y: f64,
 }
 
 impl Vec2 {
-    // ... vector operations ...
+    // ... 向量操作 ...
 }
 ```
 
 </div>
 
-One major reason for the difference is a limitation of the borrow checker. With
-a getter function the entire structure is borrowed, preventing mutable use of
-other fields of the structure.
+造成这种差异的一个主要原因是借用检查器的限制。使用 getter 函数时，整个结构体会被借用，导致无法对结构体的其他字段进行可变操作。
 
-The following program will not compile because `get_name()` borrows all of
-`alice`.
+如下程序无法编译，因为 `get_name()` 借用了整个 `alice`：
 
 ```rust,ignore
 struct Person {
@@ -89,22 +78,15 @@ error[E0506]: cannot assign to `alice.age` because it is borrowed
 error: aborting due to 1 previous error
 ```
 
-Some additional reasons for the difference in approach are:
+造成这种做法差异的其他原因还包括：
 
-- Ergonomics: Public members make it possible to use pattern matching.
-- Transparency of performance: A change in representation would dramatically
-  change the costs involved with the getters. Exposing the representation makes
-  the cost change visible.
-- Control over mutability: Static lifetime checking of mutable references
-  removes concerns of unintended mutation of the value through Rust's equivalent
-  of observation pointers.
+- 易用性：公有成员可以方便地用于模式匹配。
+- 性能透明性：表示方式的改变会极大影响 getter 的开销。暴露表示方式可以让开销变化变得可见。
+- 可变性的控制：可变引用的静态生命周期检查消除了通过 Rust 等价于“观察指针”导致的意外修改的担忧。
 
-## Types with invariants and newtypes
+## 具有不变量和新类型的类型
 
-When types need to preserve invariants but the benefits of exposing fields are
-desired, a newtype pattern can be used. A wrapping "newtype" struct that
-represents the data with an invariant is defined and access to the fields of the
-underlying struct is provided by via a non-`mut` reference.
+当类型需要保持某些不变量，但又希望享受暴露字段的好处时，可以使用 newtype 模式。定义一个包装的“新类型”结构体来表示带有不变量的数据，并通过不可变引用提供对底层结构体字段的访问。
 
 ```rust
 pub struct Vec2 {
@@ -112,8 +94,8 @@ pub struct Vec2 {
     pub y: f64,
 }
 
-/// Represents a 2-vector that has magnitude 1.
-pub struct Normalized(Vec2); // note the private field
+/// 表示模长为 1 的二维向量。
+pub struct Normalized(Vec2); // 注意私有字段
 
 fn sqrt_approx_zero(x: f64) -> bool {
     x < 0.001
@@ -128,34 +110,23 @@ impl Normalized {
         }
     }
 
-    // The getter provides a reference to the underlying Vec2 value
-    // without permitting mutation.
+    // Getter 提供对底层 Vec2 的引用，但不允许修改。
     pub fn get(&self) -> &Vec2 {
         &self.0
     }
 }
 ```
 
+## 从索引结构中借用
 
-## Borrowing from indexed structures
+由于 getter 方法与借用检查器的交互方式，导致无法通过类似 `Vec::get_mut` 这样的方法对索引结构中的多个元素进行可变借用。
 
-A significant limitation that arises from the way that getter methods interact
-with the borrow checker is that it isn't possible to mutably borrow multiple
-elements from an indexed structure like a vector using a methods like
-`Vec::get_mut`.
+内置的索引类型提供了多种方法来创建结构体的分割视图。这些方法可以用来创建符合特定应用需求的辅助函数。
 
-The built-in indexed types have several methods for creating split views onto a
-structure. These can be used to create helper functions that match the
-requirements of a specific application.
+Rustonomicon 提供了[实现该模式的示例](https://doc.rust-lang.org/nomicon/borrow-splitting.html)，包括安全和不安全的 Rust 实现。
 
-The Rustonomicon has [examples of implementing this
-pattern](https://doc.rust-lang.org/nomicon/borrow-splitting.html), using both
-safe and unsafe Rust.
+## Setter 方法
 
-## Setter methods
-
-Setter methods also borrow the entire value, which causes the same problems as
-getters that return mutable references. As with getter methods, setter methods
-are mainly used when needed to preserve invariants.
+Setter 方法同样会借用整个值，这会导致与返回可变引用的 getter 方法相同的问题。与 getter 方法一样，setter 方法主要用于需要保持不变量的场景。
 
 {{#quiz setters_and_getters.toml}}

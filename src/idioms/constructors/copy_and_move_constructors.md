@@ -1,31 +1,22 @@
-# Copy and move constructors
+# 拷贝与移动构造函数
 
-In both C++ and Rust, one rarely has to write copy or move constructors (or
-their Rust equivalents) by hand. In C++ this is because the implicit definitions
-are good enough for most purposes, especially when using smart pointers (i.e.,
-following [the rule of
-zero](https://en.cppreference.com/w/cpp/language/rule_of_three)). In Rust this
-is because move semantics are the default, and the automatically derived
-implementations of the `Clone` and `Copy` traits are good enough for most
-purposes.
+在 C++ 和 Rust 中，通常很少需要手动编写拷贝或移动构造函数（或其 Rust 等价物）。在 C++ 中，这是因为隐式定义对于大多数用途已经足够，尤其是在使用智能指针时（即遵循[零规则](https://en.cppreference.com/w/cpp/language/rule_of_three)）。在 Rust 中，这是因为移动语义是默认的，并且自动派生的 `Clone` 和 `Copy` trait 实现对于大多数用途也已足够。
 
-For the following C++ classes, the implicitly defined copy and move constructors
-are sufficient. The equivalent in Rust uses a derive macro provided by the
-standard library to implement the corresponding traits.
+对于以下 C++ 类，隐式定义的拷贝和移动构造函数就已足够。Rust 中的等价实现使用标准库提供的 derive 宏来实现相应的 trait。
 
 <div class="comparison">
 
 ```cpp
-$#include <memory>
-$#include <string>
-$
+#include <memory>
+#include <string>
+
 struct Age {
   unsigned int years;
 
   Age(unsigned int years) : years(years) {}
 
-  // copy and move constructors and destructor
-  // implicitly declared and defined
+  // 拷贝和移动构造函数及析构函数
+  // 隐式声明和定义
 };
 
 struct Person {
@@ -39,8 +30,8 @@ struct Person {
       : age(age), name(name),
         best_friend(best_friend) {}
 
-  // copy and move constructors and destructor
-  // implicitly declared and defined
+  // 拷贝和移动构造函数及析构函数
+  // 隐式声明和定义
 };
 ```
 
@@ -62,11 +53,9 @@ struct Person {
 
 </div>
 
-## User-defined constructors
+## 用户自定义构造函数
 
-On the other hand, the following example requires a user-defined copy and move
-constructor because it manages a resource (a pointer acquired from a C library).
-The equivalent in Rust requires a custom implementation of the `Clone` trait.
+另一方面，以下示例由于管理资源（从 C 库获取的指针），因此需要用户自定义的拷贝和移动构造函数。Rust 中的等价实现则需要自定义实现 `Clone` trait。
 
 <div class="comparison">
 
@@ -104,8 +93,8 @@ public:
 ```rust
 # mod example {
 mod widget_ffi {
-    // Models an opaque type.
-    // See https://doc.rust-lang.org/nomicon/ffi.html#representing-opaque-structs
+    // 模拟不透明类型。
+    // 参考 https://doc.rust-lang.org/nomicon/ffi.html#representing-opaque-structs
     #[repr(C)]
     pub struct CWidget {
         _data: [u8; 0],
@@ -159,86 +148,44 @@ impl Drop for Widget {
 
 </div>
 
-Just as with how in C++ it is uncommon to need user-defined implementations for
-copy and move constructors or user-defined implementations for destructors, in
-Rust it is rare to need to implement the `Clone` and `Drop` traits by hand for
-types that do not represent resources.
+正如在 C++ 中很少需要为拷贝和移动构造函数或析构函数手动实现一样，在 Rust 中，对于不表示资源的类型，也很少需要手动实现 `Clone` 和 `Drop` trait。
 
-There is one exception to this. If the type has type parameters, it might be
-desirable to implement `Clone` (and `Copy`) manually even if the clone should be
-done field-by-field. See the [standard library documentation of
-`Clone`](https://doc.rust-lang.org/std/clone/trait.Clone.html#how-can-i-implement-clone)
-and [of
-`Copy`](https://doc.rust-lang.org/std/marker/trait.Copy.html#how-can-i-implement-copy)
-for details.
+有一个例外。如果类型有类型参数，即使克隆操作只是字段逐个克隆，有时也希望手动实现 `Clone`（和 `Copy`）。详情可参考 [标准库文档 `Clone`](https://doc.rust-lang.org/std/clone/trait.Clone.html#how-can-i-implement-clone) 和 [`Copy`](https://doc.rust-lang.org/std/marker/trait.Copy.html#how-can-i-implement-copy)。
 
-## Trivially copyable types
+## 可平凡拷贝类型
 
-In C++, a class type is trivially copyable when it has no non-trivial copy
-constructors, move constructors, copy assignment operators, move assignment
-operators and it has a trivial destructor. Values of a trivially copyable type
-are able to be copied by copying their bytes.
+在 C++ 中，当一个类类型没有非平凡的拷贝构造函数、移动构造函数、拷贝赋值运算符、移动赋值运算符，并且拥有平凡的析构函数时，该类型被认为是可平凡拷贝的。可平凡拷贝类型的值可以通过字节拷贝来复制。
 
-In the first C++ example above, `Age` is trivially copyable, but `Person` is
-not. This is because despite using a default copy constructor, the constructor
-is not trivial because `std::string` and `std::shared_ptr` are not trivially
-copyable.
+在上面的第一个 C++ 示例中，`Age` 是可平凡拷贝的，但 `Person` 不是。这是因为虽然 `Person` 使用了默认的拷贝构造函数，但由于 `std::string` 和 `std::shared_ptr` 不是可平凡拷贝的，所以其构造函数也不是平凡的。
 
-Rust indicates whether types are trivially copyable with the `Copy` trait. Just
-as with trivially copyable types in C++, values of types that implement `Copy`
-in Rust can be copied by copying their bytes. Rust requires explicit calls to
-the `clone` method to make copies of values of types that do not implement
-`Copy`.
+Rust 通过 `Copy` trait 来标识类型是否可平凡拷贝。与 C++ 中的可平凡拷贝类型类似，实现了 `Copy` trait 的 Rust 类型的值可以通过字节拷贝来复制。对于未实现 `Copy` 的类型，Rust 需要显式调用 `clone` 方法来复制值。
 
-In the first Rust example above, `Age` implements the `Copy` trait but `Person`
-does not. This is because neither `std::String` nor `Rc<Person>` implement
-`Copy`. They do not implement `Copy` because they own data that lives on the
-heap, and so are not trivially copyable.
+在上面的第一个 Rust 示例中，`Age` 实现了 `Copy` trait，而 `Person` 没有。这是因为 `String` 和 `Rc<Person>` 都没有实现 `Copy`。它们没有实现 `Copy`，是因为它们拥有堆上的数据，因此不是可平凡拷贝的。
 
-Rust prevents implementing `Copy` for a type if any of its fields are not
-`Copy`, but does not prevent implementing `Copy` for types that should not be
-copied bit-for-bit due to their intended meaning, which is usually indicated by
-a user-defined `Clone` implementation.
+如果某个类型的字段中有任何一个不是 `Copy`，Rust 会阻止为该类型实现 `Copy`，但不会阻止为那些本不该按位拷贝的类型实现 `Copy`，这通常通过用户自定义的 `Clone` 实现来体现。
 
-Rust does not permit the implementation of both `Copy` and `Drop` for the same
-type. This aligns with the C++ standard's requirement that trivially copyable
-types not implement a user-defined destructor.
+Rust 不允许同一个类型同时实现 `Copy` 和 `Drop`。这与 C++ 标准要求可平凡拷贝类型不能有用户自定义析构函数是一致的。
 
-## Move constructors
+## 移动构造函数
 
-In Rust, all types support move semantics by default, and custom move semantics
-cannot be (and do not need to be) defined. This is because what "move" means in
-Rust is not the same as it is in C++. In Rust, moving a value means changing
-what owns the value. In particular, there is no "old" object to be destructed
-after a move, because the compiler will prevent the use of a variable whose
-value has been moved.
+在 Rust 中，所有类型默认都支持移动语义，且无法（也无需）自定义移动语义。这是因为 Rust 中的“移动”与 C++ 中的含义不同。在 Rust 中，移动一个值意味着改变其所有权。特别地，移动后不会有“旧”对象需要析构，因为编译器会阻止对已被移动的变量的使用。
 
-## Assignment operators
+## 赋值运算符
 
-Rust does not have a copy or move assignment operator. Instead, assignment
-either moves (by transferring ownership), explicitly clones and then moves, or
-implicitly copies and then moves.
+Rust 没有拷贝或移动赋值运算符。赋值操作要么是移动（转移所有权），要么是显式克隆后再移动，要么是隐式拷贝后再移动。
 
 ```rust
 fn main() {
     let x = Box::<u32>::new(5);
-    let y = x; // moves
-    let z = y.clone(); // explicitly clones and then moves the clone
-    let w = *y; // implicitly copies the content of the Box and then moves the copy
+    let y = x; // 移动
+    let z = y.clone(); // 显式克隆后移动
+    let w = *y; // 隐式拷贝 Box 的内容后移动
 }
 ```
 
-For situations where something like a user-defined copy assignment could avoid
-allocations, the `Clone` trait has an additional method called `clone_from`. The
-method is automatically defined, but can be overridden when implementing the
-`Clone` trait to provide an efficient implementation.
+在某些情况下，如果类似用户自定义的拷贝赋值可以避免分配，`Clone` trait 提供了一个额外的方法 `clone_from`。该方法会自动定义，但在实现 `Clone` trait 时可以重写以提供更高效的实现。
 
-The method is not used for normal assignments, but can be explicitly used in
-situations where the performance of the assignment is significant and would be
-improved by using the more efficient implementation, if one is defined. The
-implementation can be made more efficient because `clone_from` takes ownership
-of the object to which the values are being assigned, and so can do things like
-reuse memory to avoid allocations.
+该方法不会用于普通赋值，但在赋值性能很重要且可以通过更高效的实现提升性能时，可以显式调用。由于 `clone_from` 拥有被赋值对象的所有权，因此可以复用内存以避免分配，从而提升效率。
 
 ```rust
 fn go(x: &Vec<u32>) {
@@ -249,14 +196,8 @@ fn go(x: &Vec<u32>) {
 }
 ```
 
-## Performance concerns and `Copy`
+## 性能考量与 `Copy`
 
-The decision to implement `Copy` should be based on the semantics of the type,
-not on performance. If the size of objects being copied is a concern, then one
-should instead use a reference (`&T` or `&mut T`) or put the value on the heap
-([`Box<T>`](https://doc.rust-lang.org/std/boxed/index.html) or
-[`Rc<T>`](https://doc.rust-lang.org/std/rc/index.html)). These approaches
-correspond to passing by reference, or using a `std::unique_ptr` or
-`std::shared_ptr` in C++.
+是否实现 `Copy` 应基于类型的语义，而不是性能。如果对象的大小成为性能瓶颈，应考虑使用引用（`&T` 或 `&mut T`），或将值放在堆上（[`Box<T>`](https://doc.rust-lang.org/std/boxed/index.html) 或 [`Rc<T>`](https://doc.rust-lang.org/std/rc/index.html)）。这些方式分别对应于按引用传递，或在 C++ 中使用 `std::unique_ptr` 或 `std::shared_ptr`。
 
 {{#quiz copy_and_move_constructors.toml}}

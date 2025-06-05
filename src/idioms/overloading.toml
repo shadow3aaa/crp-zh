@@ -1,23 +1,23 @@
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt = """
-Does this program compile? If not, why not?
+这个程序能编译吗？如果不能，原因是什么？
 
 ```rust
 trait Jump {
-    // Height above ground in meters
+    // 离地高度（米）
     fn height(&self) -> f64;
 }
 
 trait Fly {
-    // Height above ground in meters
+    // 离地高度（米）
     fn height(&self) -> f64;
 }
 
 struct Pigeon {}
 
 impl Pigeon {
-    // Head to tail in meters
+    // 从头到尾的长度（米）
     fn height(&self) -> f64 {
         0.3
     }
@@ -38,15 +38,13 @@ impl Fly for Pigeon {
 """
 prompt.distractors = [
 """
-It does not compile because `Pigeon` cannot have both an inherent method called
-`height` and implement a trait with a method called `height`.
+无法编译，因为 `Pigeon` 不能同时拥有一个名为 `height` 的固有方法，并实现一个包含同名方法的 trait。
 """,
 """
-It does not compile because `Pigeon` cannot implement two traits that both have
-a method called `height`.
+无法编译，因为 `Pigeon` 不能实现两个都包含名为 `height` 方法的 trait。
 """,
 ]
 answer.answer = [
-"It compiles."
+"可以编译。"
 ]
 id = "8cebf373-6026-43ed-9364-9fda8ca7fdcd"

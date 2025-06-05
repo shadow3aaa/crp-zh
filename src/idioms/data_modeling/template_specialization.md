@@ -1,36 +1,14 @@
-# Template specialization
+# 模板特化
 
-Template specialization in C++ makes it possible for a template entity to have
-different implementations for different parameters. Most STL implementations
-make use of this to, for example, provide a [space-efficient representation of
-`std::vector<bool>`](https://en.cppreference.com/w/cpp/container/vector_bool).
+C++ 中的模板特化使模板实体能够针对不同的参数拥有不同的实现。大多数 STL 实现都利用了这一点，例如为 [`std::vector<bool>` 提供空间高效的表示](https://en.cppreference.com/w/cpp/container/vector_bool)。
 
-Because of the possibility of template specialization, when a C++ function
-operates on values of a template class like `std::vector`, the function is
-essentially defined in terms of the interface provided by the template class,
-rather than for a specific implementation.
+由于模板特化的存在，当 C++ 函数操作如 `std::vector` 这样的模板类的值时，函数实际上是基于模板类所提供的接口来定义的，而不是针对某个特定实现。
 
-To accomplish the same thing in Rust requires defining the function in terms of
-a trait for the interface against which it operates. This enables clients to
-select their choice of representation for data by using any concrete type that
-implements the interface.
+要在 Rust 中实现类似的功能，需要基于 trait（特征）来定义函数接口。这样，用户可以通过使用任何实现了该接口的具体类型，自由选择数据的具体表示方式。
 
-This is more practical to do in Rust than in C++, because generics not being a
-general metaprogramming facility means that [generic entities can be type
-checked
-locally](./templates.md#a-note-on-type-checking-and-type-errors),
-making them easier to define. It is more common to do in Rust than in C++
-because Rust does not have [implementation
-inheritance](./inheritance_and_reuse.md), so there is a
-sharper line between interface and implementation than there is in C++.
+由于 Rust 的泛型并不是一种通用的元编程工具，因此[泛型实体可以在本地进行类型检查](./templates.md#a-note-on-type-checking-and-type-errors)，这使得它们更容易定义。这种做法在 Rust 中比在 C++ 中更常见，因为 Rust 没有[实现继承](./inheritance_and_reuse.md)，所以接口与实现之间的界限比 C++ 更加清晰。
 
-The following example shows how a Rust function can be implemented so that
-different concrete representations can be selected by a client. For a compact
-bit vector representation, the example uses the
-[`BitVec`](https://docs.rs/bitvec/latest/bitvec/vec/struct.BitVec.html) type
-from the [bitvec crate](https://docs.rs/bitvec/latest/bitvec/). `BitVec` is
-intended intended to provide an API similar to `Vec<bool>` or
-`std::vector<bool>`.
+下面的例子展示了如何在 Rust 中实现一个函数，使得用户可以选择不同的具体数据表示。为了实现紧凑的位向量表示，示例中使用了 [bitvec crate](https://docs.rs/bitvec/latest/bitvec/) 的 [`BitVec`](https://docs.rs/bitvec/latest/bitvec/vec/struct.BitVec.html) 类型。`BitVec` 旨在提供类似于 `Vec<bool>` 或 `std::vector<bool>` 的 API。
 
 <div class="comparison">
 
@@ -48,21 +26,18 @@ void push_if_even(int n,
 }
 
 int main() {
-  // Operate on the default std::vector
-  // implementation
+  // 操作默认的 std::vector 实现
   std::vector<std::string> v{"a", "b"};
   push_if_even(2, v, std::string("c"));
 
-  // Operate on the (likely space-optimized)
-  // std::vector implementation
+  // 操作（可能经过空间优化的）std::vector 实现
   std::vector<bool> bv{false, true};
   push_if_even(2, bv, false);
 }
 ```
 
 ```rust,ignore
-// The Extend trait is for types that support
-// appending values to the collection.
+// Extend trait 用于支持向集合追加值的类型。
 fn push_if_even<T, I: Extend<T>>(
     n: u32,
     collection: &mut I,
@@ -76,12 +51,12 @@ fn push_if_even<T, I: Extend<T>>(
 use bitvec::prelude::*;
 
 fn main() {
-    // Operate on Vec
+    // 操作 Vec
     let mut v =
         vec!["a".to_string(), "b".to_string()];
     push_if_even(2, &mut v, "c".to_string());
 
-    // Operate on BitVec
+    // 操作 BitVec
     let mut bv = bitvec![0, 1];
     push_if_even(2, &mut bv, 0);
 }
@@ -89,14 +64,11 @@ fn main() {
 
 </div>
 
-## Trade-offs between generics and templates
+## 泛型与模板的权衡
 
-Because generic functions can only interact with generic values in ways defined
-by the trait bounds, it is easier to test generic implementations. In
-particular, code testing a generic implementation only has to consider the
-possible behaviors of the given trait.
+由于泛型函数只能以 trait bound（特征约束）所定义的方式与泛型值交互，因此测试泛型实现更加容易。特别是，测试泛型实现的代码只需考虑给定 trait 的可能行为。
 
-For a comparison, consider the following programs.
+作为对比，请看下面的程序。
 
 <div class="comparison">
 
@@ -124,41 +96,18 @@ fn max<'a, T: Ord>(x: &'a T, y: &'a T) -> &'a T {
 
 </div>
 
-In the Rust program, _parametricity_ means that (assuming safe Rust) from the
-type alone one can tell that if the function returns, it must return exactly one
-of `x` or `y`. This is because the trait bound `Ord` doesn't give any way to
-construct new values of type `T`, and the use of references doesn't give any way
-for the function to store one of `x` or `y` from an earlier call to return in a
-later call.
+在 Rust 程序中，_参数多态性_ 意味着（假设是安全的 Rust）仅从类型就可以推断出，如果函数返回，它一定会返回 `x` 或 `y` 其中之一。这是因为 `Ord` trait bound 并没有提供构造新类型 `T` 值的方法，而引用的使用也不允许函数在后续调用中返回之前调用的 `x` 或 `y`。
 
-In the C++ program, a call to `max` with `int` as the template parameter will
-give a distinctly different result than with any other parameter because of the
-template specialization enabling the behavior of the function to vary based on
-the type.
+在 C++ 程序中，当以 `int` 作为模板参数调用 `max` 时，由于模板特化，函数的行为会与其他参数类型有明显不同。
 
-The trade-off is that in Rust specialized implementations are harder to use
-because they must have different names, but that they are easier to write
-because it is easier to write generic code while being confident about its
-correctness.
+这种权衡在于，Rust 中的特化实现更难使用，因为它们必须有不同的名字，但泛型代码更容易编写且更容易保证其正确性。
 
-## Niche optimization
+## 利基优化
 
-There are several cases where the Rust compiler will perform optimizations to
-achieve more efficient representations. Those situations are all ones where the
-efficiency gains do not otherwise change the observable behavior of the code.
+在某些情况下，Rust 编译器会进行优化，以实现更高效的表示。这些情况都是在效率提升不会改变代码可观察行为的前提下进行的。
 
-[The most common case is with the `Option`
-type](https://doc.rust-lang.org/std/option/index.html#representation). When
-`Option` is used with a type where the compiler can tell that there are unused
-values, one f those unused values will be used to represent the `None` case, so
-that `Option<T>` will not require an extra word of memory to indicate the
-discriminant of the enum.
+[最常见的例子是 `Option` 类型](https://doc.rust-lang.org/std/option/index.html#representation)。当 `Option` 用于编译器能够判断有未使用值的类型时，其中一个未使用的值会被用来表示 `None`，这样 `Option<T>` 就不需要额外的内存来存储枚举的判别值。
 
-This optimization is applied to reference types (`&` and `&mut`), since
-references cannot be null. It is also applied to `NonNull<T>`, which represents
-a non-null pointer to a value of type `T`, and to `NonZeroU8` and other non-zero
-integral types. The optimization for the reference case is what makes
-`Option<&T>` and `Option<&mut T>` safer equivalents to using non-owning
-observation pointers in C++.
+这种优化会应用于引用类型（`&` 和 `&mut`），因为引用不能为 null。它也会应用于 `NonNull<T>`（表示非空指针）以及 `NonZeroU8` 等非零整数类型。对引用类型的优化使得 `Option<&T>` 和 `Option<&mut T>` 成为 C++ 中非拥有型观察指针的更安全替代方案。
 
 {{#quiz template_specialization.toml}}

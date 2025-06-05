@@ -1,30 +1,26 @@
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt="""
-Which of the following is the most idiomatic way in Rust to use the following
-function?
+在 Rust 中，以下哪种方式是最符合惯用法地使用如下函数？
 
 ```rust
-/// Fetches data into the given buffer. Returns the number of bytes populated,
-/// or `None` when the end of the data is reached. The contents of `buf` will
-/// not be read.
+/// 将数据获取到给定的缓冲区中。返回填充的字节数，
+/// 或在数据结束时返回 `None`。`buf` 的内容不会被读取。
 fn fetch(buf: &mut [u8]) -> Option<usize>
 ```
 """
 prompt.distractors = [
-# Thinking that initialization can be skipped because the bytes will not be read
-# (as it would be in C++).
+# 认为可以跳过初始化，因为字节不会被读取（就像在 C++ 中一样）。
 """
 ```rust
 let mut buf;
 
 while let Some(count) = fetch(&mut buf) {
-    // use data in buf
+    // 使用 buf 中的数据
 }
 ```
 """,
-# Thinking that the optimizer can make it so that initialization happens only
-# once because the comment promises that the bytes will not be read.
+# 认为优化器可以让初始化只发生一次，因为注释承诺字节不会被读取。
 """
 ```rust
 loop {
@@ -32,7 +28,7 @@ loop {
     let Some(count) = fetch(&mut buf) else {
         break;
     };
-    // use data in buf
+    // 使用 buf 中的数据
 }
 ```
 """
@@ -42,7 +38,7 @@ answer.answer = """
 let mut buf = [0u8; 1024];
 
 while let Some(count) = fetch(&mut buf) {
-    // use data in buf
+    // 使用 buf 中的数据
 }
 ```
 """

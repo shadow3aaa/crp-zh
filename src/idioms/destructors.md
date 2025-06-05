@@ -1,35 +1,18 @@
-# Destructors and resource cleanup
+# 析构函数与资源清理
 
-In C++, a destructor for a class `T` is defined by providing a special member
-function `~T()`. To achieve the equivalent in Rust, the [`Drop`
-trait](https://doc.rust-lang.org/std/ops/trait.Drop.html) is implemented for a
-type.
+在 C++ 中，类 `T` 的析构函数通过特殊成员函数 `~T()` 定义。要在 Rust 中实现类似功能，需要为类型实现 [`Drop` trait](https://doc.rust-lang.org/std/ops/trait.Drop.html)。
 
-For an example, see [the chapter on copy and move
-constructors](./constructors/copy_and_move_constructors.md#user-defined-constructors).
+例如，参见[拷贝与移动构造函数章节](./constructors/copy_and_move_constructors.md#user-defined-constructors)。
 
-`Drop` implementations play the same role as destructors in C++ for types that
-manage resources. That is, they enable cleanup of resources owned by the value
-at the end of the value's lifetime.
+对于管理资源的类型，`Drop` 的实现与 C++ 的析构函数作用相同。也就是说，它们允许在值生命周期结束时清理其所拥有的资源。
 
-In Rust the `Drop::drop` method of a value is called automatically by a
-destructor when the variable that owns the value goes out of scope. Unlike in
-C++, the drop method cannot be called manually. Instead the automatic "drop
-glue" implicitly calls the destructors of fields.
+在 Rust 中，当拥有某个值的变量离开作用域时，会由析构器自动调用该值的 `Drop::drop` 方法。与 C++ 不同，drop 方法不能被手动调用。自动的“drop glue”会隐式地调用字段的析构函数。
 
-## Lifetimes and destructors
+## 生命周期与析构函数
 
-C++ destructors are called in reverse order of construction when variables go
-out of scope, or for dynamically allocated objects, when they are deleted. This
-includes destructors of moved-from objects.
+C++ 中，变量离开作用域时会以与构造顺序相反的顺序调用析构函数；对于动态分配的对象，则在被删除时调用。这包括已被移动的对象的析构函数。
 
-In Rust, the drop order is similar to that of C++ (reverse order of
-declaration). If additional specific details about the drop order are needed
-(e.g., for writing unsafe code), the full rules for the drop order are described
-in [the language
-reference](https://doc.rust-lang.org/reference/destructors.html). However,
-moving an object in Rust does not leave a moved-from object on which a
-destructor will be called.
+在 Rust 中，销毁顺序与 C++ 类似（按声明的逆序）。如果需要更具体的销毁顺序细节（如编写不安全代码时），可参考[语言参考](https://doc.rust-lang.org/reference/destructors.html)中的完整规则。然而，在 Rust 中，移动对象不会留下一个“已被移动”的对象，因此不会再对其调用析构函数。
 
 <div class="comparison">
 
@@ -42,15 +25,15 @@ struct A {
 
   A(int id) : id(id) {}
 
-  // copy constructor
+  // 拷贝构造函数
   A(A &other) : id(other.id) {}
 
-  // move constructor
+  // 移动构造函数
   A(A &&other) : id(other.id) {
     other.id = 0;
   }
 
-  // destructor
+  // 析构函数
   ~A() {
     std::cout << id << std::endl;
   }
@@ -58,10 +41,9 @@ struct A {
 
 int accept(A x) {
   return x.id;
-} // the destructor of x is called after the
-  // return expression is evaluated
+} // x 的析构函数会在 return 表达式求值后调用
 
-// Prints:
+// 输出：
 // 2
 // 3
 // 0
@@ -93,7 +75,7 @@ fn accept(x: A) -> i32 {
     return x.id;
 }
 
-// Prints:
+// 输出：
 // 2
 // 3
 // 1
@@ -109,52 +91,32 @@ fn main() {
 
 </div>
 
-In Rust, after ownership of `y` is moved into the function `accept`, there is
-no additional object remaining, and so there is no additional `Drop::drop` call
-(which in the C++ example prints `0`).
+在 Rust 中，将 `y` 的所有权移动到函数 `accept` 后，不会有额外的对象残留，因此不会有额外的 `Drop::drop` 调用（而在 C++ 示例中会打印 `0`）。
 
-Rust's drop methods do run when leaving scope due to a panic, though not if the
-panic occurs in a destructor that was called in response to an initial panic.
+Rust 的 drop 方法在因 panic 离开作用域时也会运行，但如果 panic 发生在响应初始 panic 而调用的析构函数中，则不会运行。
 
-## Early cleanup and explicitly destroying values
+## 提前清理与显式销毁值
 
-In C++ you can explicitly destroy an object. This is mainly useful for
-situations where placement new has been used to allocate the object at a
-specific memory location, and so the destructor will not be implicitly called.
+在 C++ 中，可以显式销毁一个对象。这主要用于通过 placement new 在特定内存位置分配对象的场景，此时析构函数不会被自动调用。
 
-However, once the destructor has been explicitly called, [it may not be called
-again, even implicitly](https://eel.is/c++draft/class.dtor#note-8). Thus the
-destructor can't be used for early cleanup. Instead, either the class must be
-designed with a separate cleanup method that releases the resources but leaves
-the object in a state where the destructor can be called or the function using
-the object must be structured so that the variable goes out of scope at the
-desired time.
+然而，一旦析构函数被显式调用，[它可能不会再次被调用，即使是隐式的](https://eel.is/c++draft/class.dtor#note-8)。因此，析构函数不能用于提前清理。相反，要么类需要设计一个单独的清理方法来释放资源但保持对象可析构，要么使用该对象的函数结构应确保变量在期望的时机离开作用域。
 
-In Rust, values can be dropped early for early cleanup by using
-[`std::mem::drop`](https://doc.rust-lang.org/std/mem/fn.drop.html). This works
-because ([for non-`Copy`
-types](./constructors/copy_and_move_constructors.md#trivially-copyable-types))
-ownership of the object is actually transferred to `std::mem::drop` function,
-and so `Drop::drop` is called at the end of `std::mem::drop` when the lifetime
-of the parameter ends.
+在 Rust 中，可以通过 [`std::mem::drop`](https://doc.rust-lang.org/std/mem/fn.drop.html) 提前销毁值以实现提前清理。这是因为（[对于非 `Copy` 类型](./constructors/copy_and_move_constructors.md#trivially-copyable-types)）对象的所有权实际上被转移给了 `std::mem::drop` 函数，因此在 `std::mem::drop` 的生命周期结束时会调用 `Drop::drop`。
 
-Thus, `std::mem::drop` can be used for early cleanup of resources without having
-to restructure a function to force variables out of scope early.
+因此，`std::mem::drop` 可用于提前清理资源，而无需通过调整函数结构让变量提前离开作用域。
 
-For example, the following allocates a large vector on the heap, but explicitly
-drops it before allocating a second large vector on the heap, reducing the
-overall memory usage.
+例如，下面的代码在堆上分配了一个大向量，并在分配第二个大向量前显式销毁第一个，从而减少了整体内存占用。
 
 ```rust
 fn main() {
     let v = vec![0u32; 100000];
-    // ... use v
+    // ... 使用 v
 
     std::mem::drop(v);
-    // can no longer use v here
+    // 此处 v 已不可用
 
     let v2 = vec![0u32; 100000];
-    // ... use v2
+    // ... 使用 v2
 }
 ```
 

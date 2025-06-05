@@ -1,13 +1,10 @@
-# Private members and friends
+# 私有成员与友元
 
-## Private members
+## 私有成员
 
-In C++ the unit of encapsulation is the class. Access specifiers (`private`,
-`protected`, and `public`) that control access to members are enforced at the
-class boundary.
+在 C++ 中，封装的单位是类。访问限定符（`private`、`protected` 和 `public`）在类的边界上控制成员的访问。
 
-In Rust the module is the unit of encapsulation. Item visibility (Rust's analog
-to access specifiers) controls access to items at the module boundary.
+在 Rust 中，模块是封装的单位。项的可见性（Rust 中类似于访问限定符）在模块边界上控制对项的访问。
 
 <div class="comparison">
 
@@ -21,18 +18,17 @@ class Person {
 public:
   std::string name;
 
-  // Because age is private, a public constructor
-  // method is needed to create instances.
+  // 因为 age 是私有的，所以需要一个公有构造函数
+  // 方法来创建实例。
   Person(std::string name, int age)
       : name(name), age(age) {}
 
-  // Free functions cannot access private members,
-  // so this has to be a member function.
+  // 自由函数无法访问私有成员，
+  // 所以必须是成员函数。
   static void example() {
     Person alice{"Alice", 42};
     std::ctout << alice.name << cout::endl;
-    // The private field is visible here, within
-    // the class.
+    // 在类内部可以访问私有字段。
     std::ctout << alice.age << cout::endl;
   }
 };
@@ -40,7 +36,7 @@ public:
 int main() {
   Person alice("Alice", 42);
   std::cout << alice.name << std::endl;
-  // compilation error
+  // 编译错误
   // std::cout << alice.age << std::endl;
 }
 ```
@@ -49,14 +45,13 @@ int main() {
 mod person {
     pub struct Person {
         pub name: String,
-        // this field is private
+        // 该字段是私有的
         age: i32,
     }
 
     impl Person {
-        // Because age is private, a public
-        // constructor method is needed to create
-        // values outside of the person module.
+        // 因为 age 是私有的，所以需要一个公有
+        // 构造方法来在 person 模块外部创建值。
         pub fn new(
             name: String,
             age: i32,
@@ -65,16 +60,13 @@ mod person {
         }
     }
 
-    // Free functions in the same module can
-    // access private fields because the unit of
-    // encapsulation is the module, not the
-    // struct.
+    // 同一模块中的自由函数可以访问私有字段，
+    // 因为封装单位是模块而不是结构体。
     fn example() {
         let alice =
             Person::new("Alice".to_string(), 42);
         println!("{}", alice.name);
-        // The private field is visible here,
-        // within the module.
+        // 在模块内部可以访问私有字段。
         println!("{}", alice.age);
     }
 }
@@ -85,33 +77,22 @@ fn main() {
     let alice =
         Person::new("Alice".to_string(), 42);
     println!("{}", alice.name);
-    // compilation error
+    // 编译错误
     // println!("{}", alice.age);
 }
 ```
 
 </div>
 
-In the Rust example, the [constructor for `Person` is
-private](./private_constructors.md) because one of the
-fields is private.
+在 Rust 示例中，[`Person` 的构造函数是私有的](./private_constructors.md)，因为其中一个字段是私有的。
 
-## Friends
+## 友元
 
-Because encapsulation is at the module level in Rust, associated methods for
-types can access internals of other types defined in the same module. This
-subsumes most uses of the C++ `friend` declaration.
+由于 Rust 的封装是在模块级别，类型的关联方法可以访问同一模块中定义的其他类型的内部内容。这涵盖了 C++ `friend` 声明的大多数用途。
 
-For example, defining a binary tree in C++ requires that the class representing
-the nodes of the tree declare the main binary tree class as a friend in order
-for it to access internal methods while keeping them private from other uses.
-This would be required even if the `TreeNode` class were defined as an inner
-class of `BinaryTree`.
+例如，在 C++ 中定义二叉树时，表示树节点的类需要将主二叉树类声明为友元，以便访问其内部方法，同时对其他用途保持私有。即使将 `TreeNode` 类定义为 `BinaryTree` 的内部类，也需要这样做。
 
-In Rust, however, both types can be defined in the same module, and so have
-access to each other's private fields and methods. The module as a whole
-provides a collection of types, methods, and functions that together define a
-encapsulated concept.
+而在 Rust 中，可以将两种类型定义在同一个模块中，因此可以互相访问私有字段和方法。整个模块作为一个整体，提供了一组类型、方法和函数，共同定义了一个封装的概念。
 
 <div class="comparison">
 
@@ -119,8 +100,7 @@ encapsulated concept.
 #include <memory>
 
 class BinaryTree {
-  // This needs to be an inner class in order for
-  // it to be private.
+  // 必须是内部类才能保持私有。
   class TreeNode {
     friend class BinaryTree;
 
@@ -174,8 +154,7 @@ int main() {
 ```rust
 mod binary_tree {
     pub struct BinaryTree {
-        // This field is not visible outside of
-        // the module.
+        // 该字段在模块外不可见。
         root: Option<Box<TreeNode>>,
     }
 
@@ -189,8 +168,7 @@ mod binary_tree {
         }
     }
 
-    // This struct and all its fields are not
-    // visible outside of the module.
+    // 该结构体及其所有字段在模块外不可见。
     struct TreeNode {
         value: i32,
         left: Option<Box<TreeNode>>,
@@ -215,8 +193,7 @@ mod binary_tree {
         }
     }
 
-    // This free function is not visible outside
-    // of the module.
+    // 该自由函数在模块外不可见。
     fn insert(
         node: &mut Option<Box<TreeNode>>,
         value: i32,
@@ -234,7 +211,7 @@ mod binary_tree {
     }
 }
 
-// This brings the (public) type into scope.
+// 引入（公有）类型到作用域。
 use binary_tree::BinaryTree;
 
 fn main() {
@@ -245,23 +222,15 @@ fn main() {
 
 </div>
 
-## Passkey idiom
+## Passkey 惯用法
 
-In the previous C++ example, the `TreeNode` constructor has to be public in
-order to be used with `make_unique`. Fortunately, the constructor is still
-inaccessible outside of the containing class, but it is not always the case that
-such helper classes can be inner classes.
+在前面的 C++ 示例中，`TreeNode` 的构造函数必须是公有的，以便与 `make_unique` 一起使用。幸运的是，该构造函数在包含类外部仍然不可访问，但并非所有辅助类都能成为内部类。
 
-To make the constructor effectively private when it is not possible, one might
-need to use a programming pattern like [the passkey
-idiom](https://chromium.googlesource.com/chromium/src/+/HEAD/docs/patterns/passkey.md).
+如果无法做到这一点，可以使用类似[Passkey 惯用法](https://chromium.googlesource.com/chromium/src/+/HEAD/docs/patterns/passkey.md)的编程模式，使构造函数实际上变为私有。
 
-The passkey idiom is also sometimes used to provide finer-grained control over
-access to members than is possible with friend declarations. In either case, the
-effect is achieved by modeling a capability-like system.
+Passkey 惯用法有时也用于比 friend 声明更细粒度地控制成员访问。无论哪种情况，其效果都是通过建模类似能力的系统实现的。
 
-In Rust, it is possible to express the same idiom in order to achieve the same
-effect.
+在 Rust 中，也可以表达同样的惯用法以达到相同效果。
 
 <div class="comparison">
 
@@ -283,9 +252,8 @@ public:
 
   static std::unique_ptr<Person>
   createPerson(std::string name, int age) {
-    // Other uses of make_unique are not possible
-    // because the Passkey type cannot be
-    // constructed.
+    // 其他地方无法使用 make_unique，
+    // 因为 Passkey 类型无法被构造。
     return std::make_unique<Person>(Passkey(),
                                     name, age);
   }
@@ -297,8 +265,7 @@ pub trait Maker<K, B> {
     fn make(passkey: K, args: B) -> Self;
 }
 
-// Generic helper that we want to be able to call
-// an otherwise private function or method.
+// 泛型辅助函数，用于调用本应私有的函数或方法。
 fn alloc_thing<K, B, T: Maker<K, B>>(
     passkey: K,
     args: B,
@@ -315,25 +282,21 @@ mod person {
         age: u32,
     }
 
-    // A zero-sized type to act as the passkey.
+    // 用作 passkey 的零大小类型。
     pub struct Passkey {
-        // This field is zero-sized. It is also
-        // private, which prevents construction
-        // of Passkey outside of the person
-        // module.
+        // 该字段为零大小，同时也是私有的，
+        // 防止在 person 模块外部构造 Passkey。
         _phantom: PhantomData<()>,
     }
 
     impl Person {
-        // Private method that will be exposed
-        // with a passkey wrapper.
+        // 私有方法，通过 passkey 包装器暴露。
         fn new(name: String, age: u32) -> Person {
             Person { name, age }
         }
 
-        // Method that uses external helper that
-        // requires access to another
-        // otherwise-private method.
+        // 使用外部辅助函数的方法，
+        // 需要访问另一个本应私有的方法。
         fn alloc(
             name: String,
             age: u32,
@@ -347,15 +310,13 @@ mod person {
         }
     }
 
-    // Helper structure needed to make the trait
-    // providing the interface generic.
+    // 为实现泛型接口所需的辅助结构体。
     pub struct MakePersonArgs {
         pub name: String,
         pub age: u32,
     }
 
-    // Implementation of the trait that exposes
-    // the method requiring a passkey.
+    // 实现 trait，暴露需要 passkey 的方法。
     impl Maker<Passkey, MakePersonArgs> for Person {
         fn make(
             _passkey: Passkey,
@@ -371,36 +332,23 @@ mod person {
 
 </div>
 
-However the Passkey idiom is unlikely to be used in Rust because
+不过，Passkey 惯用法在 Rust 中很少用到，因为
 
-- coupled types are usually defined in the same module (or a `pub (in path)`
-  declaration can be used), making it unnecessary, and
-- it requires cooperation from the interface by which the calling function will
-  use a type.
+- 相关类型通常定义在同一个模块中（或者可以用 `pub (in path)` 声明），因此没有必要；
+- 它要求接口的调用方配合使用。
 
-The second point contrasts with the use above involving `std::make_unique` which
-is able to forward to the underlying constructor without knowing about it at the
-point of the definition of `std::make_unique`. While the example below is not
-useful (because `alloc_thing` is not a useful helper), it does demonstrate what
-would types have to be defined in order to achieve the same effect as when using
-the idiom in C++.
+第二点与上面涉及 `std::make_unique` 的用法形成对比，后者可以在不知道底层构造函数的情况下转发调用。而下面的例子虽然没有实际用途（因为 `alloc_thing` 不是一个有用的辅助函数），但它确实演示了要实现与 C++ 中该惯用法相同效果时需要定义哪些类型。
 
+## 友元与测试
 
-## Friends and testing
+友元声明的另一个常见用途是让类的内部内容可用于单元测试。虽然在 C++ 中这种做法通常不被推荐，但有时为了测试本应私有的辅助内部类或辅助方法是必要的。
 
-Another common use of friend declarations is to make the internals of a class
-available for unit testing. Though this practice is often discouraged in C++, it
-is sometimes necessary in order to test other-wise private helper inner classes
-or helper methods.
-
-In Rust, tests are usually defined in the same module as the code being tested.
-Because the content of modules is visible to submodules, this makes it so that
-all of the content of the module is available for testing.
+在 Rust 中，测试通常定义在与被测试代码相同的模块中。由于模块内容对子模块可见，这使得模块的所有内容都可以用于测试。
 
 <div class="comparison">
 
 ```cpp
-// Using Boost.Test
+// 使用 Boost.Test
 // https://www.boost.org/doc/libs/1_84_0/libs/test/doc/html/index.html
 #include <string>
 
@@ -475,27 +423,18 @@ mod test {
 
 </div>
 
-<!-- Testing in Rust is described in more detail in the [chapter on unit
-testing](/etc/unit_tests.md). -->
+<!-- Rust 的测试将在[单元测试章节](/etc/unit_tests.md)中详细介绍。 -->
 
-## Visibility of methods on Rust traits
+## Rust trait 方法的可见性
 
-Because traits in Rust are intended for the definition of interfaces, the
-methods for some type that are declared by a trait are visible whenever both the
-trait and the type are visible. In other words, it is not possible to have
-private trait methods.
+由于 Rust 中的 trait 旨在定义接口，某个类型由 trait 声明的方法在 trait 和类型都可见时总是可见。换句话说，trait 方法无法设为私有。
 
-The default visibility for trait methods differs from Rust structs where the
-default visibility is private to the defining module.
+trait 方法的默认可见性与 Rust 结构体不同，结构体的默认可见性是限定在定义模块内。
 
-## Private constructors and friends
+## 私有构造函数与友元
 
-In C++ one can control which classes can derive from a specific class by making
-all of the constructors private and then declaring classes which may derive from
-it as friends.
+在 C++ 中，可以通过将所有构造函数设为私有，并将允许派生的类声明为友元，从而控制哪些类可以继承某个类。
 
-In Rust, one can achieve the similar goal of controlling which types can
-implement a trait by using the [sealed trait
-pattern](https://predr.ag/blog/definitive-guide-to-sealed-traits-in-rust/).
+在 Rust 中，可以通过[密封 trait 模式](https://predr.ag/blog/definitive-guide-to-sealed-traits-in-rust/)实现类似的目标，控制哪些类型可以实现某个 trait。
 
 {{#quiz private_and_friends.toml}}

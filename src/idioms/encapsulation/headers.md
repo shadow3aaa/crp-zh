@@ -1,15 +1,8 @@
-# Header files
+# 头文件
 
-One use of header files in C++ is to expose declarations that are defined in one
-translation units to other translation units without requiring the duplication
-of the declarations in multiple files. By convention, declarations that are not
-included in the header are considered to be private to the defining translation
-unit (though, to enforce this convention other mechanisms, such as [anonymous
-namespaces](./anonymous_namespaces.md), are required).
+C++ 中头文件的一个用途是将一个翻译单元中定义的声明暴露给其他翻译单元，而无需在多个文件中重复声明。按照惯例，没有包含在头文件中的声明被认为是该翻译单元私有的（不过，要强制执行这一惯例，还需要其他机制，比如[匿名命名空间](./anonymous_namespaces.md)）。
 
-In contrast, Rust uses neither textually-included header files nor forward
-declarations. Instead, Rust modules control visibility and linkage
-simultaneously and expose public definitions for use by other modules.
+相比之下，Rust 既不使用文本包含的头文件，也不需要前向声明。Rust 模块同时控制可见性和链接性，并通过公开定义将内容暴露给其他模块使用。
 
 <div class="comparison">
 
@@ -66,7 +59,7 @@ use person::*;
 
 fn main() {
     let p = Person::new("Alice".to_string());
-    // doesn't compile, private field
+    // 无法编译，字段是私有的
     // let name = p.name;
     let name = p.name();
 
@@ -76,31 +69,18 @@ fn main() {
 
 </div>
 
-In `person.rs`, the `Person` type is public but the `name` field is not. This
-prevents both direct construction of values of the type (similar to private
-members preventing aggregate initialization in C++) and prevents field access.
-The static method `Person::new(String)` and method `Person::name()` are exposed
-to clients of the module by the `pub` visibility declarations.
+在 `person.rs` 中，`Person` 类型是公开的，但 `name` 字段不是。这既防止了该类型值的直接构造（类似于 C++ 中私有成员阻止聚合初始化），也阻止了字段访问。静态方法 `Person::new(String)` 和方法 `Person::name()` 通过 `pub` 可见性声明对模块的使用者开放。
 
-In the `client` module, the `mod` declaration defines the content of `person.rs`
-as a submodule named `person`. The `use` declaration brings the contents of the
-`person` module into scope.
+在 `client` 模块中，`mod` 声明将 `person.rs` 的内容定义为名为 `person` 的子模块。`use` 声明将 `person` 模块的内容引入作用域。
 
-## The essence of the difference
+## 本质区别
 
-A C++ program is a collection of translation units. Header files are required to
-make providing forward declarations of definitions from other translation units
-manageable.
+C++ 程序是由多个翻译单元组成的。头文件的存在使得来自其他翻译单元的定义可以通过前向声明进行管理。
 
-A Rust program is a tree of modules. Definitions in one module may access items
-from other modules based on visibility declarations given in the definitions of
-the module themselves.
+Rust 程序是由模块树组成的。一个模块中的定义能否访问其他模块的内容，取决于这些模块自身定义的可见性声明。
 
-## Submodules and additional visibility features
+## 子模块与更多可见性特性
 
-Modules and visibility declarations are more powerful than shown in the above
-example. More details on how to use modules, `pub`, and `use` to achieve
-encapsulation goals are described in the chapter on [private members and
-friends](./private_and_friends.md).
+模块和可见性声明比上述示例更为强大。关于如何使用模块、`pub` 和 `use` 实现封装目标的更多细节，请参见[私有成员与友元](./private_and_friends.md)一章。
 
 {{#quiz headers.toml}}

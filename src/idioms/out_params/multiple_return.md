@@ -1,17 +1,14 @@
-# Multiple return values
+# 多返回值
 
-One idiom for returning multiple values from a function or method in C++ is to
-pass in references to which the values can be assigned.
+在 C++ 中，从函数或方法返回多个值的一种惯用法是传入引用参数，由函数对这些引用赋值。
 
-There are several reasons why this idiom might be used:
+这种惯用法可能被采用的原因有：
 
-- compatibility with versions of C++ earlier than C++11,
-- working in a codebase that uses C-style of C++, or
-- performance concerns.
+- 需要兼容 C++11 之前的版本，
+- 代码库采用了 C 风格的 C++，
+- 或出于性能考虑。
 
-The idiomatic translation of this program into Rust makes use of either
-[tuples](https://doc.rust-lang.org/std/primitive.tuple.html) or a named
-structure for the return type.
+将该模式惯用地翻译到 Rust 时，通常会使用 [元组](https://doc.rust-lang.org/std/primitive.tuple.html) 或具名结构体作为返回类型。
 
 <div class="comparison">
 
@@ -41,46 +38,36 @@ fn main() {
 
 </div>
 
-Rust has a dedicated tuple syntax and supports pattern matching with `let`
-bindings in part to support use cases like this one.
+Rust 拥有专门的元组语法，并支持 `let` 绑定的模式匹配，部分原因正是为了支持类似这样的用例。
 
-## Problems with the direct transliteration
+## 直接翻译的弊端
 
-It is possible to transliterate the original example that uses out parameters to
-Rust, but Rust requires the initialization of the variables before they can be
-passed to a function. The resulting program is not idiomatic Rust.
+虽然可以将原本使用输出参数的示例直接翻译为 Rust，但 Rust 要求变量在传递给函数前必须初始化。这样写出来的程序并不是惯用的 Rust。
 
 ```rust
-// NOT IDIOMATIC RUST
+// 非惯用 Rust
 fn get_point(x: &mut i32, y: &mut i32) {
     *x = 5;
     *y = 6;
 }
 
 fn main() {
-    let mut x = 0; // initialized to arbitrary values
+    let mut x = 0; // 必须初始化为任意值
     let mut y = 0;
     get_point(&mut x, &mut y);
     // ...
 }
 ```
 
-This approach requires assigning arbitrary initial values to the variables and
-making the variables mutable, both of which make it harder for the compiler to
-help with avoiding programming errors.
+这种方式要求变量赋予任意初值，并且必须是可变的，这会让编译器更难帮助开发者避免编程错误。
 
-Additionally, the Rust compiler is tuned for optimizing the idiomatic version of
-the program, and produces a significantly faster binary for that version.
+此外，Rust 编译器对惯用写法的优化更好，生成的二进制文件也显著更快。
 
-In situations where the performance of memory allocation is a concern (such as
-when it is necessary to reuse entire buffers in memory), the trade-offs may be
-different. That situation is discussed in the chapter on [pre-allocated
-buffers](./pre-allocated_buffers.md).
+在某些情况下（如需要复用整个内存缓冲区时），内存分配的性能可能成为关注点，这时权衡会有所不同。相关内容详见[预分配缓冲区](./pre-allocated_buffers.md)章节。
 
-## Similarities with idiomatic C++ since C++11
+## 与 C++11 及之后惯用法的相似之处
 
-In C++11 and later, `std::pair` and `std::tuple` are available for returning
-multiple values instead of assigning to reference parameters.
+自 C++11 起，`std::pair` 和 `std::tuple` 可用于返回多个值，而不是通过引用参数赋值。
 
 ```cpp
 #include <tuple>
@@ -97,7 +84,6 @@ int main() {
 }
 ```
 
-This more closely aligns with the normal Rust idiom for returning multiple
-values.
+这种方式与 Rust 返回多个值的惯用法更为接近。
 
 {{#quiz multiple_return.toml}}

@@ -1,13 +1,8 @@
-# Overloading
+# 重载（Overloading）
 
-C++ supports overloading of functions, so long as the invocations of the
-functions can be distinguished by the number or types of their arguments.
+C++ 支持函数重载，只要函数的调用可以通过参数的数量或类型来区分。
 
-Rust does not support this kind of function overloading. Instead, Rust has a few
-different mechanisms (some of which C++ also has) for achieving the effects of
-overloading in a way that interacts better with type inference. The mechanisms
-usually involve making the commonalities between the overloaded functions
-apparent in the code.
+Rust 不支持这种函数重载。相反，Rust 提供了几种不同的机制（其中有些 C++ 也有）来实现类似重载的效果，并且这些机制与类型推断结合得更好。这些机制通常要求将重载函数之间的共性在代码中显式表达出来。
 
 <div class="comparison">
 
@@ -36,12 +31,9 @@ fn twice(x: f64) -> f64 {
 
 </div>
 
-In practice, an example like the above would also likely be implemented in a
-more structured way even in C++, using templates.
+实际上，即使在 C++ 中，上述示例通常也会用模板来实现得更结构化。
 
-When phrased this way, the example can be translated to Rust, with the notable
-addition of [requiring a trait bound on the
-type](./data_modeling/concepts.md).
+用这种方式表述后，该示例可以被翻译为 Rust，显著的不同是 [需要对类型加上 trait 约束](./data_modeling/concepts.md)。
 
 <div class="comparison">
 
@@ -64,16 +56,11 @@ where
 
 </div>
 
-## Overloaded methods
+## 重载方法
 
-In C++ it is possible to have methods with the same name but different
-signatures on the same type. In Rust there can be at most one method with the
-same name for each trait implementation and at most one inherent method with the
-same name for a type.
+在 C++ 中，可以在同一类型上定义名称相同但签名不同的方法。而在 Rust 中，每个 trait 实现最多只能有一个同名方法，每个类型的固有方法（inherent method）同样如此。
 
-In cases where there are multiple methods with the same names because the method
-is defined for multiple traits, the desired method must be distinguished at the
-call site by specifying the trait.
+如果有多个同名方法是因为该方法为多个 trait 定义的，那么在调用时必须通过指定 trait 来区分所需的方法。
 
 ```rust
 trait TraitA {
@@ -88,41 +75,37 @@ struct MyStruct;
 
 impl MyStruct {
     fn go(&self) -> String {
-        "Called inherent method".to_string()
+        "调用固有方法".to_string()
     }
 }
 
 impl TraitA for MyStruct {
     fn go(&self) -> String {
-        "Called Trait A method".to_string()
+        "调用 Trait A 方法".to_string()
     }
 }
 
 impl TraitB for MyStruct {
     fn go(&self) -> String {
-        "Called Trait B method".to_string()
+        "调用 Trait B 方法".to_string()
     }
 }
 
 fn main() {
     let my_struct = MyStruct;
 
-    // Calling the inherent method
+    // 调用固有方法
     println!("{}", my_struct.go());
 
-    // Calling the method from TraitA
+    // 调用 TraitA 的方法
     println!("{}", TraitA::go(&my_struct));
 
-    // Calling the method from TraitB
+    // 调用 TraitB 的方法
     println!("{}", TraitB::go(&my_struct));
 }
 ```
 
-One exception to this is when the methods are all from the same generic trait
-with with different type parameters for the implementations. In that case, if
-the signature is sufficient to determine which implementation to use, the trait
-does not need to be specified to resolve the method. This is common when using
-the [`From` trait](https://doc.rust-lang.org/std/convert/trait.From.html).
+有一个例外是：当这些方法都来自同一个泛型 trait，但实现时类型参数不同。如果签名足以确定使用哪个实现，则无需指定 trait。这在使用 [`From` trait](https://doc.rust-lang.org/std/convert/trait.From.html) 时很常见。
 
 ```rust
 struct Widget;
@@ -140,21 +123,18 @@ impl From<f32> for Widget {
 }
 
 fn main() {
-    // Calls <Widget as From<i32>>::from
+    // 调用 <Widget as From<i32>>::from
     let w1 = Widget::from(5);
-    // Calls <Widget as From<f32>>::from
+    // 调用 <Widget as From<f32>>::from
     let w2 = Widget::from(1.0);
 }
 ```
 
-## Overloaded operators
+## 重载运算符
 
-In C++ most operators can either be overloaded either with a free-standing
-function or by providing a method defining the operator on a class.
+在 C++ 中，大多数运算符可以通过自由函数或在类中定义方法来重载。
 
-Rust provides operator via implementation of specific traits. Implementing a
-method of the same name as required by the trait will not make a type usable
-with the operator if the trait is not implemented.
+Rust 通过实现特定的 trait 来提供运算符重载。仅仅实现与 trait 要求同名的方法，并不能让类型支持该运算符，必须实现对应的 trait。
 
 <div class="comparison">
 
@@ -185,7 +165,7 @@ struct Vec2 {
 impl std::ops::Add for &Vec2 {
     type Output = Vec2;
 
-    // Note that the type of self here is &Vec2.
+    // 注意这里 self 的类型是 &Vec2。
     fn add(self, other: Self) -> Vec2 {
         Vec2 {
             x: self.x + other.x,
@@ -203,11 +183,7 @@ fn main() {
 
 </div>
 
-Additionally, sometimes it is best to provide trait implementations for various
-combinations of reference types, especially for types that implement the [`Copy
-trait`](./constructors/copy_and_move_constructors.md), since they are
-likely to want to be used either with or without taking a reference. For the
-example above, that involve defining four implementations.
+此外，尤其是对于实现了 [`Copy trait`](./constructors/copy_and_move_constructors.md) 的类型，通常最好为各种引用类型的组合都实现 trait，因为它们很可能既会以引用也会以所有权方式使用。对于上述例子，需要定义四种实现。
 
 ```rust
 #[derive(Clone, Copy)]
@@ -227,8 +203,7 @@ impl std::ops::Add<&Vec2> for &Vec2 {
     }
 }
 
-// If Vec2 weren't so small, it might be desireable to re-use space in the below
-// implementations, since they take ownership.
+// 如果 Vec2 不是这么小的类型，下面这些实现由于会转移所有权，可能希望复用空间。
 
 impl std::ops::Add<Vec2> for &Vec2 {
     type Output = Vec2;
@@ -270,7 +245,7 @@ fn main() {
 }
 ```
 
-The repetition can be addressed by defining a macro.
+这种重复可以通过定义宏来解决。
 
 ```rust
 #[derive(Clone, Copy)]
@@ -306,13 +281,11 @@ fn main() {
 }
 ```
 
-## Default arguments
+## 默认参数
 
-Default arguments in C++ are sometimes implemented in terms of function
-overloading.
+C++ 中的默认参数有时是通过函数重载实现的。
 
-Rust does not have default arguments. Instead, arguments with `Option` type can
-be used to provide a similar effect.
+Rust 没有默认参数。可以通过 `Option` 类型的参数来实现类似的效果。
 
 <div class="comparison">
 
@@ -349,23 +322,13 @@ fn main() {
 
 </div>
 
-## Unrelated overloads
+## 无关的重载
 
-The lack of completely ad hoc overloading in Rust encourages the definition of
-traits that capture essential commonalities between types, so that functions can
-be implemented in terms of those interfaces and used generally. However, it also
-sometime encourages the anti-pattern of defining of traits that only capture
-incidental commonalities (such as having methods of the same name).
+Rust 不支持完全随意的重载，这促使开发者定义能捕捉类型间本质共性的 trait，使得函数可以基于这些接口实现并被广泛使用。但有时也会导致反模式，即定义只捕捉偶然共性的 trait（比如仅仅有同名方法）。
 
-It is better programming practice in those cases to simply define separate
-functions, rather than to shoehorn in a trait where no real commonality exists.
+在这种情况下，更好的编程实践是直接定义不同的函数，而不是强行用 trait 来表达并不存在的共性。
 
-This is commonly seen in Rust in the naming conventions for constructor static
-methods. Instead of them all being named `new` with different arguments, they
-are [usually given names of the form
-`from_something`](https://rust-lang.github.io/api-guidelines/naming.html), where
-the `something` varies based on from what the value is being constructed, or a
-more specific name if appropriate.
+在 Rust 中，这种情况常见于构造函数的静态方法命名约定。它们通常不会都叫 `new` 并通过不同参数区分，而是 [通常采用 `from_something`](https://rust-lang.github.io/api-guidelines/naming.html) 的形式，其中 `something` 根据构造来源不同而变化，或者用更具体的名称。
 
 ```rust
 struct Vec3 {
@@ -389,8 +352,6 @@ impl Vec3 {
 }
 ```
 
-This differs from the conversion methods supported by the `From` and `Into`
-traits, which have the additional purpose of supporting trait bounds on generic
-functions which should take any type convertible to a specific type.
+这与 `From` 和 `Into` trait 支持的转换方法不同，后者还可以用于泛型函数的 trait bound，以接收任何可转换为特定类型的类型。
 
 {{#quiz overloading.toml}}
