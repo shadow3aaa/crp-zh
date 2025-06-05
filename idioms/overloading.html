@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Overloading - C++ to Rust Phrasebook</title>
+        <title>重载 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,14 +163,9 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="overloading"><a class="header" href="#overloading">Overloading</a></h1>
-<p>C++ supports overloading of functions, so long as the invocations of the
-functions can be distinguished by the number or types of their arguments.</p>
-<p>Rust does not support this kind of function overloading. Instead, Rust has a few
-different mechanisms (some of which C++ also has) for achieving the effects of
-overloading in a way that interacts better with type inference. The mechanisms
-usually involve making the commonalities between the overloaded functions
-apparent in the code.</p>
+                        <h1 id="重载overloading"><a class="header" href="#重载overloading">重载（Overloading）</a></h1>
+<p>C++ 支持函数重载，只要函数的调用可以通过参数的数量或类型来区分。</p>
+<p>Rust 不支持这种函数重载。相反，Rust 提供了几种不同的机制（其中有些 C++ 也有）来实现类似重载的效果，并且这些机制与类型推断结合得更好。这些机制通常要求将重载函数之间的共性在代码中显式表达出来。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;string&gt;
 
@@ -194,11 +189,8 @@ int twice(int x) {
 // }
 <span class="boring">}</span></code></pre></pre>
 </div>
-<p>In practice, an example like the above would also likely be implemented in a
-more structured way even in C++, using templates.</p>
-<p>When phrased this way, the example can be translated to Rust, with the notable
-addition of <a href="./data_modeling/concepts.html">requiring a trait bound on the
-type</a>.</p>
+<p>实际上，即使在 C++ 中，上述示例通常也会用模板来实现得更结构化。</p>
+<p>用这种方式表述后，该示例可以被翻译为 Rust，显著的不同是 <a href="./data_modeling/concepts.html">需要对类型加上 trait 约束</a>。</p>
 <div class="comparison">
 <pre><code class="language-cpp">template &lt;typename T&gt;
 T twice(T x) {
@@ -216,14 +208,9 @@ where
 }
 <span class="boring">}</span></code></pre></pre>
 </div>
-<h2 id="overloaded-methods"><a class="header" href="#overloaded-methods">Overloaded methods</a></h2>
-<p>In C++ it is possible to have methods with the same name but different
-signatures on the same type. In Rust there can be at most one method with the
-same name for each trait implementation and at most one inherent method with the
-same name for a type.</p>
-<p>In cases where there are multiple methods with the same names because the method
-is defined for multiple traits, the desired method must be distinguished at the
-call site by specifying the trait.</p>
+<h2 id="重载方法"><a class="header" href="#重载方法">重载方法</a></h2>
+<p>在 C++ 中，可以在同一类型上定义名称相同但签名不同的方法。而在 Rust 中，每个 trait 实现最多只能有一个同名方法，每个类型的固有方法（inherent method）同样如此。</p>
+<p>如果有多个同名方法是因为该方法为多个 trait 定义的，那么在调用时必须通过指定 trait 来区分所需的方法。</p>
 <pre><pre class="playground"><code class="language-rust">trait TraitA {
     fn go(&amp;self) -&gt; String;
 }
@@ -236,39 +223,35 @@ struct MyStruct;
 
 impl MyStruct {
     fn go(&amp;self) -&gt; String {
-        "Called inherent method".to_string()
+        "调用固有方法".to_string()
     }
 }
 
 impl TraitA for MyStruct {
     fn go(&amp;self) -&gt; String {
-        "Called Trait A method".to_string()
+        "调用 Trait A 方法".to_string()
     }
 }
 
 impl TraitB for MyStruct {
     fn go(&amp;self) -&gt; String {
-        "Called Trait B method".to_string()
+        "调用 Trait B 方法".to_string()
     }
 }
 
 fn main() {
     let my_struct = MyStruct;
 
-    // Calling the inherent method
+    // 调用固有方法
     println!("{}", my_struct.go());
 
-    // Calling the method from TraitA
+    // 调用 TraitA 的方法
     println!("{}", TraitA::go(&amp;my_struct));
 
-    // Calling the method from TraitB
+    // 调用 TraitB 的方法
     println!("{}", TraitB::go(&amp;my_struct));
 }</code></pre></pre>
-<p>One exception to this is when the methods are all from the same generic trait
-with with different type parameters for the implementations. In that case, if
-the signature is sufficient to determine which implementation to use, the trait
-does not need to be specified to resolve the method. This is common when using
-the <a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From</code> trait</a>.</p>
+<p>有一个例外是：当这些方法都来自同一个泛型 trait，但实现时类型参数不同。如果签名足以确定使用哪个实现，则无需指定 trait。这在使用 <a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From</code> trait</a> 时很常见。</p>
 <pre><pre class="playground"><code class="language-rust">struct Widget;
 
 impl From&lt;i32&gt; for Widget {
@@ -284,17 +267,14 @@ impl From&lt;f32&gt; for Widget {
 }
 
 fn main() {
-    // Calls &lt;Widget as From&lt;i32&gt;&gt;::from
+    // 调用 &lt;Widget as From&lt;i32&gt;&gt;::from
     let w1 = Widget::from(5);
-    // Calls &lt;Widget as From&lt;f32&gt;&gt;::from
+    // 调用 &lt;Widget as From&lt;f32&gt;&gt;::from
     let w2 = Widget::from(1.0);
 }</code></pre></pre>
-<h2 id="overloaded-operators"><a class="header" href="#overloaded-operators">Overloaded operators</a></h2>
-<p>In C++ most operators can either be overloaded either with a free-standing
-function or by providing a method defining the operator on a class.</p>
-<p>Rust provides operator via implementation of specific traits. Implementing a
-method of the same name as required by the trait will not make a type usable
-with the operator if the trait is not implemented.</p>
+<h2 id="重载运算符"><a class="header" href="#重载运算符">重载运算符</a></h2>
+<p>在 C++ 中，大多数运算符可以通过自由函数或在类中定义方法来重载。</p>
+<p>Rust 通过实现特定的 trait 来提供运算符重载。仅仅实现与 trait 要求同名的方法，并不能让类型支持该运算符，必须实现对应的 trait。</p>
 <div class="comparison">
 <pre><code class="language-cpp">struct Vec2 {
   double x;
@@ -320,7 +300,7 @@ struct Vec2 {
 impl std::ops::Add for &amp;Vec2 {
     type Output = Vec2;
 
-    // Note that the type of self here is &amp;Vec2.
+    // 注意这里 self 的类型是 &amp;Vec2。
     fn add(self, other: Self) -&gt; Vec2 {
         Vec2 {
             x: self.x + other.x,
@@ -335,10 +315,7 @@ fn main() {
     let c = &amp;a + &amp;b;
 }</code></pre></pre>
 </div>
-<p>Additionally, sometimes it is best to provide trait implementations for various
-combinations of reference types, especially for types that implement the <a href="./constructors/copy_and_move_constructors.html"><code>Copy trait</code></a>, since they are
-likely to want to be used either with or without taking a reference. For the
-example above, that involve defining four implementations.</p>
+<p>此外，尤其是对于实现了 <a href="./constructors/copy_and_move_constructors.html"><code>Copy trait</code></a> 的类型，通常最好为各种引用类型的组合都实现 trait，因为它们很可能既会以引用也会以所有权方式使用。对于上述例子，需要定义四种实现。</p>
 <pre><pre class="playground"><code class="language-rust">#[derive(Clone, Copy)]
 struct Vec2 {
     x: f64,
@@ -356,8 +333,7 @@ impl std::ops::Add&lt;&amp;Vec2&gt; for &amp;Vec2 {
     }
 }
 
-// If Vec2 weren't so small, it might be desireable to re-use space in the below
-// implementations, since they take ownership.
+// 如果 Vec2 不是这么小的类型，下面这些实现由于会转移所有权，可能希望复用空间。
 
 impl std::ops::Add&lt;Vec2&gt; for &amp;Vec2 {
     type Output = Vec2;
@@ -397,7 +373,7 @@ fn main() {
     let b = Vec2 { x: 3.0, y: 4.0 };
     let c = a + b;
 }</code></pre></pre>
-<p>The repetition can be addressed by defining a macro.</p>
+<p>这种重复可以通过定义宏来解决。</p>
 <pre><pre class="playground"><code class="language-rust">#[derive(Clone, Copy)]
 struct Vec2 {
     x: f64,
@@ -429,11 +405,9 @@ fn main() {
     let b = Vec2 { x: 3.0, y: 4.0 };
     let c = a + b;
 }</code></pre></pre>
-<h2 id="default-arguments"><a class="header" href="#default-arguments">Default arguments</a></h2>
-<p>Default arguments in C++ are sometimes implemented in terms of function
-overloading.</p>
-<p>Rust does not have default arguments. Instead, arguments with <code>Option</code> type can
-be used to provide a similar effect.</p>
+<h2 id="默认参数"><a class="header" href="#默认参数">默认参数</a></h2>
+<p>C++ 中的默认参数有时是通过函数重载实现的。</p>
+<p>Rust 没有默认参数。可以通过 <code>Option</code> 类型的参数来实现类似的效果。</p>
 <div class="comparison">
 <pre><code class="language-cpp">unsigned int shift(unsigned int x,
                    unsigned int shiftAmount) {
@@ -462,20 +436,10 @@ fn main() {
     let res = shift(7, None); // shifts by 2
 }</code></pre></pre>
 </div>
-<h2 id="unrelated-overloads"><a class="header" href="#unrelated-overloads">Unrelated overloads</a></h2>
-<p>The lack of completely ad hoc overloading in Rust encourages the definition of
-traits that capture essential commonalities between types, so that functions can
-be implemented in terms of those interfaces and used generally. However, it also
-sometime encourages the anti-pattern of defining of traits that only capture
-incidental commonalities (such as having methods of the same name).</p>
-<p>It is better programming practice in those cases to simply define separate
-functions, rather than to shoehorn in a trait where no real commonality exists.</p>
-<p>This is commonly seen in Rust in the naming conventions for constructor static
-methods. Instead of them all being named <code>new</code> with different arguments, they
-are <a href="https://rust-lang.github.io/api-guidelines/naming.html">usually given names of the form
-<code>from_something</code></a>, where
-the <code>something</code> varies based on from what the value is being constructed, or a
-more specific name if appropriate.</p>
+<h2 id="无关的重载"><a class="header" href="#无关的重载">无关的重载</a></h2>
+<p>Rust 不支持完全随意的重载，这促使开发者定义能捕捉类型间本质共性的 trait，使得函数可以基于这些接口实现并被广泛使用。但有时也会导致反模式，即定义只捕捉偶然共性的 trait（比如仅仅有同名方法）。</p>
+<p>在这种情况下，更好的编程实践是直接定义不同的函数，而不是强行用 trait 来表达并不存在的共性。</p>
+<p>在 Rust 中，这种情况常见于构造函数的静态方法命名约定。它们通常不会都叫 <code>new</code> 并通过不同参数区分，而是 <a href="https://rust-lang.github.io/api-guidelines/naming.html">通常采用 <code>from_something</code></a> 的形式，其中 <code>something</code> 根据构造来源不同而变化，或者用更具体的名称。</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>struct Vec3 {
@@ -498,13 +462,11 @@ impl Vec3 {
     }
 }
 <span class="boring">}</span></code></pre></pre>
-<p>This differs from the conversion methods supported by the <code>From</code> and <code>Into</code>
-traits, which have the additional purpose of supporting trait bounds on generic
-functions which should take any type convertible to a specific type.</p>
-<div class="quiz-placeholder" data-quiz-name="&quot;overloading&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;8cebf373-6026-43ed-9364-9fda8ca7fdcd&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:[&quot;It compiles.&quot;]},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;It does not compile because `Pigeon` cannot have both an inherent method called\n`height` and implement a trait with a method called `height`.\n&quot;,&quot;It does not compile because `Pigeon` cannot implement two traits that both have\na method called `height`.\n&quot;],&quot;prompt&quot;:&quot;Does this program compile? If not, why not?\n\n```rust\ntrait Jump {\n    // Height above ground in meters\n    fn height(&amp;self) -&gt; f64;\n}\n\ntrait Fly {\n    // Height above ground in meters\n    fn height(&amp;self) -&gt; f64;\n}\n\nstruct Pigeon {}\n\nimpl Pigeon {\n    // Head to tail in meters\n    fn height(&amp;self) -&gt; f64 {\n        0.3\n    }\n}\n\nimpl Jump for Pigeon {\n    fn height(&amp;self) -&gt; f64 {\n        0.0\n    }\n}\n\nimpl Fly for Pigeon {\n    fn height(&amp;self) -&gt; f64 {\n        5.0\n    }\n}\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
+<p>这与 <code>From</code> 和 <code>Into</code> trait 支持的转换方法不同，后者还可以用于泛型函数的 trait bound，以接收任何可转换为特定类型的类型。</p>
+<div class="quiz-placeholder" data-quiz-name="&quot;overloading&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;8cebf373-6026-43ed-9364-9fda8ca7fdcd&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:[&quot;可以编译。&quot;]},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;无法编译，因为 `Pigeon` 不能同时拥有一个名为 `height` 的固有方法，并实现一个包含同名方法的 trait。\n&quot;,&quot;无法编译，因为 `Pigeon` 不能实现两个都包含名为 `height` 方法的 trait。\n&quot;],&quot;prompt&quot;:&quot;这个程序能编译吗？如果不能，原因是什么？\n\n```rust\ntrait Jump {\n    // 离地高度（米）\n    fn height(&amp;self) -&gt; f64;\n}\n\ntrait Fly {\n    // 离地高度（米）\n    fn height(&amp;self) -&gt; f64;\n}\n\nstruct Pigeon {}\n\nimpl Pigeon {\n    // 从头到尾的长度（米）\n    fn height(&amp;self) -&gt; f64 {\n        0.3\n    }\n}\n\nimpl Jump for Pigeon {\n    fn height(&amp;self) -&gt; f64 {\n        0.0\n    }\n}\n\nimpl Fly for Pigeon {\n    fn height(&amp;self) -&gt; f64 {\n        5.0\n    }\n}\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Overloading">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=重载">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

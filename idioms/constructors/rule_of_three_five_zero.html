@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Rule of three/five/zero - C++ to Rust Phrasebook</title>
+        <title>三/五/零法则 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,45 +163,21 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="rule-of-threefivezero"><a class="header" href="#rule-of-threefivezero">Rule of three/five/zero</a></h1>
-<h2 id="rule-of-three"><a class="header" href="#rule-of-three">Rule of three</a></h2>
-<p>In C++ the rule of three is a rule of thumb that if a class has a user-defined
-destructor, copy constructor or copy assignment operator, it probably should
-have all three.</p>
-<p>The corresponding rule for Rust is that if a type has a user-defined <code>Clone</code> or
-<code>Drop</code> implementation, it probably needs both. This is for the same reason as
-the rule of three in C++: if a type has a user-defined implementation for
-<code>Clone</code> or <code>Drop</code>, it is probably because the type manages a resource, and both
-<code>Clone</code> and <code>Drop</code> will need to take special actions for the resource.</p>
-<h2 id="rule-of-five"><a class="header" href="#rule-of-five">Rule of five</a></h2>
-<p>The rule of five in C++ states that if move semantics are needed for a type with
-a user-defined copy constructor or copy assignment operator, then a user-defined
-move constructor and move assignment should also be provided, because no
-implicit move constructor or move assignment operator will be generated.</p>
-<p>In Rust, this rule is not relevant because of the <a href="copy_and_move_constructors.html#move-constructors">difference in move semantics
-between C++ and Rust.</a></p>
-<h2 id="rule-of-zero"><a class="header" href="#rule-of-zero">Rule of zero</a></h2>
-<p>The rule of zero states that classes with user-defined copy/move constructors,
-assignment operators, and destructors should deal only with ownership, and other
-classes should not have those constructors or destructors. In practice, most
-classes should make use of types from the STL (<code>shared_ptr</code>, <code>vector</code>, etc.) for
-dealing with ownership concerns so that the implicitly defined copy and move
-constructors are sufficient.</p>
-<p>In Rust, the same is true. See the list of Rust type equivalents for equivalents
-of C++ <a href="../type_equivalents.html#pointers">smart pointer types</a> and
-equivalents of C++ <a href="../type_equivalents.html#containers">container types</a>.</p>
-<p>One difference between C++ and Rust in applying the rule of zero is that in C++
-<code>std::unique_ptr</code> can take a custom deleter, making it possible to use
-<code>std::unique_ptr</code> for wrapping raw pointers that require custom destruction
-logic. In Rust, the <code>Box</code> type is not parameterized in the same way. To
-accomplish the same goal, one instead must define a new type with a user-defined
-<code>Drop</code> implementation, as is done in <a href="./copy_and_move_constructors.html#user-defined-constructors">the example in the chapter on copy and
-move
-constructors</a>.</p>
-<div class="quiz-placeholder" data-quiz-name="&quot;rule_of_three_five_zero&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;cddc736a-b6c3-4f3f-a3a7-b42eb362d650&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:[&quot;`Clone`&quot;]},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;`Move`&quot;,&quot;`Copy`&quot;],&quot;prompt&quot;:&quot;If the `Drop` trait is implemented for a type in Rust, which other traits should\nprobably be implemented?\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
+                        <h1 id="三五零法则"><a class="header" href="#三五零法则">三/五/零法则</a></h1>
+<h2 id="三法则"><a class="header" href="#三法则">三法则</a></h2>
+<p>在 C++ 中，三法则是一条经验法则：如果一个类自定义了析构函数、拷贝构造函数或拷贝赋值运算符，那么它很可能需要同时自定义这三者。</p>
+<p>Rust 中的对应规则是：如果一个类型自定义了 <code>Clone</code> 或 <code>Drop</code> 实现，那么它很可能需要同时实现这两个 trait。原因与 C++ 的三法则相同：如果一个类型自定义了 <code>Clone</code> 或 <code>Drop</code>，通常是因为该类型管理某种资源，而 <code>Clone</code> 和 <code>Drop</code> 都需要对该资源进行特殊处理。</p>
+<h2 id="五法则"><a class="header" href="#五法则">五法则</a></h2>
+<p>C++ 的五法则指出：如果一个类型自定义了拷贝构造函数或拷贝赋值运算符，并且需要移动语义，那么也应当自定义移动构造函数和移动赋值运算符，因为不会自动生成隐式的移动构造函数或移动赋值运算符。</p>
+<p>在 Rust 中，这条规则并不适用，因为 <a href="copy_and_move_constructors.html#move-constructors">C++ 和 Rust 的移动语义不同</a>。</p>
+<h2 id="零法则"><a class="header" href="#零法则">零法则</a></h2>
+<p>零法则认为：自定义拷贝/移动构造函数、赋值运算符和析构函数的类应只处理所有权问题，其他类则不应自定义这些函数。实际上，大多数类应当使用 STL 中的类型（如 <code>shared_ptr</code>、<code>vector</code> 等）来处理所有权，这样隐式定义的拷贝和移动构造函数就足够了。</p>
+<p>在 Rust 中同样如此。可参考 Rust 类型等价表，了解 C++ <a href="../type_equivalents.html#pointers">智能指针类型</a> 和 <a href="../type_equivalents.html#containers">容器类型</a> 的对应关系。</p>
+<p>C++ 和 Rust 在应用零法则时有一个区别：C++ 的 <code>std::unique_ptr</code> 可以接受自定义删除器，因此可以用来包装需要自定义析构逻辑的原始指针。而在 Rust 中，<code>Box</code> 类型并没有类似的参数化机制。要实现类似功能，需要自定义一个类型并实现 <code>Drop</code>，具体可参考<a href="./copy_and_move_constructors.html#user-defined-constructors">拷贝和移动构造函数章节中的示例</a>。</p>
+<div class="quiz-placeholder" data-quiz-name="&quot;rule_of_three_five_zero&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;cddc736a-b6c3-4f3f-a3a7-b42eb362d650&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:[&quot;`Clone`&quot;]},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;`Move`&quot;,&quot;`Copy`&quot;],&quot;prompt&quot;:&quot;如果在 Rust 中为某个类型实现了 `Drop` trait，还应该实现哪些其他 trait？\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Rule of three/five/zero">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=三/五/零法则">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

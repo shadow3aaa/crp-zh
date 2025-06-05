@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Type equivalents - C++ to Rust Phrasebook</title>
+        <title>类型等价 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,23 +163,12 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="type-equivalents"><a class="header" href="#type-equivalents">Type equivalents</a></h1>
-<p>The type equivalents listed in this document are equivalent for the purposes of
-programming in Rust as one would program in C++. They are not necessarily
-equivalent in terms of being useful for interacting with C or C++ programs via
-an FFI. For types that are useful for interoperability with C or C++, see the
-<a href="https://doc.rust-lang.org/std/ffi/index.html">Rust <code>std::ffi</code> module
-documentation</a> and the <a href="https://doc.rust-lang.org/nomicon/ffi.html">FFI
-documentation in the Rustonomicon</a>.</p>
-<h2 id="primitive-types"><a class="header" href="#primitive-types">Primitive types</a></h2>
-<h3 id="integer-types"><a class="header" href="#integer-types">Integer types</a></h3>
-<p>In C++, many of the integer types (like <code>int</code> and <code>long</code>) have implementation
-defined widths. In Rust, integer types are always specified with their widths,
-much like the types in <code>&lt;cstdint&gt;</code> in C++. When it isn't clear what integer type
-to use, <a href="https://doc.rust-lang.org/book/ch03-02-data-types.html#integer-types">it is common to default to <code>i32</code>, which is the type that Rust defaults
-to for integer
-literals</a>.</p>
-<div class="table-wrapper"><table><thead><tr><th>C++ type</th><th>Rust type</th></tr></thead><tbody>
+                        <h1 id="类型等价"><a class="header" href="#类型等价">类型等价</a></h1>
+<p>本文件中列出的类型等价关系，是针对在 Rust 中以类似 C++ 的方式编程时的等价性。它们不一定适用于通过 FFI 与 C 或 C++ 程序交互的场景。若需与 C 或 C++ 互操作的类型，请参阅 <a href="https://doc.rust-lang.org/std/ffi/index.html">Rust <code>std::ffi</code> 模块文档</a> 以及 <a href="https://doc.rust-lang.org/nomicon/ffi.html">Rustonomicon 中的 FFI 文档</a>。</p>
+<h2 id="基本类型"><a class="header" href="#基本类型">基本类型</a></h2>
+<h3 id="整数类型"><a class="header" href="#整数类型">整数类型</a></h3>
+<p>在 C++ 中，许多整数类型（如 <code>int</code> 和 <code>long</code>）的宽度由实现定义。而在 Rust 中，整数类型总是带有明确的宽度，类似于 C++ 中 <code>&lt;cstdint&gt;</code> 里的类型。当不确定使用哪种整数类型时，<a href="https://doc.rust-lang.org/book/ch03-02-data-types.html#integer-types">通常默认使用 <code>i32</code>，这也是 Rust 整数字面量的默认类型</a>。</p>
+<div class="table-wrapper"><table><thead><tr><th>C++ 类型</th><th>Rust 类型</th></tr></thead><tbody>
 <tr><td><code>uint8_t</code></td><td><code>u8</code></td></tr>
 <tr><td><code>uint16_t</code></td><td><code>u16</code></td></tr>
 <tr><td><code>uint32_t</code></td><td><code>u32</code></td></tr>
@@ -192,90 +181,43 @@ literals</a>.</p>
 <tr><td></td><td><code>isize</code></td></tr>
 </tbody></table>
 </div>
-<p>In C++ <code>size_t</code> is conventionally used only for sizes and offsets. The same is
-true in Rust for <code>usize</code>, which is the pointer-sized integer type. The <code>isize</code>
-type is the signed equivalent of <code>usize</code> and has no direct equivalent in C++.
-The <code>isize</code> type is typically only used to represent pointer offsets.</p>
-<h3 id="floating-point-types"><a class="header" href="#floating-point-types">Floating point types</a></h3>
-<p>As with integer types in C++, the floating point types <code>float</code>, <code>double</code>, and
-<code>long double</code> have implementation defined widths. C++23 introduced types
-guaranteed to be IEEE 754 floats of specific widths. Of those, <code>float32_t</code> and
-<code>float64_t</code> correspond to what is usually expected from <code>float</code> and <code>double</code>.
-Rust's floating point types are analogous to these.</p>
-<div class="table-wrapper"><table><thead><tr><th>C++ type</th><th>Rust type</th></tr></thead><tbody>
+<p>在 C++ 中，<code>size_t</code> 通常只用于表示大小和偏移量。Rust 中的 <code>usize</code> 也是指针宽度的整数类型，使用方式相同。<code>isize</code> 是 <code>usize</code> 的有符号对应类型，在 C++ 中没有直接等价类型，通常仅用于表示指针偏移。</p>
+<h3 id="浮点类型"><a class="header" href="#浮点类型">浮点类型</a></h3>
+<p>与 C++ 中的整数类型类似，<code>float</code>、<code>double</code> 和 <code>long double</code> 的宽度由实现定义。C++23 引入了保证为特定位宽 IEEE 754 浮点数的类型，其中 <code>float32_t</code> 和 <code>float64_t</code> 分别对应通常的 <code>float</code> 和 <code>double</code>。Rust 的浮点类型与这些类似。</p>
+<div class="table-wrapper"><table><thead><tr><th>C++ 类型</th><th>Rust 类型</th></tr></thead><tbody>
 <tr><td><code>float16_t</code></td><td></td></tr>
 <tr><td><code>float32_t</code></td><td><code>f32</code></td></tr>
 <tr><td><code>float64_t</code></td><td><code>f64</code></td></tr>
 <tr><td><code>float128_t</code></td><td></td></tr>
 </tbody></table>
 </div>
-<p>The Rust types analogous to <code>float16_t</code> and <code>float128_t</code> (<code>f16</code> and <code>f128</code>) are
-<a href="https://github.com/rust-lang/rust/issues/116909">not yet available in stable
-Rust</a>.</p>
-<h3 id="raw-memory-types"><a class="header" href="#raw-memory-types">Raw memory types</a></h3>
-<p>In C++ pointers to or arrays of <code>char</code>, <code>unsigned char</code>, or <code>byte</code> are used to
-represent raw memory. In Rust, arrays (<code>[u8; N]</code>), vectors (<code>Vec&lt;u8&gt;</code>), or
-slices (<code>&amp;[u8]</code>) of <code>u8</code> are used to accomplish the same goal. However,
-accessing the underlying memory of another Rust value in that way requires
-unsafe Rust. There are <a href="../etc/libraries.html">libraries</a> for creating safe wrappers
-around that kind of access for purposes such as serialization or interacting
-with hardware.</p>
-<h3 id="character-and-string-types"><a class="header" href="#character-and-string-types">Character and string types</a></h3>
-<p>The C++ <code>char</code> or <code>wchar_t</code> types have implementation defined widths. Rust does
-not have an equivalent to these types. When working with string encodings in
-Rust one would use unsigned integer types where one would use the fixed width
-character types in C++.</p>
-<div class="table-wrapper"><table><thead><tr><th>C++ type</th><th>Rust type</th></tr></thead><tbody>
+<p>Rust 中与 <code>float16_t</code> 和 <code>float128_t</code> 对应的类型（<code>f16</code> 和 <code>f128</code>）<a href="https://github.com/rust-lang/rust/issues/116909">尚未在稳定版 Rust 中提供</a>。</p>
+<h3 id="原始内存类型"><a class="header" href="#原始内存类型">原始内存类型</a></h3>
+<p>在 C++ 中，<code>char</code>、<code>unsigned char</code> 或 <code>byte</code> 的指针或数组常用于表示原始内存。在 Rust 中，<code>[u8; N]</code> 数组、<code>Vec&lt;u8&gt;</code> 向量或 <code>&amp;[u8]</code> 切片用于实现同样的目的。但以这种方式访问其他 Rust 值的底层内存需要使用 unsafe Rust。对于序列化或硬件交互等用途，有<a href="../etc/libraries.html">相关库</a>可用于安全封装这类访问。</p>
+<h3 id="字符与字符串类型"><a class="header" href="#字符与字符串类型">字符与字符串类型</a></h3>
+<p>C++ 的 <code>char</code> 或 <code>wchar_t</code> 类型宽度由实现定义。Rust 没有直接等价的类型。在 Rust 中处理字符串编码时，通常用无符号整数类型来代替 C++ 中的定宽字符类型。</p>
+<div class="table-wrapper"><table><thead><tr><th>C++ 类型</th><th>Rust 类型</th></tr></thead><tbody>
 <tr><td><code>char8_t</code></td><td><code>u8</code></td></tr>
 <tr><td><code>char16_t</code></td><td><code>u16</code></td></tr>
 </tbody></table>
 </div>
-<p>The Rust <code>char</code> type represents a Unicode scalar value. Thus, a Rust <code>char</code> is
-the same size as a <code>u32</code>. For working with characters in Rust strings (which are
-guaranteed to be valid UTF-8), the <code>char</code> type is appropriate. For representing
-a byte, one should instead use <code>u8</code>.</p>
-<p>The Rust standard library includes a type for UTF-8 strings and string slices:
-<code>String</code> and <code>&amp;str</code>, respectively. Both types guarantee that represented strings
-are valid UTF-8. The Rust <code>char</code> type is appropriate for representing elements
-of a <code>String</code>.</p>
-<p>Because <code>str</code> (without the reference) is a slice, it is unsized and therefore
-must be used behind a pointer-like construct, such as a reference or box. For
-this reason, string slices are often described as <code>&amp;str</code> instead of <code>str</code> in
-documentation, even though they can also be used as <code>Box&lt;str&gt;</code>, <code>Rc&lt;str&gt;</code>, etc.</p>
-<p>Rust also includes types for platform-specific string representations and slices
-of those strings:
-<a href="https://doc.rust-lang.org/std/ffi/struct.OsString.html"><code>std::ffi::OsString</code></a>
-and <code>&amp;std::ffi::OsStr</code>. While these strings use the OS-specific representation,
-to use one with the Rust FFI, it must still be converted to a
-<a href="https://doc.rust-lang.org/std/ffi/struct.CString.html"><code>CString</code></a>.</p>
-<p>Unlike C++ which has <code>std::u16string</code>, Rust has no specific representation for
-UTF-16 strings. Something like <code>Vec&lt;u16&gt;</code> can be used, but the type will not
-guarantee that its contents are a valid UTF-16 string. Rust does provide a
-mechanisms for converting <code>String</code> to and from a UTF-16 encoding
-(<a href="https://doc.rust-lang.org/std/string/struct.String.html#method.encode_utf16"><code>String::encode_utf16</code></a>
-and
-<a href="https://doc.rust-lang.org/std/string/struct.String.html#method.from_utf16"><code>String::from_utf16</code></a>,
-among others) as well as similar mechanisms for accessing the underlying UTF-8
-encoding
-(https://doc.rust-lang.org/std/string/struct.String.html#method.from_utf8).</p>
-<div class="table-wrapper"><table><thead><tr><th>Purpose</th><th>Rust type</th></tr></thead><tbody>
-<tr><td>representing text</td><td><code>String</code> and <code>&amp;str</code></td></tr>
-<tr><td>representing bytes</td><td>vectors, arrays, or slices of <code>u8</code></td></tr>
-<tr><td>interacting with OS</td><td><code>OsString</code> and <code>&amp;OsStr</code></td></tr>
-<tr><td>representing UTF-8</td><td><code>String</code></td></tr>
-<tr><td>representing UTF-16</td><td>use <a href="../etc/libraries.html">a library</a></td></tr>
+<p>Rust 的 <code>char</code> 类型表示一个 Unicode 标量值，因此其大小等同于 <code>u32</code>。在 Rust 字符串（保证为有效 UTF-8）中处理字符时，<code>char</code> 类型是合适的选择。若需表示字节，则应使用 <code>u8</code>。</p>
+<p>Rust 标准库包含用于 UTF-8 字符串和字符串切片的类型：<code>String</code> 和 <code>&amp;str</code>。这两种类型都保证字符串为有效的 UTF-8。<code>char</code> 类型适合用于表示 <code>String</code> 的元素。</p>
+<p>由于 <code>str</code>（不带引用）是切片类型，因此本身是无大小的，必须通过引用或 Box 等指针类型使用。因此文档中常用 <code>&amp;str</code> 表示字符串切片，尽管也可以用 <code>Box&lt;str&gt;</code>、<code>Rc&lt;str&gt;</code> 等。</p>
+<p>Rust 还包含用于平台相关字符串表示及其切片的类型：<a href="https://doc.rust-lang.org/std/ffi/struct.OsString.html"><code>std::ffi::OsString</code></a> 和 <code>&amp;std::ffi::OsStr</code>。这些字符串采用操作系统特定的表示方式，但若要与 Rust FFI 一起使用，仍需转换为 <a href="https://doc.rust-lang.org/std/ffi/struct.CString.html"><code>CString</code></a>。</p>
+<p>与 C++ 的 <code>std::u16string</code> 不同，Rust 没有专门的 UTF-16 字符串类型。可以使用 <code>Vec&lt;u16&gt;</code>，但该类型无法保证内容为有效的 UTF-16 字符串。Rust 提供了将 <code>String</code> 与 UTF-16 编码互转的机制（<a href="https://doc.rust-lang.org/std/string/struct.String.html#method.encode_utf16"><code>String::encode_utf16</code></a> 和 <a href="https://doc.rust-lang.org/std/string/struct.String.html#method.from_utf16"><code>String::from_utf16</code></a> 等），也有类似机制用于访问底层 UTF-8 编码（https://doc.rust-lang.org/std/string/struct.String.html#method.from_utf8）。</p>
+<div class="table-wrapper"><table><thead><tr><th>用途</th><th>Rust 类型</th></tr></thead><tbody>
+<tr><td>表示文本</td><td><code>String</code> 和 <code>&amp;str</code></td></tr>
+<tr><td>表示字节</td><td><code>u8</code> 的向量、数组或切片</td></tr>
+<tr><td>与操作系统交互</td><td><code>OsString</code> 和 <code>&amp;OsStr</code></td></tr>
+<tr><td>表示 UTF-8</td><td><code>String</code></td></tr>
+<tr><td>表示 UTF-16</td><td>使用<a href="../etc/libraries.html">相关库</a></td></tr>
 </tbody></table>
 </div>
-<h3 id="boolean-types"><a class="header" href="#boolean-types">Boolean types</a></h3>
-<p>The <code>bool</code> type in Rust is analogous to the <code>bool</code> type in C++. Unlike C++, Rust
-makes <a href="https://doc.rust-lang.org/reference/types/boolean.html">guarantees about the size, alignment, and bit pattern used to represent
-values of the <code>bool</code>
-type</a>.</p>
+<h3 id="布尔类型"><a class="header" href="#布尔类型">布尔类型</a></h3>
+<p>Rust 的 <code>bool</code> 类型与 C++ 的 <code>bool</code> 类型类似。但与 C++ 不同，Rust <a href="https://doc.rust-lang.org/reference/types/boolean.html">对 <code>bool</code> 类型的大小、对齐和位模式有明确保证</a>。</p>
 <h3 id="void"><a class="header" href="#void"><code>void</code></a></h3>
-<p>In C++ <code>void</code> indicates that a function does not return a value. Because Rust is
-expression-oriented, all functions return values. In the place of <code>void</code>, Rust
-uses the unit type <code>()</code>. When a function does not have a return type declared,
-<code>()</code> is the return type.</p>
+<p>在 C++ 中，<code>void</code> 表示函数不返回值。由于 Rust 是表达式导向的，所有函数都有返回值。Rust 用单元类型 <code>()</code> 代替 <code>void</code>。当函数未声明返回类型时，默认返回 <code>()</code>。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
@@ -292,10 +234,7 @@ void process() {
 }
 <span class="boring">}</span></code></pre></pre>
 </div>
-<p>Since the unit type has only one value (also written <code>()</code>), values of the type
-provide no information. This also means that the return value can be left
-implicit, as in the above example. The following example makes the unit type
-usage explicit.</p>
+<p>由于单元类型只有一个值（也写作 <code>()</code>），该类型的值不携带任何信息。因此返回值可以省略，如上例所示。如下例则显式使用了单元类型：</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>fn process() -&gt; () {
@@ -303,60 +242,40 @@ usage explicit.</p>
     ()
 }
 <span class="boring">}</span></code></pre></pre>
-<p>The syntax of the unit type and syntax of the unit value resemble that of an
-empty tuple. Essentially, that is what the type is. The following example shows
-some equivalent types, though without the special syntax or language
-integration.</p>
-<pre><pre class="playground"><code class="language-rust">struct Pair&lt;T1, T2&gt;(T1, T2); // the same as (T1, T2)
-struct Single&lt;T&gt;(T); // a tuple with just one value (T1)
-struct Unit; // the same as ()
-// can also be written as
-// struct Unit();
-
+<p>单元类型的语法和单元值的语法类似于空元组，本质上它就是这样一种类型。下面的例子展示了一些等价类型，但没有特殊语法或语言集成：</p>
+<pre><pre class="playground"><code class="language-rust">struct Pair&lt;T1, T2&gt;(T1, T2); // 等价于 (T1, T2)
+struct Single&lt;T&gt;(T); // 只有一个值的元组 (T1)
+struct Unit; // 等价于 ()
+             // 也可以写作 struct Unit();
 fn main() {
     let pair = Pair(1,2.0);
     let single = Single(1);
     let unit = Unit;
-    // can also be written as
-    // let unit = Unit();
+    // 也可以写作 let unit = Unit();
 }</code></pre></pre>
-<p>Using a unit type instead of <code>void</code> enables expressions with unit type (such as
-function calls that would return <code>void</code> in C++) to be used in contexts that
-expect a value. This is especially helpful with defining and using generic
-functions, instead of needing something like <code>std::is_void</code> to special-case the
-handling when a type is <code>void</code>.</p>
-<h2 id="pointers"><a class="header" href="#pointers">Pointers</a></h2>
-<p>The following table maps the ownership-managing classes from C++ to equivalents
-types in Rust.</p>
-<div class="table-wrapper"><table><thead><tr><th>Use</th><th>C++ type</th><th>Rust type</th></tr></thead><tbody>
-<tr><td>Owned</td><td><code>T</code></td><td><code>T</code></td></tr>
-<tr><td>Single owner, dynamic storage</td><td><code>std::unique_ptr&lt;T&gt;</code></td><td><code>Box&lt;T&gt;</code></td></tr>
-<tr><td>Shared owner, dynamic storage, immutable, not thread-safe</td><td><code>std::shared_ptr&lt;T&gt;</code></td><td><code>std::rc::Rc&lt;T&gt;</code></td></tr>
-<tr><td>Shared owner, dynamic storage, immutable, thread-safe</td><td><code>std::shared_ptr&lt;T&gt;</code></td><td><code>std::sync::Arc&lt;T&gt;</code></td></tr>
-<tr><td>Shared owner, dynamic storage, mutable, not thread-safe</td><td><code>std::shared_ptr&lt;T&gt;</code></td><td><a href="https://doc.rust-lang.org/book/ch15-05-interior-mutability.html#having-multiple-owners-of-mutable-data-by-combining-rct-and-refcellt"><code>std::rc::Rc&lt;std::cell::RefCell&lt;T&gt;&gt;</code></a></td></tr>
-<tr><td>Shared owner, dynamic storage, mutable, thread-safe</td><td><code>std::shared_ptr&lt;std::mutex&lt;T&gt;&gt;</code></td><td><a href="https://doc.rust-lang.org/book/ch16-03-shared-state.html"><code>std::sync::Arc&lt;std::mutex::Mutex&lt;T&gt;&gt;</code></a></td></tr>
-<tr><td>Const reference</td><td><code>const &amp;T</code></td><td><code>&amp;T</code></td></tr>
-<tr><td>Mutable reference</td><td><code>&amp;T</code></td><td><code>&amp;mut T</code></td></tr>
-<tr><td>Const observer pointer</td><td><code>const *T</code></td><td><code>&amp;T</code></td></tr>
-<tr><td>Mutable observer pointer</td><td><code>*T</code></td><td><code>&amp;mut T</code></td></tr>
+<p>用单元类型代替 <code>void</code>，使得返回单元类型的表达式（如 C++ 中返回 <code>void</code> 的函数调用）可以在需要值的上下文中使用。这对于定义和使用泛型函数尤其有用，无需像 <code>std::is_void</code> 那样对 <code>void</code> 类型做特殊处理。</p>
+<h2 id="指针"><a class="header" href="#指针">指针</a></h2>
+<p>下表将 C++ 的所有权管理类与 Rust 中的等价类型进行了对应。</p>
+<div class="table-wrapper"><table><thead><tr><th>用途</th><th>C++ 类型</th><th>Rust 类型</th></tr></thead><tbody>
+<tr><td>拥有所有权</td><td><code>T</code></td><td><code>T</code></td></tr>
+<tr><td>单一所有者，动态存储</td><td><code>std::unique_ptr&lt;T&gt;</code></td><td><code>Box&lt;T&gt;</code></td></tr>
+<tr><td>共享所有者，动态存储，不可变，非线程安全</td><td><code>std::shared_ptr&lt;T&gt;</code></td><td><code>std::rc::Rc&lt;T&gt;</code></td></tr>
+<tr><td>共享所有者，动态存储，不可变，线程安全</td><td><code>std::shared_ptr&lt;T&gt;</code></td><td><code>std::sync::Arc&lt;T&gt;</code></td></tr>
+<tr><td>共享所有者，动态存储，可变，非线程安全</td><td><code>std::shared_ptr&lt;T&gt;</code></td><td><a href="https://doc.rust-lang.org/book/ch15-05-interior-mutability.html#having-multiple-owners-of-mutable-data-by-combining-rct-and-refcellt"><code>std::rc::Rc&lt;std::cell::RefCell&lt;T&gt;&gt;</code></a></td></tr>
+<tr><td>共享所有者，动态存储，可变，线程安全</td><td><code>std::shared_ptr&lt;std::mutex&lt;T&gt;&gt;</code></td><td><a href="https://doc.rust-lang.org/book/ch16-03-shared-state.html"><code>std::sync::Arc&lt;std::mutex::Mutex&lt;T&gt;&gt;</code></a></td></tr>
+<tr><td>常量引用</td><td><code>const &amp;T</code></td><td><code>&amp;T</code></td></tr>
+<tr><td>可变引用</td><td><code>&amp;T</code></td><td><code>&amp;mut T</code></td></tr>
+<tr><td>常量观察指针</td><td><code>const *T</code></td><td><code>&amp;T</code></td></tr>
+<tr><td>可变观察指针</td><td><code>*T</code></td><td><code>&amp;mut T</code></td></tr>
 </tbody></table>
 </div>
-<p>In C++, the thread safety of <code>std::shared_ptr</code> is more nuanced than it appears
-in this table (e.g., some uses may require <code>std::atomic</code>). However, in safe Rust
-the compiler will prevent the incorrect use of the shared owner types.</p>
-<p>Unlike with C++ references, Rust can have references-to-references. Rust
-references are more like observer pointers than they are like C++ references.</p>
+<p>在 C++ 中，<code>std::shared_ptr</code> 的线程安全性比表格中所示更为复杂（例如某些用法可能需要 <code>std::atomic</code>）。但在安全的 Rust 中，编译器会阻止对共享所有权类型的不正确使用。</p>
+<p>与 C++ 引用不同，Rust 可以有引用的引用。Rust 的引用更像观察指针，而不是 C++ 的引用。</p>
 <h3 id="void-1"><a class="header" href="#void-1"><code>void*</code></a></h3>
-<p>Rust does not have anything directly analogous to <code>void*</code> in C++. The upcoming chapter
-on <code>RTTI</code><!--LINKME--> will cover some use cases where the goal is dynamic
-typing. The <a href="https://doc.rust-lang.org/nomicon/ffi.html#representing-opaque-structs">FFI chapter of the
-Rustonomicon</a>
-covers some use cases where the goal is interoperability with C programs that
-use <code>void*</code>.</p>
-<h2 id="containers"><a class="header" href="#containers">Containers</a></h2>
-<p>Both C++ and Rust containers own their elements. However, in both the element
-type may be a non-owning type, such as a pointer in C++ or a reference in Rust.</p>
-<div class="table-wrapper"><table><thead><tr><th>C++ type</th><th>Rust type</th></tr></thead><tbody>
+<p>Rust 没有与 C++ 的 <code>void*</code> 直接对应的类型。关于动态类型的场景将在后续的 <code>RTTI</code> 章节中介绍。关于与 C 程序互操作时 <code>void*</code> 的用法，可参见 <a href="https://doc.rust-lang.org/nomicon/ffi.html#representing-opaque-structs">Rustonomicon 的 FFI 章节</a>。</p>
+<h2 id="容器"><a class="header" href="#容器">容器</a></h2>
+<p>C++ 和 Rust 的容器都拥有其元素。但在两者中，元素类型都可以是非拥有类型，如 C++ 中的指针或 Rust 中的引用。</p>
+<div class="table-wrapper"><table><thead><tr><th>C++ 类型</th><th>Rust 类型</th></tr></thead><tbody>
 <tr><td><code>std::vector&lt;T&gt;</code></td><td><a href="https://doc.rust-lang.org/std/vec/struct.Vec.html"><code>Vec&lt;T&gt;</code></a></td></tr>
 <tr><td><code>std::array&lt;T, N&gt;</code></td><td><a href="https://doc.rust-lang.org/std/primitive.array.html"><code>[T; N]</code></a></td></tr>
 <tr><td><code>std::list&lt;T&gt;</code></td><td><a href="https://doc.rust-lang.org/std/collections/struct.LinkedList.html"><code>std::collections::LinkedList&lt;T&gt;</code></a></td></tr>
@@ -371,24 +290,10 @@ type may be a non-owning type, such as a pointer in C++ or a reference in Rust.<
 <tr><td><code>std::span&lt;T&gt;</code></td><td><a href="https://doc.rust-lang.org/std/primitive.slice.html"><code>&amp;[T]</code></a></td></tr>
 </tbody></table>
 </div>
-<p>For maps and sets instead of the container being parameterized over the hash or
-comparison function used, the types require that the key types implement the
-<code>std::hash::Hash</code> (unordered) or <code>std::cmp::Ord</code> (ordered) traits. To use the containers
-with different hash or comparison functions, one must use a wrapper type with a
-different implementation of the required trait.</p>
-<p>Some C++ container types provided by the STL have no equivalent in Rust. Many of
-those have equivalents available in third-party <a href="../etc/libraries.html">libraries</a>.</p>
-<p>One significant different in the use of these types between C++ in Rust is with
-the <code>Vec&lt;T&gt;</code> and array <code>[T; N]</code> types, from which slice references <code>&amp;[T]</code> or
-<code>&amp;mut [T]</code> to part or all of the data can be cheaply created. For this reason,
-when defining a function that does not modify the length of a vector and does
-not need to statically know the number of elements in an array, it is more
-idiomatic to take a parameter as <code>&amp;[T]</code> or <code>&amp;mut [T]</code> than as a reference to the
-owned type.</p>
-<p>In C++ it is better to take begin and end iterators than a <code>span</code> when possible,
-since iterators are more general. The same is true with Rust and taking a
-generic type that implements <code>IntoIter&lt;&amp;T&gt;</code> or <code>IntoIter&lt;&amp;mut T&gt;</code> instead of
-<code>&amp;[T]</code>.</p>
+<p>对于映射和集合，容器类型不再通过哈希或比较函数参数化，而是要求键类型实现 <code>std::hash::Hash</code>（无序）或 <code>std::cmp::Ord</code>（有序） trait。若需使用不同哈希或比较函数，需用包装类型实现所需 trait。</p>
+<p>C++ STL 提供的一些容器类型在 Rust 中没有等价物，但许多可以通过第三方<a href="../etc/libraries.html">库</a>获得。</p>
+<p>C++ 与 Rust 在这些类型的使用上有一个显著区别：Rust 的 <code>Vec&lt;T&gt;</code> 和数组 <code>[T; N]</code> 可以方便地创建切片引用 <code>&amp;[T]</code> 或 <code>&amp;mut [T]</code>，用于部分或全部数据。因此，定义不修改向量长度且不需静态知道数组元素数量的函数时，更惯用的做法是将参数类型设为 <code>&amp;[T]</code> 或 <code>&amp;mut [T]</code>，而不是对拥有类型的引用。</p>
+<p>在 C++ 中，若可能，最好传递起止迭代器而不是 <code>span</code>，因为迭代器更通用。Rust 也是如此，优先接受实现了 <code>IntoIter&lt;&amp;T&gt;</code> 或 <code>IntoIter&lt;&amp;mut T&gt;</code> 的泛型类型，而不是 <code>&amp;[T]</code>。</p>
 <div class="comparison">
 <pre><code class="language-c++">#include &lt;iterator&gt;
 #include &lt;vector&gt;
@@ -418,10 +323,10 @@ fn main() {
     go(&amp;mut v);
 }</code></pre></pre>
 </div>
-<div class="quiz-placeholder" data-quiz-name="&quot;type_equivalents&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;4fb18334-8405-438d-8d3e-859a8823bccf&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:[&quot;It is guaranteed in safe Rust to represent a valid Unicode scalar value.\n&quot;,&quot;It is 32 bits wide.\n&quot;]},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;It is equivalent to the C++ `wchar` type.\n&quot;,&quot;It is equivalent to the C++ `char` type.\n&quot;,&quot;It is equivalent to the C++ `char8_t` type.\n&quot;,&quot;It is equivalent to the C++ `int32_t` type.\n&quot;,&quot;It is 8 bits wide.\n&quot;],&quot;prompt&quot;:&quot;Which of the following are true about the Rust `char` type.\n&quot;}},{&quot;id&quot;:&quot;5586766c-b5ce-4bea-b995-da0b3c548b0d&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:[&quot;It provides thread-safe read access to a value of type `T`.\n&quot;,&quot;It represents shared ownership of a value of type `T`.\n&quot;]},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;It provides thread-safe write access to a value of type `T`.\n&quot;,&quot;It can be empty (i.e., not own some value of type `T`).\n&quot;],&quot;prompt&quot;:&quot;Which of the following are true about `std::sync::Arc&lt;T&gt;`.\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
+<div class="quiz-placeholder" data-quiz-name="&quot;type_equivalents&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;4fb18334-8405-438d-8d3e-859a8823bccf&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:[&quot;在安全的 Rust 中，它保证表示一个有效的 Unicode 标量值。\n&quot;,&quot;它是 32 位宽的。\n&quot;]},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;它等同于 C++ 的 `wchar` 类型。\n&quot;,&quot;它等同于 C++ 的 `char` 类型。\n&quot;,&quot;它等同于 C++ 的 `char8_t` 类型。\n&quot;,&quot;它等同于 C++ 的 `int32_t` 类型。\n&quot;,&quot;它是 8 位宽的。\n&quot;],&quot;prompt&quot;:&quot;以下关于 Rust 的 `char` 类型，哪些说法是正确的？\n&quot;}},{&quot;id&quot;:&quot;5586766c-b5ce-4bea-b995-da0b3c548b0d&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:[&quot;它为类型 `T` 的值提供线程安全的只读访问。\n&quot;,&quot;它表示对类型 `T` 的值的共享所有权。\n&quot;]},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;它为类型 `T` 的值提供线程安全的写访问。\n&quot;,&quot;它可以为空（即不拥有某个类型为 `T` 的值）。\n&quot;],&quot;prompt&quot;:&quot;以下关于 `std::sync::Arc&lt;T&gt;`，哪些说法是正确的？\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Type equivalents">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=类型等价">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

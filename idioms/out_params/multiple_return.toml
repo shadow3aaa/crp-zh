@@ -1,8 +1,7 @@
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt = """
-Which of the following is the most idiomatic translation of this C++ function
-signature into a Rust function signature?
+下列哪一项是将此 C++ 函数签名最符合惯用写法地翻译为 Rust 函数签名？
 
 ```cpp
 void main() {}

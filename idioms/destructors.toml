@@ -54,19 +54,10 @@ answer.stdout = """
 4
 """
 context = """
-The call to `passthrough` moves ownership of the value in `w` into the
-function's parameter, and then moves ownership back out again when it returns,
-so that `w2` ends up owning the value. None of those steps cause `drop` to be
-called because no initialized variable goes out of scope. When the ownership of
-the value is moved from the `w` into the parameter, or from the `a` in the
-`passthrough` function to `w2`, `w` and `a` are left uninitialized.
+对 `passthrough` 的调用会将 `w` 中的值的所有权移动到函数的参数中，然后在返回时再将所有权移出，因此最终 `w2` 拥有该值。这些步骤都不会导致调用 `drop`，因为没有已初始化的变量离开作用域。当所有权从 `w` 移动到参数，或从 `passthrough` 函数中的 `a` 移动到 `w2` 时，`w` 和 `a` 都变为未初始化状态。
 
-At the end of `main`, `w2` is dropped first, since it is declared last. Then its
-members are dropped in order of declaration in the struct definition. Each field
-is completely destructed before the next field is, thus when the `Box` in field
-`boxed_sub` is dropped, it drops the value it owns before the value in `sub` is
-dropped. Finally `s3`, is dropped.
+在 `main` 结束时，`w2` 会最先被销毁，因为它是最后声明的。然后其成员会按照结构体定义中的声明顺序依次被销毁。每个字段在下一个字段销毁前会被完全析构，因此当字段 `boxed_sub` 中的 `Box` 被销毁时，它会先销毁其拥有的值，然后再销毁 `sub` 字段中的值。最后，`s3` 被销毁。
 
-`w`, `s2`, and `s1` are not dropepd because they are not initialized.
+`w`、`s2` 和 `s1` 不会被销毁，因为它们没有被初始化。
 """
 id = "9132e738-cc0b-4ba5-a323-9200b99bcbc4"

@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Inheritance and implementation reuse - C++ to Rust Phrasebook</title>
+        <title>继承与实现复用 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,14 +163,9 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="inheritance-and-implementation-reuse"><a class="header" href="#inheritance-and-implementation-reuse">Inheritance and implementation reuse</a></h1>
-<p>Rust does not have inheritance and so the primary means of reuse of
-implementations in Rust are composition, aggregation, and
-<a href="./templates.html">generics</a>.</p>
-<p>However, Rust traits do have support for default methods which resemble one
-simple case of using inheritance for reuse of implementations. For example, in
-the following example two virtual methods are used to support a method whose
-implementation is provided by the abstract class.</p>
+                        <h1 id="继承与实现复用"><a class="header" href="#继承与实现复用">继承与实现复用</a></h1>
+<p>Rust 没有继承机制，因此 Rust 中实现复用的主要方式是组合、聚合和<a href="./templates.html">泛型</a>。</p>
+<p>不过，Rust 的 trait 支持默认方法，这类似于用继承来复用实现的简单场景。例如，下面的例子中，两个虚函数用于支持一个由抽象类提供实现的方法。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
@@ -246,30 +241,14 @@ fn main() {
     p.reset_device();
 }</code></pre></pre>
 </div>
-<p>In practice, the <code>resetDevice()</code> method in the <code>Device</code> class might be made
-non-virtual in C++ if it is not expected that it will be overridden. In order to
-make it align with the Rust example, we have made it virtual here, since Rust
-traits can be used either for <a href="./abstract_classes.html">dynamic
-dispatch</a> or <a href="./concepts.html">static
-dispatch</a> (with <a href="./abstract_classes.html#vtables-and-rust-trait-object-types">no vtable overhead in the
-static dispatch
-case</a>).</p>
-<p>Rust traits differ from abstract classes in few more ways. For example,
-Rust traits cannot define data members and cannot define private or protected
-methods. This limits the effectiveness of using traits to implement the template
-method pattern.</p>
-<p>Rust traits also cannot be privately implemented. Anywhere that both a trait
-and a type that implements that trait are visible, the methods of the trait are
-visible as methods on the type.</p>
-<p>Traits can, however, inherit from each other, including multiple inheritance. As
-in modern C++, inheritance hierarchies in Rust tend to be shallow. In situations
-with complex multiple inheritance, however, the diamond problem cannot arise in
-Rust because traits cannot override other traits implementations. Therefore, all
-paths to a common parent trait resolve to the same implementation.</p>
-<div class="quiz-placeholder" data-quiz-name="&quot;inheritance_and_reuse&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;context&quot;:&quot;Unlike with a C++ parent class, the default method is not part of `BareLogger`,\neven when accessed statically via the trait.\n&quot;,&quot;id&quot;:&quot;2bc058d0-99e4-44e0-9abe-5497b713731e&quot;,&quot;type&quot;:&quot;Tracing&quot;,&quot;answer&quot;:{&quot;doesCompile&quot;:true,&quot;stdout&quot;:&quot;a message\nan error\nanother message\nanother error\n&quot;},&quot;prompt&quot;:{&quot;program&quot;:&quot;trait Logger {\n    fn log(&amp;self, message: &amp;str);\n\n    fn error(&amp;self, message: &amp;str) {\n        self.log(&amp;format!(\&quot;ERROR: {}\&quot;, message));\n    }\n}\n\nstruct BareLogger;\n\nimpl Logger for BareLogger {\n    fn log(&amp;self, message: &amp;str) {\n        println!(\&quot;{}\&quot;, message);\n    }\n\n    fn error(&amp;self, message: &amp;str) {\n        // Omits the ERROR: prefix\n        println!(\&quot;{}\&quot;, message)\n    }\n}\n\nfn main() {\n    let logger = BareLogger;\n    logger.log(\&quot;a message\&quot;);\n    logger.error(\&quot;an error\&quot;);\n    &lt;BareLogger as Logger&gt;::log(&amp;logger, \&quot;another message\&quot;);\n    &lt;BareLogger as Logger&gt;::error(&amp;logger, \&quot;another error\&quot;);\n}\n&quot;}},{&quot;context&quot;:&quot;A trait only defines an interface, with the ability to define default methods as\na convenience for when some methods on the trait can be defined in terms of\nothers.\n&quot;,&quot;id&quot;:&quot;78c03495-5d3d-4faf-8375-b9f338a377ff&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;It does not compile because in Rust traits cannot have fields.\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;It does compile.\n&quot;,&quot;It does not compile, because `health` isn't initialized when `Enemy` implements\n`Damageable`.\n&quot;,&quot;It does not compile, because `e.health` isn't initialized before using `e` in\n`main`.\n&quot;],&quot;prompt&quot;:&quot;Does the following program compile? If not, why not?\n\n```rust\ntrait Damageable {\n    health: u32;\n\n    fn take_damage(&amp;mut self, damage: u32) {\n        self.health = self.health.saturating_sub(damage);\n    }\n}\n\nimpl Damageable for Enemy {}\n\nfn main() {\n    let e = Enemy;\n    e.take_damage(10);\n}\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
+<p>实际上，如果 <code>Device</code> 类中的 <code>resetDevice()</code> 方法不需要被重写，在 C++ 中它可以被声明为非虚函数。为了与 Rust 示例保持一致，这里将其声明为虚函数，因为 Rust 的 trait 既可以用于<a href="./abstract_classes.html">动态分发</a>，也可以用于<a href="./concepts.html">静态分发</a>（<a href="./abstract_classes.html#vtables-and-rust-trait-object-types">静态分发情况下没有 vtable 开销</a>）。</p>
+<p>Rust 的 trait 与抽象类还有其他一些区别。例如，Rust 的 trait 不能定义数据成员，也不能定义私有或受保护的方法。这限制了 trait 在实现模板方法模式时的能力。</p>
+<p>Rust 的 trait 也不能被私有实现。只要 trait 和实现该 trait 的类型都可见，trait 的方法就会作为类型的方法可见。</p>
+<p>不过，trait 之间可以相互继承，包括多重继承。与现代 C++ 类似，Rust 中的继承层次通常较浅。在涉及复杂多重继承的场景下，Rust 不会出现菱形继承问题，因为 trait 不能重写其他 trait 的实现。因此，所有通向同一个父 trait 的路径都会解析为同一个实现。</p>
+<div class="quiz-placeholder" data-quiz-name="&quot;inheritance_and_reuse&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;context&quot;:&quot;与 C++ 父类不同，默认方法并不是 `BareLogger` 的一部分，即使通过 trait 静态访问也是如此。\n&quot;,&quot;id&quot;:&quot;2bc058d0-99e4-44e0-9abe-5497b713731e&quot;,&quot;type&quot;:&quot;Tracing&quot;,&quot;answer&quot;:{&quot;doesCompile&quot;:true,&quot;stdout&quot;:&quot;a message\nan error\nanother message\nanother error\n&quot;},&quot;prompt&quot;:{&quot;program&quot;:&quot;trait Logger {\n    fn log(&amp;self, message: &amp;str);\n\n    fn error(&amp;self, message: &amp;str) {\n        self.log(&amp;format!(\&quot;ERROR: {}\&quot;, message));\n    }\n}\n\nstruct BareLogger;\n\nimpl Logger for BareLogger {\n    fn log(&amp;self, message: &amp;str) {\n        println!(\&quot;{}\&quot;, message);\n    }\n\n    fn error(&amp;self, message: &amp;str) {\n        // 省略了 ERROR: 前缀\n        println!(\&quot;{}\&quot;, message)\n    }\n}\n\nfn main() {\n    let logger = BareLogger;\n    logger.log(\&quot;a message\&quot;);\n    logger.error(\&quot;an error\&quot;);\n    &lt;BareLogger as Logger&gt;::log(&amp;logger, \&quot;another message\&quot;);\n    &lt;BareLogger as Logger&gt;::error(&amp;logger, \&quot;another error\&quot;);\n}\n&quot;}},{&quot;context&quot;:&quot;trait 只定义接口，可以为某些方法提供默认实现，便于用其他 trait 方法实现部分功能。\n&quot;,&quot;id&quot;:&quot;78c03495-5d3d-4faf-8375-b9f338a377ff&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;不能编译，因为在 Rust 中 trait 不能包含字段。\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;可以编译。\n&quot;,&quot;不能编译，因为 `Enemy` 实现 `Damageable` 时 `health` 没有初始化。\n&quot;,&quot;不能编译，因为在 `main` 中使用 `e` 前，`e.health` 没有初始化。\n&quot;],&quot;prompt&quot;:&quot;以下程序能否编译？如果不能，原因是什么？\n\n```rust\ntrait Damageable {\n    health: u32;\n\n    fn take_damage(&amp;mut self, damage: u32) {\n        self.health = self.health.saturating_sub(damage);\n    }\n}\n\nimpl Damageable for Enemy {}\n\nfn main() {\n    let e = Enemy;\n    e.take_damage(10);\n}\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Inheritance and implementation reuse">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=继承与实现复用">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

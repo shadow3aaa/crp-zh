@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Template specialization - C++ to Rust Phrasebook</title>
+        <title>模板特化 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,34 +163,12 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="template-specialization"><a class="header" href="#template-specialization">Template specialization</a></h1>
-<p>Template specialization in C++ makes it possible for a template entity to have
-different implementations for different parameters. Most STL implementations
-make use of this to, for example, provide a <a href="https://en.cppreference.com/w/cpp/container/vector_bool">space-efficient representation of
-<code>std::vector&lt;bool&gt;</code></a>.</p>
-<p>Because of the possibility of template specialization, when a C++ function
-operates on values of a template class like <code>std::vector</code>, the function is
-essentially defined in terms of the interface provided by the template class,
-rather than for a specific implementation.</p>
-<p>To accomplish the same thing in Rust requires defining the function in terms of
-a trait for the interface against which it operates. This enables clients to
-select their choice of representation for data by using any concrete type that
-implements the interface.</p>
-<p>This is more practical to do in Rust than in C++, because generics not being a
-general metaprogramming facility means that <a href="./templates.html#a-note-on-type-checking-and-type-errors">generic entities can be type
-checked
-locally</a>,
-making them easier to define. It is more common to do in Rust than in C++
-because Rust does not have <a href="./inheritance_and_reuse.html">implementation
-inheritance</a>, so there is a
-sharper line between interface and implementation than there is in C++.</p>
-<p>The following example shows how a Rust function can be implemented so that
-different concrete representations can be selected by a client. For a compact
-bit vector representation, the example uses the
-<a href="https://docs.rs/bitvec/latest/bitvec/vec/struct.BitVec.html"><code>BitVec</code></a> type
-from the <a href="https://docs.rs/bitvec/latest/bitvec/">bitvec crate</a>. <code>BitVec</code> is
-intended intended to provide an API similar to <code>Vec&lt;bool&gt;</code> or
-<code>std::vector&lt;bool&gt;</code>.</p>
+                        <h1 id="模板特化"><a class="header" href="#模板特化">模板特化</a></h1>
+<p>C++ 中的模板特化使模板实体能够针对不同的参数拥有不同的实现。大多数 STL 实现都利用了这一点，例如为 <a href="https://en.cppreference.com/w/cpp/container/vector_bool"><code>std::vector&lt;bool&gt;</code> 提供空间高效的表示</a>。</p>
+<p>由于模板特化的存在，当 C++ 函数操作如 <code>std::vector</code> 这样的模板类的值时，函数实际上是基于模板类所提供的接口来定义的，而不是针对某个特定实现。</p>
+<p>要在 Rust 中实现类似的功能，需要基于 trait（特征）来定义函数接口。这样，用户可以通过使用任何实现了该接口的具体类型，自由选择数据的具体表示方式。</p>
+<p>由于 Rust 的泛型并不是一种通用的元编程工具，因此<a href="./templates.html#a-note-on-type-checking-and-type-errors">泛型实体可以在本地进行类型检查</a>，这使得它们更容易定义。这种做法在 Rust 中比在 C++ 中更常见，因为 Rust 没有<a href="./inheritance_and_reuse.html">实现继承</a>，所以接口与实现之间的界限比 C++ 更加清晰。</p>
+<p>下面的例子展示了如何在 Rust 中实现一个函数，使得用户可以选择不同的具体数据表示。为了实现紧凑的位向量表示，示例中使用了 <a href="https://docs.rs/bitvec/latest/bitvec/">bitvec crate</a> 的 <a href="https://docs.rs/bitvec/latest/bitvec/vec/struct.BitVec.html"><code>BitVec</code></a> 类型。<code>BitVec</code> 旨在提供类似于 <code>Vec&lt;bool&gt;</code> 或 <code>std::vector&lt;bool&gt;</code> 的 API。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;string&gt;
 #include &lt;vector&gt;
@@ -205,19 +183,16 @@ void push_if_even(int n,
 }
 
 int main() {
-  // Operate on the default std::vector
-  // implementation
+  // 操作默认的 std::vector 实现
   std::vector&lt;std::string&gt; v{"a", "b"};
   push_if_even(2, v, std::string("c"));
 
-  // Operate on the (likely space-optimized)
-  // std::vector implementation
+  // 操作（可能经过空间优化的）std::vector 实现
   std::vector&lt;bool&gt; bv{false, true};
   push_if_even(2, bv, false);
 }
 </code></pre>
-<pre><code class="language-rust ignore">// The Extend trait is for types that support
-// appending values to the collection.
+<pre><code class="language-rust ignore">// Extend trait 用于支持向集合追加值的类型。
 fn push_if_even&lt;T, I: Extend&lt;T&gt;&gt;(
     n: u32,
     collection: &amp;mut I,
@@ -231,22 +206,19 @@ fn push_if_even&lt;T, I: Extend&lt;T&gt;&gt;(
 use bitvec::prelude::*;
 
 fn main() {
-    // Operate on Vec
+    // 操作 Vec
     let mut v =
         vec!["a".to_string(), "b".to_string()];
     push_if_even(2, &amp;mut v, "c".to_string());
 
-    // Operate on BitVec
+    // 操作 BitVec
     let mut bv = bitvec![0, 1];
     push_if_even(2, &amp;mut bv, 0);
 }</code></pre>
 </div>
-<h2 id="trade-offs-between-generics-and-templates"><a class="header" href="#trade-offs-between-generics-and-templates">Trade-offs between generics and templates</a></h2>
-<p>Because generic functions can only interact with generic values in ways defined
-by the trait bounds, it is easier to test generic implementations. In
-particular, code testing a generic implementation only has to consider the
-possible behaviors of the given trait.</p>
-<p>For a comparison, consider the following programs.</p>
+<h2 id="泛型与模板的权衡"><a class="header" href="#泛型与模板的权衡">泛型与模板的权衡</a></h2>
+<p>由于泛型函数只能以 trait bound（特征约束）所定义的方式与泛型值交互，因此测试泛型实现更加容易。特别是，测试泛型实现的代码只需考虑给定 trait 的可能行为。</p>
+<p>作为对比，请看下面的程序。</p>
 <div class="comparison">
 <pre><code class="language-cpp">template &lt;totally_ordered T&gt;
 T max(const T &amp;x, const T &amp;y) {
@@ -269,40 +241,17 @@ int max(const int &amp;x, const int &amp;y) {
 }
 <span class="boring">}</span></code></pre></pre>
 </div>
-<p>In the Rust program, <em>parametricity</em> means that (assuming safe Rust) from the
-type alone one can tell that if the function returns, it must return exactly one
-of <code>x</code> or <code>y</code>. This is because the trait bound <code>Ord</code> doesn't give any way to
-construct new values of type <code>T</code>, and the use of references doesn't give any way
-for the function to store one of <code>x</code> or <code>y</code> from an earlier call to return in a
-later call.</p>
-<p>In the C++ program, a call to <code>max</code> with <code>int</code> as the template parameter will
-give a distinctly different result than with any other parameter because of the
-template specialization enabling the behavior of the function to vary based on
-the type.</p>
-<p>The trade-off is that in Rust specialized implementations are harder to use
-because they must have different names, but that they are easier to write
-because it is easier to write generic code while being confident about its
-correctness.</p>
-<h2 id="niche-optimization"><a class="header" href="#niche-optimization">Niche optimization</a></h2>
-<p>There are several cases where the Rust compiler will perform optimizations to
-achieve more efficient representations. Those situations are all ones where the
-efficiency gains do not otherwise change the observable behavior of the code.</p>
-<p><a href="https://doc.rust-lang.org/std/option/index.html#representation">The most common case is with the <code>Option</code>
-type</a>. When
-<code>Option</code> is used with a type where the compiler can tell that there are unused
-values, one f those unused values will be used to represent the <code>None</code> case, so
-that <code>Option&lt;T&gt;</code> will not require an extra word of memory to indicate the
-discriminant of the enum.</p>
-<p>This optimization is applied to reference types (<code>&amp;</code> and <code>&amp;mut</code>), since
-references cannot be null. It is also applied to <code>NonNull&lt;T&gt;</code>, which represents
-a non-null pointer to a value of type <code>T</code>, and to <code>NonZeroU8</code> and other non-zero
-integral types. The optimization for the reference case is what makes
-<code>Option&lt;&amp;T&gt;</code> and <code>Option&lt;&amp;mut T&gt;</code> safer equivalents to using non-owning
-observation pointers in C++.</p>
-<div class="quiz-placeholder" data-quiz-name="&quot;template_specialization&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;context&quot;:&quot;&gt; Both will display \&quot;Unknown type\&quot; for everything other than `int` or `i32`.\n\nIn both cases what will be displayed for other types will depend on\nimplementations/specializations elsewhere in the program.\n\n&gt; Both `displayWithType` and `display_with_type` can be called with ANY\n&gt; arguments whose types overload `&lt;&lt;` or implement `Display`.\n\nThe default function implementation `type_display_name` in the `DisplayWithType`\ntrait does not make it possible to call `display_with_type` on any type. Types\nstill need to explicitly declare that they implement the trait.\n&quot;,&quot;id&quot;:&quot;6ac15484-9038-45b7-9b47-f08918551d3a&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:[&quot;Both `displayWithType` and `display_with_type` can ONLY be called with arguments\nwhose types overload `&lt;&lt;` or implement `Display`.\n&quot;]},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;Both `displayWithType` and `display_with_type` will display \&quot;Unknown type\&quot; for\neverything other than `int` or `i32`.\n&quot;,&quot;Both `displayWithType` and `display_with_type` can be called with ANY arguments\nwhose types overload `&lt;&lt;` or implement `Display`.\n&quot;],&quot;prompt&quot;:&quot;The following Rust program is an approximate translation of the C++ program.\nWhich statements are true about them?\n\nC++:\n\n```cpp\n#include &lt;iostream&gt;\n\ntemplate &lt;typename T&gt;\nvoid displayWithType(T t) {\n  std::cout &lt;&lt; \&quot;Unknown: \&quot; &lt;&lt; t &lt;&lt; std::endl;\n}\n\ntemplate &lt;&gt;\nvoid displayWithType&lt;int&gt;(int t) {\n  std::cout &lt;&lt; \&quot;int: \&quot; &lt;&lt; t &lt;&lt; std::endl;\n}\n```\n\nRust:\n\n```rust\ntrait TypeDisplayName {\n    fn type_display_name() -&gt; &amp;'static str {\n        \&quot;Unknown\&quot;\n    }\n}\n\nimpl TypeDisplayName for i32 {\n    fn type_display_name() -&gt; &amp;'static str {\n        \&quot;i32\&quot;\n    }\n}\n\nuse std::fmt::Display;\n\nfn display_with_type&lt;T: TypeDisplayName + Display&gt;(x: T) {\n    println!(\&quot;{}: {}\&quot;, T::type_display_name(), x);\n}\n```\n&quot;}},{&quot;context&quot;:&quot;`Option&lt;NonZero&lt;u32&gt;&gt;` makes use of the niche optimization.\n&quot;,&quot;id&quot;:&quot;5523ba5a-2772-4700-946e-2028471ead73&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;They are all the same size.&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nOption&lt;NonZero&lt;u32&gt;&gt;\n```\n&quot;,&quot;```rust\nNonZero&lt;u32&gt;\n```\n&quot;,&quot;```rust\nu32\n```\n&quot;],&quot;prompt&quot;:&quot;Which of the following types is the largest?\n&quot;}},{&quot;id&quot;:&quot;2f5fbeda-ab4a-48cc-92be-509d8191da0a&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nOption&lt;u32&gt;\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nNonZero&lt;u32&gt;\n```\n&quot;,&quot;```rust\nu32\n```\n&quot;,&quot;They are all the same size.&quot;],&quot;prompt&quot;:&quot;Which of the following types is the largest?\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
+<p>在 Rust 程序中，<em>参数多态性</em> 意味着（假设是安全的 Rust）仅从类型就可以推断出，如果函数返回，它一定会返回 <code>x</code> 或 <code>y</code> 其中之一。这是因为 <code>Ord</code> trait bound 并没有提供构造新类型 <code>T</code> 值的方法，而引用的使用也不允许函数在后续调用中返回之前调用的 <code>x</code> 或 <code>y</code>。</p>
+<p>在 C++ 程序中，当以 <code>int</code> 作为模板参数调用 <code>max</code> 时，由于模板特化，函数的行为会与其他参数类型有明显不同。</p>
+<p>这种权衡在于，Rust 中的特化实现更难使用，因为它们必须有不同的名字，但泛型代码更容易编写且更容易保证其正确性。</p>
+<h2 id="利基优化"><a class="header" href="#利基优化">利基优化</a></h2>
+<p>在某些情况下，Rust 编译器会进行优化，以实现更高效的表示。这些情况都是在效率提升不会改变代码可观察行为的前提下进行的。</p>
+<p><a href="https://doc.rust-lang.org/std/option/index.html#representation">最常见的例子是 <code>Option</code> 类型</a>。当 <code>Option</code> 用于编译器能够判断有未使用值的类型时，其中一个未使用的值会被用来表示 <code>None</code>，这样 <code>Option&lt;T&gt;</code> 就不需要额外的内存来存储枚举的判别值。</p>
+<p>这种优化会应用于引用类型（<code>&amp;</code> 和 <code>&amp;mut</code>），因为引用不能为 null。它也会应用于 <code>NonNull&lt;T&gt;</code>（表示非空指针）以及 <code>NonZeroU8</code> 等非零整数类型。对引用类型的优化使得 <code>Option&lt;&amp;T&gt;</code> 和 <code>Option&lt;&amp;mut T&gt;</code> 成为 C++ 中非拥有型观察指针的更安全替代方案。</p>
+<div class="quiz-placeholder" data-quiz-name="&quot;template_specialization&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;context&quot;:&quot;&gt; 都会对除 `int` 或 `i32` 以外的所有类型显示 \&quot;Unknown type\&quot;。\n\n实际上，两者对于其他类型的显示内容取决于程序中其他地方的实现/特化。\n\n&gt; `displayWithType` 和 `display_with_type` 都可以被任何重载了 `&lt;&lt;` 或实现了 `Display` 的类型调用。\n\n`DisplayWithType` trait 中 `type_display_name` 的默认实现并不意味着 `display_with_type` 可以被任意类型调用。类型仍需显式声明实现该 trait。\n&quot;,&quot;id&quot;:&quot;6ac15484-9038-45b7-9b47-f08918551d3a&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:[&quot;`displayWithType` 和 `display_with_type` 只能被重载了 `&lt;&lt;` 或实现了 `Display` 的类型调用。\n&quot;]},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;`displayWithType` 和 `display_with_type` 都会对除 `int` 或 `i32` 以外的所有类型显示 \&quot;Unknown type\&quot;。\n&quot;,&quot;`displayWithType` 和 `display_with_type` 都可以被任何重载了 `&lt;&lt;` 或实现了 `Display` 的类型调用。\n&quot;],&quot;prompt&quot;:&quot;以下 Rust 程序是对 C++ 程序的近似翻译。\n关于它们，下列哪些说法是正确的？\n\nC++:\n\n```cpp\n#include &lt;iostream&gt;\n\ntemplate &lt;typename T&gt;\nvoid displayWithType(T t) {\n  std::cout &lt;&lt; \&quot;Unknown: \&quot; &lt;&lt; t &lt;&lt; std::endl;\n}\n\ntemplate &lt;&gt;\nvoid displayWithType&lt;int&gt;(int t) {\n  std::cout &lt;&lt; \&quot;int: \&quot; &lt;&lt; t &lt;&lt; std::endl;\n}\n```\n\nRust:\n\n```rust\ntrait TypeDisplayName {\n    fn type_display_name() -&gt; &amp;'static str {\n        \&quot;Unknown\&quot;\n    }\n}\n\nimpl TypeDisplayName for i32 {\n    fn type_display_name() -&gt; &amp;'static str {\n        \&quot;i32\&quot;\n    }\n}\n\nuse std::fmt::Display;\n\nfn display_with_type&lt;T: TypeDisplayName + Display&gt;(x: T) {\n    println!(\&quot;{}: {}\&quot;, T::type_display_name(), x);\n}\n```\n&quot;}},{&quot;context&quot;:&quot;`Option&lt;NonZero&lt;u32&gt;&gt;` 利用了 niche 优化。\n&quot;,&quot;id&quot;:&quot;5523ba5a-2772-4700-946e-2028471ead73&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;它们的大小都相同。&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nOption&lt;NonZero&lt;u32&gt;&gt;\n```\n&quot;,&quot;```rust\nNonZero&lt;u32&gt;\n```\n&quot;,&quot;```rust\nu32\n```\n&quot;],&quot;prompt&quot;:&quot;下列哪种类型占用的空间最大？\n&quot;}},{&quot;id&quot;:&quot;2f5fbeda-ab4a-48cc-92be-509d8191da0a&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nOption&lt;u32&gt;\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nNonZero&lt;u32&gt;\n```\n&quot;,&quot;```rust\nu32\n```\n&quot;,&quot;它们的大小都相同。&quot;],&quot;prompt&quot;:&quot;下列哪种类型占用的空间最大？\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Template specialization">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=模板特化">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

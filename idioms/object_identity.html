@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Object identity - C++ to Rust Phrasebook</title>
+        <title>对象标识 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,40 +163,25 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="object-identity"><a class="header" href="#object-identity">Object identity</a></h1>
-<p>In C++ the pointer to an object is sometimes used to represent its identity in
-terms of the logic of a program.</p>
-<p>In some cases, this is a standard optimization, such as when implementing the
-copy assignment operator.</p>
-<p>In other cases the pointer value is used as a logical identity to distinguish
-between specific instances of an object that otherwise have the same properties.
-For example, representing a labeled graph where there may be distinct nodes that
-have the same label.</p>
-<p>In Rust, some of these cases are not applicable, and others cases are typically
-handled by instead by implementing a synthetic notion of identity for the
-values.</p>
-<h2 id="overloading-copy-assignment-and-equality-comparison-operators"><a class="header" href="#overloading-copy-assignment-and-equality-comparison-operators">Overloading copy assignment and equality comparison operators</a></h2>
-<p>For example, when implementing the copy-assignment operator, one might
-short-circuit when the copied object and the assignee are the same.
-Note that in this use the pointer values are not stored.</p>
-<p>This kind of optimization is unnecessary when implementing <a href="./constructors/copy_and_move_constructors.html#assignment-operators">Rust's equivalent to
-the copy assignment
-operator</a>
-<code>Clone::clone_from</code>. The type of <code>Clone::clone_from</code> prevents the same object
-from being passed as both arguments, because one of the arguments is a mutable
-reference, which is exclusive, and so prevents the other reference argument from
-referring to the same object.</p>
+                        <h1 id="对象标识"><a class="header" href="#对象标识">对象标识</a></h1>
+<p>在 C++ 中，对象的指针有时被用来表示其在程序逻辑中的身份。</p>
+<p>在某些情况下，这是一种标准优化，例如实现拷贝赋值运算符时。</p>
+<p>在其他情况下，指针值被用作逻辑身份，以区分那些属性相同但实例不同的对象。例如，在表示带标签的图时，可能存在具有相同标签但不同的节点实例。</p>
+<p>在 Rust 中，这些用法有些并不适用，其他情况则通常通过为值实现一种“合成身份”来处理。</p>
+<h2 id="重载拷贝赋值与相等比较运算符"><a class="header" href="#重载拷贝赋值与相等比较运算符">重载拷贝赋值与相等比较运算符</a></h2>
+<p>例如，在实现拷贝赋值运算符时，可以在被赋值对象和赋值源对象为同一对象时直接返回。注意，这种用法下指针值并不会被存储。</p>
+<p>在实现 <a href="./constructors/copy_and_move_constructors.html#assignment-operators">Rust 的拷贝赋值等价物</a> <code>Clone::clone_from</code> 时，这类优化是不必要的。<code>Clone::clone_from</code> 的类型签名保证了同一个对象不会同时作为两个参数传入，因为其中一个参数是独占的可变引用，这样就阻止了另一个引用参数指向同一对象。</p>
 <div class="comparison">
 <pre><code class="language-cpp">struct Person
 {
     std::string name;
-    // many other expensive-to-copy fields
+    // 许多其他复制开销较大的字段
 
     Person&amp; operator=(const Person&amp; other) {
-        // compare object identity first
+        // 首先比较对象标识
         if (this != &amp;other) {
             this.name = other.name;
-            // copy the other expensive-to-copy fields
+            // 复制其他复制开销较大的字段
         }
 
         return *this;
@@ -215,40 +200,34 @@ impl Clone for Person {
     }
 
     fn clone_from(&amp;mut self, source: &amp;Self) {
-        // self and source cannot be the same here,
-        // because that would mean there are a
-        // mutable and an immutable reference to
-        // the same memory location. Therefore, a
-        // check for assignment to self is not
-        // needed, even for the purpose of
-        // optimization.
+        // self 和 source 不可能相同，
+        // 因为这意味着同一内存位置同时有
+        // 可变引用和不可变引用。
+        // 因此，这里无需做自赋值检查，
+        // 即使是出于优化目的。
 
         self.name.clone_from(&amp;source.name);
     }
 }
 <span class="boring">}</span></code></pre></pre>
 </div>
-<p>In cases in C++ where most comparisons are between an object and itself (e.g.,
-the object's primary use is to be stored in a hash set), and comparison of
-unequal objects is expensive, comparing object identity might be used as
-optimization for the equality comparison operator overload.</p>
-<p>For supporting similar operations in Rust,
-<a href="https://doc.rust-lang.org/std/ptr/fn.eq.html"><code>std::ptr::eq</code></a> can be used.</p>
+<p>在 C++ 中，如果大多数比较都是对象与自身的比较（例如对象主要用于哈希集合），且不相等对象的比较开销很大，则可以通过比较对象标识来优化相等比较运算符的重载。</p>
+<p>在 Rust 中，如需支持类似操作，可以使用 <a href="https://doc.rust-lang.org/std/ptr/fn.eq.html"><code>std::ptr::eq</code></a>。</p>
 <div class="comparison">
 <pre><code class="language-cpp">struct Person
 {
     std::string name;
-    // many other expensive-to-compare fields
+    // 许多其他比较开销较大的字段
 };
 
 
 bool operator==(const Person&amp; lhs, const Person&amp; rhs) {
-    // compare object identity first
+    // 首先比较对象标识
     if (&amp;lhs == &amp;rhs) {
         return true;
     }
 
-    // compare the other expensive-to-compare fields
+    // 比较其他比较开销较大的字段
 
     return true;
 }
@@ -257,7 +236,7 @@ bool operator==(const Person&amp; lhs, const Person&amp; rhs) {
 </span><span class="boring">fn main() {
 </span>struct Person {
     name: String,
-    // many other expensive-to-compare fields
+    // 许多其他比较开销较大的字段
 }
 
 impl PartialEq for Person {
@@ -265,7 +244,7 @@ impl PartialEq for Person {
         if std::ptr::eq(self, other) {
             return true;
         }
-        // compare other expensive-to-compare fields
+        // 比较其他比较开销较大的字段
 
         true
     }
@@ -274,20 +253,10 @@ impl PartialEq for Person {
 impl Eq for Person {}
 <span class="boring">}</span></code></pre></pre>
 </div>
-<h2 id="distinguishing-between-values-in-a-relational-structure"><a class="header" href="#distinguishing-between-values-in-a-relational-structure">Distinguishing between values in a relational structure</a></h2>
-<p>The other use is when relationships between values are represented using a data
-structure external to the values, such as when representing a labeled graph in
-which multiple nodes might share the same label, but have edges between
-different sets of other nodes. This differs from the earlier case because the
-pointer value is preserved.</p>
-<p>One real-world example of this is in the LLVM codebase, where occurrences of
-declarations, statements, and expressions in the AST are distinguished by object
-identity. For example, variable expressions (<code>class DeclRefExpr</code>) contain the
-<a href="https://github.com/llvm/llvm-project/blob/ddc48fefe389789f64713b5924a03fb2b7961ef3/clang/include/clang/AST/Expr.h#L1265C1-L1275C16">pointer to the occurrence of the declaration to which the variable
-refers</a>.</p>
-<p>Similarly, when comparing whether two variable declarations represent
-declarations of the same variable, <a href="https://github.com/llvm/llvm-project/blob/aa33c095617400a23a2b814c4defeb12e7761639/clang/lib/AST/Stmt.cpp#L1476-L1485">a pointer to some canonical <code>VarDecl</code> is
-used</a>:</p>
+<h2 id="在关系结构中区分值"><a class="header" href="#在关系结构中区分值">在关系结构中区分值</a></h2>
+<p>另一种用法是，当值之间的关系通过外部数据结构表示时，例如在表示带标签的图时，多个节点可能有相同的标签，但它们与其他节点的连接关系不同。这与前面的情况不同，因为这里会保留指针值。</p>
+<p>一个现实中的例子是在 LLVM 代码库中，AST 中声明、语句和表达式的出现通过对象标识来区分。例如，变量表达式（<code>class DeclRefExpr</code>）包含了<a href="https://github.com/llvm/llvm-project/blob/ddc48fefe389789f64713b5924a03fb2b7961ef3/clang/include/clang/AST/Expr.h#L1265C1-L1275C16">指向其所引用声明的指针</a>。</p>
+<p>类似地，在比较两个变量声明是否代表同一个变量声明时，会<a href="https://github.com/llvm/llvm-project/blob/aa33c095617400a23a2b814c4defeb12e7761639/clang/lib/AST/Stmt.cpp#L1476-L1485">使用指向某个规范 <code>VarDecl</code> 的指针</a>：</p>
 <pre><code class="language-cpp">VarDecl *VarDecl::getCanonicalDecl();
 
 bool CapturedStmt::capturesVariable(const VarDecl *Var) const {
@@ -301,21 +270,10 @@ bool CapturedStmt::capturesVariable(const VarDecl *Var) const {
   return false;
 }
 </code></pre>
-<p>This kind of use is often discouraged in C++ because of the risk of
-use-after-free bugs, but might be used in performance sensitive applications
-where either storing the memory to represent the mapping or the additional
-indirection to resolve an entity's value from its identity is cost prohibitive.</p>
-<p>In Rust it is generally preferred to represent the identity of the objects with
-synthetic identifiers. This is in part as a technique for modeling
-self-referential data structures.</p>
-<p>As an example, one popular Rust graph library
-<a href="https://docs.rs/petgraph/latest/petgraph/">petgraph</a> uses <code>u32</code> as its default
-node identity type. This incurs the cost of an extra call to dereference the
-synthetic identifier to the label of the represented node as well as the extra
-memory required to store the mapping from nodes to labels.</p>
-<p>A simplified graph representation using the same synthetic identifier technique
-would look like the following, which represents the node identities by their
-index in the vectors that represent the labels and the edges.</p>
+<p>这种用法在 C++ 中通常不被推荐，因为容易引发悬垂指针等 use-after-free 问题，但在对性能要求极高的场景下，如果存储映射关系或通过间接方式解析实体身份的开销过高，可能会采用这种方式。</p>
+<p>在 Rust 中，通常推荐用合成标识符来表示对象身份。这也是建模自引用数据结构的一种技术。</p>
+<p>例如，流行的 Rust 图结构库 <a href="https://docs.rs/petgraph/latest/petgraph/">petgraph</a> 默认使用 <code>u32</code> 作为节点标识类型。这会带来一次额外的查找以通过标识符获取节点标签，以及存储节点到标签映射所需的额外内存开销。</p>
+<p>使用相同合成标识符技术的简化图结构如下，通过节点在标签和边的向量中的索引来表示节点身份：</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>enum Color {
@@ -324,21 +282,18 @@ index in the vectors that represent the labels and the edges.</p>
 }
 
 struct Graph {
-    /// Maps from node id to node labels, which here are colors.
+    /// 从节点 id 到节点标签（此处为颜色）的映射
     nodes_labels: Vec&lt;Color&gt;,
 
-    /// Maps from node id to adjacent nodes ids.
+    /// 从节点 id 到相邻节点 id 的映射
     edges: Vec&lt;Vec&lt;usize&gt;&gt;,
 }
 <span class="boring">}</span></code></pre></pre>
-<p>If performance requirements make the use of synthetic identifiers unacceptable,
-then it may be necessary to use prevent the value from being moved. The <a href="https://doc.rust-lang.org/std/pin/index.html"><code>Pin</code>
-and <code>PhantomPinned</code> structs</a> can
-be used to achieve an effect similar to deleting the move constructor in C++.</p>
-<div class="quiz-placeholder" data-quiz-name="&quot;object_identity&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;9f8a464a-6fbb-4352-815a-7a42d162f9fd&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;Because because `self` is a mutable reference, the borrow checker ensures that\n`source` can't be a reference to the same memory location.\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;Because `std::ptr::mem` is unsafe Rust.\n&quot;,&quot;Because the compiler will add the check when optimizing anyway.\n&quot;],&quot;prompt&quot;:&quot;Why is the check for self-assignment in `clone_from` not idiomatic Rust?\n\n```rust\nstruct LargeStruct {\n    field1: String,\n    // ...\n    field100: String,\n}\n\nimpl Clone for LargeStruct {\n    fn clone(&amp;self) -&gt; Self {\n        Self {\n            field1: self.field1.clone(),\n            // ...\n            field100: self.field100.clone(),\n        }\n    }\n\n    fn clone_from(&amp;mut self, source: &amp;Self) {\n        if std::ptr::eq(self, source) {\n            return;\n        }\n\n        self.field1.clone_from(&amp;source.field1);\n        // ...\n        self.field100.clone_from(&amp;source.field100);\n    }\n}\n```\n&quot;}},{&quot;id&quot;:&quot;d60a321a-3b38-4425-8a9a-6b95fe0e3837&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:[&quot;Synthetic identifiers are easier to use for forming self-referential structures.\n&quot;,&quot;Synthetic identifiers avoid the complexity of using `Pin` to prevent values from\nbeing moved.\n&quot;]},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;There is no way to access memory locations in Rust.\n&quot;,&quot;Comparing memory locations requires unsafe Rust.\n&quot;],&quot;prompt&quot;:&quot;Which are reasons why in Rust synthetic identifiers are usually used instead of\nmemory location for object identity?\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
+<p>如果性能需求无法接受合成标识符的开销，则可能需要防止值被移动。可以使用 <a href="https://doc.rust-lang.org/std/pin/index.html"><code>Pin</code> 和 <code>PhantomPinned</code> 结构体</a> 来实现类似于 C++ 中删除移动构造函数的效果。</p>
+<div class="quiz-placeholder" data-quiz-name="&quot;object_identity&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;9f8a464a-6fbb-4352-815a-7a42d162f9fd&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;因为 `self` 是一个可变引用，借用检查器保证了 `source` 不可能是指向同一内存位置的引用。\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;因为 `std::ptr::mem` 是不安全的 Rust。\n&quot;,&quot;因为编译器在优化时会自动添加该检查。\n&quot;],&quot;prompt&quot;:&quot;为什么在 `clone_from` 中检查自赋值不是 Rust 的惯用做法？\n```rust\nstruct LargeStruct {\n    field1: String,\n    // ...\n    field100: String,\n}\n\nimpl Clone for LargeStruct {\n    fn clone(&amp;self) -&gt; Self {\n        Self {\n            field1: self.field1.clone(),\n            // ...\n            field100: self.field100.clone(),\n        }\n    }\n\n    fn clone_from(&amp;mut self, source: &amp;Self) {\n        if std::ptr::eq(self, source) {\n            return;\n        }\n\n        self.field1.clone_from(&amp;source.field1);\n        // ...\n        self.field100.clone_from(&amp;source.field100);\n    }\n}\n```\n&quot;}},{&quot;id&quot;:&quot;d60a321a-3b38-4425-8a9a-6b95fe0e3837&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:[&quot;合成标识符更容易用于构建自引用结构。\n&quot;,&quot;合成标识符避免了使用 `Pin` 防止值被移动的复杂性。\n&quot;]},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;在 Rust 中无法访问内存地址。\n&quot;,&quot;比较内存地址需要使用不安全的 Rust。\n&quot;],&quot;prompt&quot;:&quot;在 Rust 中，为什么通常使用合成标识符而不是内存地址来表示对象身份？\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Object identity">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=对象标识">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

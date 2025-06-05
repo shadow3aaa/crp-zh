@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Curiously recurring template pattern (CRTP) - C++ to Rust Phrasebook</title>
+        <title>奇异递归模板模式（CRTP） - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,29 +163,18 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="curiously-recurring-template-pattern-crtp"><a class="header" href="#curiously-recurring-template-pattern-crtp">Curiously recurring template pattern (CRTP)</a></h1>
-<p>The C++ <a href="https://en.cppreference.com/w/cpp/language/crtp">curiously recurring template
-pattern</a> is used to make the
-concrete type of the derived class available in the definition of methods
-defined in the base class.</p>
-<h2 id="sharing-implementations-with-static-polymorphism"><a class="header" href="#sharing-implementations-with-static-polymorphism">Sharing implementations with static polymorphism</a></h2>
-<p>The basic use of the CRTP is for reducing redundancy in implementations that
-make use of static polymorphism. In this use case, the <code>this</code> pointer is cast to
-the type provided by the template parameter so that methods from the derived
-class can be called. This enables methods implemented in the base class to call
-methods in the derived class without having to declare them virtual, avoiding
-the cost of dynamic dispatch.</p>
-<p>In the following example, <code>Triangle</code> and <code>Square</code> have a common implementation
-of <code>twiceArea</code> without the need for dynamic dispatch. This use case is addressed
-in Rust using default trait methods.</p>
+                        <h1 id="奇异递归模板模式crtp"><a class="header" href="#奇异递归模板模式crtp">奇异递归模板模式（CRTP）</a></h1>
+<p>C++ 的<a href="https://en.cppreference.com/w/cpp/language/crtp">奇异递归模板模式（CRTP）</a>用于让派生类的具体类型在基类定义的方法中可用。</p>
+<h2 id="通过静态多态共享实现"><a class="header" href="#通过静态多态共享实现">通过静态多态共享实现</a></h2>
+<p>CRTP 的基本用途是减少使用静态多态时的实现冗余。在这种用法中，<code>this</code> 指针被转换为模板参数提供的类型，从而可以调用派生类的方法。这使得基类中实现的方法能够调用派生类的方法，而无需将其声明为虚函数，从而避免了动态分派的开销。</p>
+<p>在下面的示例中，<code>Triangle</code> 和 <code>Square</code> 共享了 <code>twiceArea</code> 的实现，无需动态分派。这个用例在 Rust 中通过 trait 的默认方法实现。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
 template &lt;typename T&gt;
 struct Shape {
-  // This implementation is shared and can call
-  // the area method from derived classes without
-  // declaring it virtual.
+  // 该实现是共享的，并且可以调用
+  // 派生类的 area 方法，无需声明为虚函数。
   double twiceArea() {
     return 2.0 * static_cast&lt;T *&gt;(this)-&gt;area();
   }
@@ -260,35 +249,23 @@ fn main() {
     println!("{}", square.twice_area());
 }</code></pre></pre>
 </div>
-<p>The reason why nothing additional needs to be done for the default method to
-invoke area statically in Rust is that calls to methods on <code>self</code> are always
-resolved statically in Rust. This is possible because <a href="../idioms/data_modeling/inheritance_and_reuse.html">Rust does not have
-inheritance between concrete
-types</a>. Despite being defined in
-the trait, the default method is actually implemented as part of the
-implementing struct.</p>
-<h2 id="method-chaining"><a class="header" href="#method-chaining">Method chaining</a></h2>
-<p>Another common use for the CRTP is for implementing method chaining when an
-implementation of a method to be chained is provided by a base class.</p>
-<p>In C++ the template parameter is used to ensure that the type returned from the
-shared function is that of the derived class, so that further methods defined in
-the derived class can be called on it. The template parameter is also used to
-call a method on the derived type without declaring the method as virtual.</p>
-<p>In Rust the template parameter is not required because the <code>Self</code> type is
-available in traits to refer to the type of the implementing struct.</p>
+<p>在 Rust 中，默认方法无需额外处理即可静态调用 <code>area</code>，原因在于对 <code>self</code> 的方法调用总是静态解析的。这是因为 <a href="../idioms/data_modeling/inheritance_and_reuse.html">Rust 不支持具体类型之间的继承</a>。尽管默认方法定义在 trait 中，但实际实现是作为实现结构体的一部分。</p>
+<h2 id="方法链式调用"><a class="header" href="#方法链式调用">方法链式调用</a></h2>
+<p>CRTP 的另一个常见用途是当链式调用的方法由基类实现时，实现方法链式调用。</p>
+<p>在 C++ 中，模板参数用于确保共享函数返回的是派生类的类型，这样可以继续调用派生类中定义的其他方法。模板参数也用于在不声明虚函数的情况下调用派生类型的方法。</p>
+<p>在 Rust 中，不需要模板参数，因为 trait 中的 <code>Self</code> 类型已经可以引用实现结构体的类型。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;span&gt;
 #include &lt;string&gt;
 #include &lt;vector&gt;
 
-// D is the type of the derived class
+// D 是派生类的类型
 template &lt;typename D&gt;
 struct Combinable {
   D combineWith(D &amp;d);
 
-  // concat is implemented in the base class, but
-  // operates on values of the derived class.
+  // concat 在基类中实现，但操作的是派生类的值。
   D concat(std::span&lt;D&gt; vec) {
     D acc(*static_cast&lt;D *&gt;(this));
 
@@ -309,8 +286,7 @@ struct Sum : Combinable&lt;Sum&gt; {
     return Sum(sum + s.sum);
   }
 
-  // Sum includes an additional method that can be
-  // chained.
+  // Sum 包含一个可以链式调用的额外方法。
   Sum mult(int n) {
     return Sum(sum * n);
   }
@@ -320,23 +296,18 @@ int main() {
   Sum s(0);
   std::vector&lt;Sum&gt; v{1, 2, 3, 4};
   Sum x = s.concat(v)
-              // Even though concat is part of the
-              // base class, it returns a value of
-              // the implementing class, making it
-              // possible to chain methods
-              // specific to that class.
+              // 尽管 concat 属于基类，但它返回的是
+              // 实现类的值，因此可以链式调用该类特有的方法。
               .mult(2)
               .combineWith(5);
   std::cout &lt;&lt; x.sum &lt;&lt; std::endl;
 }
 </code></pre>
-<pre><pre class="playground"><code class="language-rust">// No generic type is required: Self already
-// refers to implementing type.
+<pre><pre class="playground"><code class="language-rust">// 不需要泛型类型：Self 已经指向实现类型。
 trait Combinable {
     fn combine_with(&amp;self, other: &amp;Self) -&gt; Self;
 
-    // concat has a default implementation in
-    // terms of Self.
+    // concat 有一个基于 Self 的默认实现。
     fn concat(&amp;self, others: &amp;[Self]) -&gt; Self
     where
         Self: Clone,
@@ -354,8 +325,7 @@ trait Combinable {
 struct Sum(i32);
 
 impl Sum {
-    // Sum includes an additional method that can be
-    // chained.
+    // Sum 包含一个可以链式调用的额外方法。
     fn mult(&amp;self, n: i32) -&gt; Self {
         Self(self.0 * n)
     }
@@ -372,24 +342,18 @@ fn main() {
     let v = vec![Sum(1), Sum(2), Sum(3), Sum(4)];
     let x = s
         .concat(&amp;v)
-        // Even though concat is part of the
-        // trait, it returns a value of the
-        // implementing type, making it possible
-        // to chain methods specific to that type.
+        // 尽管 concat 属于 trait，但它返回的是
+        // 实现类型的值，因此可以链式调用该类型特有的方法。
         .mult(2)
         .combine_with(&amp;Sum(5));
     println!("{}", x.0)
 }</code></pre></pre>
 </div>
-<p>Again, the reason why <code>Self</code> can refer to the implementing type is that <a href="../idioms/data_modeling/inheritance_and_reuse.html">Rust
-does not have inheritance between concrete
-types</a>. This contrasts with C++
-where a value may be used at any number of types which are concrete, and so it
-would not be clear which type something like <code>Self</code> should refer to.</p>
+<p>同样，<code>Self</code> 能够引用实现类型，是因为 <a href="../idioms/data_modeling/inheritance_and_reuse.html">Rust 不支持具体类型之间的继承</a>。这与 C++ 形成对比，在 C++ 中一个值可能属于多个具体类型，因此无法明确 <code>Self</code> 应该指向哪个类型。</p>
 <div class="quiz-placeholder" data-quiz-name="&quot;crtp&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;context&quot;:&quot;Dynamic dispatch in Rust only occurs when invoking a method on a trait object.\nSome of the patterns used to ensure static dispatch is used in C++ are not\nneeded in Rust.\n&quot;,&quot;id&quot;:&quot;9dd51ab1-5e7a-441b-bc59-c80a73bde71f&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:[&quot;`total += shape.area(); // 2`\n&quot;]},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;`2.0 * self.area() // 1`\n&quot;,&quot;`println!(\&quot;{}\&quot;, triangle.twice_area()); // 3`\n&quot;,&quot;`println!(\&quot;{}\&quot;, square.twice_area()); // 4`\n&quot;,&quot;`2.0 * self.area() // 1` when invoked via `sum_areas`.\n&quot;],&quot;prompt&quot;:&quot;In the following Rust program, which calls are resolved using dynamic dispatch?\n\n```rust\ntrait Shape {\n    fn area(&amp;self) -&gt; f64;\n\n    fn twice_area(&amp;self) -&gt; f64 {\n        2.0 * self.area() // 1\n    }\n}\n\nstruct Triangle {\n    base: f64,\n    height: f64,\n}\n\nimpl Shape for Triangle {\n    fn area(&amp;self) -&gt; f64 {\n        0.5 * self.base * self.height\n    }\n}\n\nstruct Square {\n    side: f64,\n}\n\nimpl Shape for Square {\n    fn area(&amp;self) -&gt; f64 {\n        self.side * self.side\n    }\n}\n\nfn sum_areas(shapes: &amp;[&amp;dyn Shape]) -&gt; f64 {\n    let mut total = 0.0;\n    for shape in shapes {\n        total += shape.area(); // 2\n    }\n    total\n}\n\nfn main() {\n    let triangle = Triangle {\n        base: 2.0,\n        height: 1.0,\n    };\n    let square = Square { side: 2.0 };\n    println!(\&quot;{}\&quot;, triangle.twice_area()); // 3\n    println!(\&quot;{}\&quot;, square.twice_area()); // 4\n\n    println!(\n        \&quot;{}\&quot;,\n        sum_areas(&amp;[&amp;triangle, &amp;square])\n    );\n}\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Curiously recurring template pattern (CRTP)">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=奇异递归模板模式（CRTP）">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

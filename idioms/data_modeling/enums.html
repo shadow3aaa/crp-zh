@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Enums - C++ to Rust Phrasebook</title>
+        <title>枚举 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,14 +163,10 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="enums"><a class="header" href="#enums">Enums</a></h1>
-<p>In C++, enums are often used to model a fixed set of alternatives, especially when
-each of those enumerators corresponds to a specific integer value, such as is needed
-when working with hardware, system calls, or protocol implementations.</p>
-<p>For example, the various modes for a GPIO pin could be modeled as an enum, which
-would restrict methods using the mode to valid values.</p>
-<p>While Rust enums are <a href="./tagged_unions.html">more general</a>,
-they can still be used for this sort of modeling.</p>
+                        <h1 id="枚举enums"><a class="header" href="#枚举enums">枚举（Enums）</a></h1>
+<p>在 C++ 中，枚举常用于建模一组固定的备选项，尤其是在每个枚举值都对应特定整数值的场景，例如硬件操作、系统调用或协议实现。</p>
+<p>例如，GPIO 引脚的各种模式可以用枚举来建模，这样可以限制相关方法只接受有效的模式值。</p>
+<p>虽然 Rust 的枚举<a href="./tagged_unions.html">更为通用</a>，但它们同样适用于此类建模。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;cstdint&gt;
 
@@ -223,32 +219,24 @@ fn set_pin_mode(pin: Pin, mode: Mode) {
 }
 <span class="boring">}</span></code></pre></pre>
 </div>
-<p>The <code>#[repr(u8)]</code> attribute ensures that the representation of the enum is the
-same as a byte (like declaring the underlying type of an enum in C++). The enum
-values can then be freely converted to the underlying type with the <code>as</code>.</p>
-<p>In C++ the standard way to convert from an integer to an enum is a static cast.
-However, this <a href="https://eel.is/c++draft/expr.static.cast#10">requires that the user check the validity of the cast
-themselves</a>. Often the conversion
-is done by a function that checks that the value to convert is a valid enum
-value.</p>
-<p>In Rust the standard way to perform the conversion is to implement the <code>TryFrom</code>
-trait for the type and then use the <code>try_from</code> method or <code>try_into</code> method.</p>
+<p><code>#[repr(u8)]</code> 属性确保枚举的内存布局与字节类型一致（类似于 C++ 中声明枚举的底层类型）。这样，枚举值就可以通过 <code>as</code> 关键字自由转换为底层类型。</p>
+<p>在 C++ 中，将整数转换为枚举的标准方式是使用 static_cast。然而，这<a href="https://eel.is/c++draft/expr.static.cast#10">要求用户自行检查转换的有效性</a>。通常，这种转换会通过一个函数来实现，该函数会检查待转换值是否为有效的枚举值。</p>
+<p>在 Rust 中，标准做法是为该类型实现 <code>TryFrom</code> trait，然后使用 <code>try_from</code> 或 <code>try_into</code> 方法进行转换。</p>
 <div class="comparison">
-<pre><code class="language-cpp"><span class="boring">#include &lt;cstdint&gt;
-</span><span class="boring">
-</span><span class="boring">enum Pin : uint8_t {
-</span><span class="boring">  Pin1 = 0x01,
-</span><span class="boring">  Pin2 = 0x02,
-</span><span class="boring">  Pin3 = 0x04
-</span><span class="boring">};
-</span><span class="boring">
-</span>struct InvalidPin {
+<pre><code class="language-cpp">#include &lt;cstdint&gt;
+
+enum Pin : uint8_t {
+  Pin1 = 0x01,
+  Pin2 = 0x02,
+  Pin3 = 0x04
+};
+
+struct InvalidPin {
     uint8_t pin;
 };
 
 Pin to_pin(uint8_t pin) {
-  // The values are not contiguous, so we can't
-  // just check the bounds and then cast.
+  // 这些值不是连续的，因此不能只检查范围后直接转换。
   switch (pin) {
   case 0x1: { return Pin1; }
   case 0x2: { return Pin2; }
@@ -264,7 +252,7 @@ int main() {
     return 0;
   }
 
-  // use pin p
+  // 使用 pin p
 }
 </code></pre>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#[repr(u8)]
@@ -299,26 +287,17 @@ fn main() {
     return;
   };
 
-  // use pin p
+  // 使用 pin p
 }</code></pre></pre>
 </div>
-<p>See <a href="../exceptions.html">Exceptions and error handling</a> for examples of how
-to ergonomically handle the result of <code>try_from</code>.</p>
-<p>If low-level performance is more of a concern than memory safety,
-<code>std::mem::transmute</code> is analogous to a C++ reinterpret cast, but requires
-unsafe Rust because its use can result in undefined behavior. Uses of
-<code>std::mem::transmute</code> for this purpose should not be hidden behind an interface
-that can be called from safe Rust unless the interface can actually guarantee
-that the call will never happen with an invalid value.</p>
-<h2 id="enums-and-methods"><a class="header" href="#enums-and-methods">Enums and methods</a></h2>
-<p>In C++ enums cannot have methods. Instead, to model an enum with methods one
-must define a wrapper class for the enum and define the methods on that wrapper
-class. In Rust, methods can be defined on an enum with an <code>impl</code> block, just
-like any other type.</p>
+<p>关于如何优雅地处理 <code>try_from</code> 的结果，请参见<a href="../exceptions.html">异常与错误处理</a>。</p>
+<p>如果对底层性能的需求高于内存安全，可以使用 <code>std::mem::transmute</code>，它类似于 C++ 的 reinterpret_cast，但需要使用 unsafe Rust，因为不当使用可能导致未定义行为。将 <code>std::mem::transmute</code> 用于此目的时，不应将其隐藏在可从安全 Rust 调用的接口之后，除非该接口能够实际保证不会传入无效值。</p>
+<h2 id="枚举与方法"><a class="header" href="#枚举与方法">枚举与方法</a></h2>
+<p>在 C++ 中，枚举不能拥有方法。若要为枚举建模方法，必须为枚举定义一个包装类，并在该包装类上定义方法。而在 Rust 中，可以像为其他类型一样，通过 <code>impl</code> 块为枚举定义方法。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;cstdint&gt;
 
-// Actual enum
+// 实际的枚举
 enum PinImpl : uint8_t {
   Pin1 = 0x01,
   Pin2 = 0x02,
@@ -327,16 +306,14 @@ enum PinImpl : uint8_t {
 
 class LastPin{};
 
-// Wrapper type
+// 包装类型
 struct Pin {
   PinImpl pin;
 
-  // Conversion constructor so that PinImpl can be
-  // used as a Pin.
+  // 转换构造函数，使 PinImpl 可作为 Pin 使用。
   Pin(PinImpl p) : pin(p) {}
 
-  // Conversion method so wrapper type can be
-  // used with switch statement.
+  // 转换方法，使包装类型可用于 switch 语句。
   operator PinImpl() {
     return this-&gt;pin;
   }
@@ -376,10 +353,10 @@ impl Pin {
 }
 <span class="boring">}</span></code></pre></pre>
 </div>
-<div class="quiz-placeholder" data-quiz-name="&quot;enums&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;b1f69693-be11-4105-b408-7f8925c4303d&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nimpl TryFrom&lt;u8&gt; for Color {\n    type Error = InvalidColor;\n\n    fn try_from(c: u8) -&gt; Result&lt;Self, InvalidColor&gt; {\n        match c {\n            0 =&gt; Ok(Color::Red),\n            1 =&gt; Ok(Color::Blue),\n            2 =&gt; Ok(Color::Green),\n            3 =&gt; Ok(Color::Yellow),\n            _ =&gt; Err(InvalidColor(c)),\n        }\n    }\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nimpl TryFrom&lt;u8&gt; for Color {\n    type Error = InvalidColor;\n\n    fn try_from(c: u8) -&gt; Result&lt;Self, InvalidColor&gt; {\n        match c {\n            0 | 2 | 3 =&gt; Ok(c as Color),\n            _ =&gt; Err(InvalidColor(c)),\n        }\n    }\n}\n```\n&quot;,&quot;```rust\n#[derive(Clone, Copy)]\nstruct ColorWrapper {\n    color: Color,\n}\n\nimpl TryFrom&lt;u8&gt; for ColorWrapper {\n    type Error = InvalidColor;\n\n    fn try_from(c: u8) -&gt; Result&lt;Self, InvalidColor&gt; {\n        let color = match c {\n            0 =&gt; Ok(Color::Red),\n            1 =&gt; Ok(Color::Blue),\n            2 =&gt; Ok(Color::Green),\n            3 =&gt; Ok(Color::Yellow),\n            _ =&gt; Err(InvalidColor(c)),\n        }?;\n        Ok(ColorWrapper { color })\n    }\n}\n```\n&quot;],&quot;prompt&quot;:&quot;Which of these Rust programs is the most idiomatic translation of the following\nC++ program?\n\n```cpp\n#include &lt;cstdint&gt;\n#include &lt;iostream&gt;\n\nenum ColorImpl : uint8_t {\n  Red,\n  Blue,\n  Green,\n  Yellow,\n};\n\nstruct InvalidColor {\n  uint8_t color;\n};\n\nstruct Color {\n  ColorImpl color;\n\n  Color(ColorImpl c) : color(c) {}\n\n  operator ColorImpl() {\n    return color;\n  }\n\n  explicit Color(uint8_t c) {\n    if (c &lt; Red || c &gt; Yellow) {\n      throw InvalidColor{c};\n    }\n    color = static_cast&lt;ColorImpl&gt;(c);\n  }\n};\n```\n\nAll of the Rust options start with the following import and definitions.\n\n```rust\nuse std::convert::TryFrom;\n\n#[repr(i8)]\n#[derive(Clone, Copy)]\nenum Color {\n    Red,\n    Blue,\n    Green,\n    Yellow,\n}\n\nstruct InvalidColor(u8);\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
+<div class="quiz-placeholder" data-quiz-name="&quot;enums&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;b1f69693-be11-4105-b408-7f8925c4303d&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nimpl TryFrom&lt;u8&gt; for Color {\n    type Error = InvalidColor;\n\n    fn try_from(c: u8) -&gt; Result&lt;Self, InvalidColor&gt; {\n        match c {\n            0 =&gt; Ok(Color::Red),\n            1 =&gt; Ok(Color::Blue),\n            2 =&gt; Ok(Color::Green),\n            3 =&gt; Ok(Color::Yellow),\n            _ =&gt; Err(InvalidColor(c)),\n        }\n    }\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nimpl TryFrom&lt;u8&gt; for Color {\n    type Error = InvalidColor;\n\n    fn try_from(c: u8) -&gt; Result&lt;Self, InvalidColor&gt; {\n        match c {\n            0 | 2 | 3 =&gt; Ok(c as Color),\n            _ =&gt; Err(InvalidColor(c)),\n        }\n    }\n}\n```\n&quot;,&quot;```rust\n#[derive(Clone, Copy)]\nstruct ColorWrapper {\n    color: Color,\n}\n\nimpl TryFrom&lt;u8&gt; for ColorWrapper {\n    type Error = InvalidColor;\n\n    fn try_from(c: u8) -&gt; Result&lt;Self, InvalidColor&gt; {\n        let color = match c {\n            0 =&gt; Ok(Color::Red),\n            1 =&gt; Ok(Color::Blue),\n            2 =&gt; Ok(Color::Green),\n            3 =&gt; Ok(Color::Yellow),\n            _ =&gt; Err(InvalidColor(c)),\n        }?;\n        Ok(ColorWrapper { color })\n    }\n}\n```\n&quot;],&quot;prompt&quot;:&quot;以下哪一个 Rust 程序是对下面 C++ 程序最地道的翻译？\n\n```cpp\n#include &lt;cstdint&gt;\n#include &lt;iostream&gt;\n\nenum ColorImpl : uint8_t {\n  Red,\n  Blue,\n  Green,\n  Yellow,\n};\n\nstruct InvalidColor {\n  uint8_t color;\n};\n\nstruct Color {\n  ColorImpl color;\n\n  Color(ColorImpl c) : color(c) {}\n\n  operator ColorImpl() {\n    return color;\n  }\n\n  explicit Color(uint8_t c) {\n    if (c &lt; Red || c &gt; Yellow) {\n      throw InvalidColor{c};\n    }\n    color = static_cast&lt;ColorImpl&gt;(c);\n  }\n};\n```\n\n所有 Rust 选项都以如下导入和定义开始。\n\n```rust\nuse std::convert::TryFrom;\n\n#[repr(i8)]\n#[derive(Clone, Copy)]\nenum Color {\n    Red,\n    Blue,\n    Green,\n    Yellow,\n}\n\nstruct InvalidColor(u8);\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Enums">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=枚举">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

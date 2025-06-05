@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Null (nullptr) - C++ to Rust Phrasebook</title>
+        <title>空值（nullptr） - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,23 +163,13 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="null-nullptr"><a class="header" href="#null-nullptr">Null (nullptr)</a></h1>
-<p>This section covers idiomatic uses of <code>nullptr</code> in C++ and how to achieve the
-same results in Rust.</p>
-<p>Some uses of <code>nullptr</code> in C++ don't arise in the first place in Rust because of
-other language differences. For example, <a href="./null/moved_members.html">moved objects don't leave anything
-behind that needs to be destroyed</a>. Therefore
-there is no need to use <code>nullptr</code> as a placeholder for a moved pointer that can
-have <code>delete</code> or <code>free</code> called on it.</p>
-<p>Other uses are replaced by <code>Option</code>, which in safe Rust requires checking for
-the empty case before accessing the contained value. This use is common enough
-that <a href="https://doc.rust-lang.org/std/option/index.html#representation">Rust has an
-optimization</a>
-for when <code>Option</code> is used with a reference (<code>&amp;</code> or <code>&amp;mut ref</code>), <code>Box</code>
-(equivalent of <code>unique_ptr</code>), and <code>NonNull</code> (a non-null raw pointer).</p>
+                        <h1 id="nullnullptr"><a class="header" href="#nullnullptr">Null（nullptr）</a></h1>
+<p>本节介绍 C++ 中 <code>nullptr</code> 的惯用用法，以及如何在 Rust 中实现相同的效果。</p>
+<p>由于语言差异，C++ 中某些 <code>nullptr</code> 的用法在 Rust 中根本不会出现。例如，<a href="./null/moved_members.html">被移动的对象不会留下需要销毁的内容</a>。因此，无需像在 C++ 中那样，用 <code>nullptr</code> 作为已移动指针的占位符，以便后续可以对其调用 <code>delete</code> 或 <code>free</code>。</p>
+<p>其他用法则被 <code>Option</code> 替代。在安全的 Rust 中，访问其内部值前必须检查是否为空。这种用法非常常见，以至于 <a href="https://doc.rust-lang.org/std/option/index.html#representation">Rust 针对某些情况做了优化</a>：当 <code>Option</code> 与引用（<code>&amp;</code> 或 <code>&amp;mut ref</code>）、<code>Box</code>（等同于 <code>unique_ptr</code>）以及 <code>NonNull</code>（非空原始指针）一起使用时，会有特殊的表示优化。</p>
 
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Null (nullptr)">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=空值（nullptr）">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

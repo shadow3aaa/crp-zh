@@ -1,31 +1,31 @@
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt = """
-Which of the following are true about the Rust `char` type.
+以下关于 Rust 的 `char` 类型，哪些说法是正确的？
 """
 prompt.distractors = [
 """
-It is equivalent to the C++ `wchar` type.
+它等同于 C++ 的 `wchar` 类型。
 """,
 """
-It is equivalent to the C++ `char` type.
+它等同于 C++ 的 `char` 类型。
 """,
 """
-It is equivalent to the C++ `char8_t` type.
+它等同于 C++ 的 `char8_t` 类型。
 """,
 """
-It is equivalent to the C++ `int32_t` type.
+它等同于 C++ 的 `int32_t` 类型。
 """,
 """
-It is 8 bits wide.
+它是 8 位宽的。
 """
 ]
 answer.answer = [
 """
-It is guaranteed in safe Rust to represent a valid Unicode scalar value.
+在安全的 Rust 中，它保证表示一个有效的 Unicode 标量值。
 """,
 """
-It is 32 bits wide.
+它是 32 位宽的。
 """
 ]
 id = "4fb18334-8405-438d-8d3e-859a8823bccf"
@@ -33,22 +33,22 @@ id = "4fb18334-8405-438d-8d3e-859a8823bccf"
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt = """
-Which of the following are true about `std::sync::Arc<T>`.
+以下关于 `std::sync::Arc<T>`，哪些说法是正确的？
 """
 prompt.distractors = [
 """
-It provides thread-safe write access to a value of type `T`.
+它为类型 `T` 的值提供线程安全的写访问。
 """,
 """
-It can be empty (i.e., not own some value of type `T`).
+它可以为空（即不拥有某个类型为 `T` 的值）。
 """
 ]
 answer.answer = [
 """
-It provides thread-safe read access to a value of type `T`.
+它为类型 `T` 的值提供线程安全的只读访问。
 """,
 """
-It represents shared ownership of a value of type `T`.
+它表示对类型 `T` 的值的共享所有权。
 """
 ]
 id = "5586766c-b5ce-4bea-b995-da0b3c548b0d"

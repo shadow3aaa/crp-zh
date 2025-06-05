@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Optional return values - C++ to Rust Phrasebook</title>
+        <title>可选返回值 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,19 +163,14 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="optional-return-values"><a class="header" href="#optional-return-values">Optional return values</a></h1>
-<p>One idiom in C++ for optionally producing a result from a method or function is
-to use a reference parameter along with a boolean or integer return value to
-indicate whether the result was produced. This might be done for the same
-reasons as for using <a href="./multiple_return.html">out parameters for multiple return
-values</a>:</p>
+                        <h1 id="可选返回值"><a class="header" href="#可选返回值">可选返回值</a></h1>
+<p>在 C++ 中，一种用于可选地从方法或函数产生结果的惯用法是，使用引用参数配合布尔值或整数返回值来指示结果是否被产生。这样做的原因与<a href="./multiple_return.html">用于多返回值的 out 参数</a>类似：</p>
 <ul>
-<li>compatibility with versions of C++ earlier than C++11,</li>
-<li>working in a codebase that uses C-style of C++, and</li>
-<li>performance concerns.</li>
+<li>兼容早于 C++11 的 C++ 版本，</li>
+<li>适用于采用 C 风格的 C++ 代码库，</li>
+<li>性能方面的考虑。</li>
 </ul>
-<p>The idiomatic Rust approach for optionally returning a value is to return a
-value of type <a href="https://doc.rust-lang.org/std/option/index.html"><code>Option</code></a>.</p>
+<p>Rust 中用于可选返回值的惯用做法是返回 <a href="https://doc.rust-lang.org/std/option/index.html"><code>Option</code></a> 类型的值。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
@@ -232,19 +227,12 @@ fn main() {
     go(10, 0);
 }</code></pre></pre>
 </div>
-<p>When there is useful information to provide in the failing case, the <a href="https://doc.rust-lang.org/std/result/"><code>Result</code>
-type</a> can be used instead. The <a href="../exceptions.html">chapter
-on error handling</a> describes the use of <code>Result</code>.</p>
-<h2 id="returning-a-pointer"><a class="header" href="#returning-a-pointer">Returning a pointer</a></h2>
-<p>When the value being returned is a pointer, another common idiom in C++ is to
-use <code>nullptr</code> to represent the optional case. In the Rust translation of that
-idiom, <code>Option</code> is also used, along with a reference type, such as <code>&amp;</code> or <code>Box</code>.
-See <a href="../null/sentinel_values.html#nullptr">the chapter on using <code>nullptr</code> as a sentinel
-value</a> for more details.</p>
-<h2 id="problems-with-the-direct-transliteration"><a class="header" href="#problems-with-the-direct-transliteration">Problems with the direct transliteration</a></h2>
-<p>It is possible to transliterate the original example that uses out parameters to
-Rust, but the resulting code is not idiomatic.</p>
-<pre><pre class="playground"><code class="language-rust">// NOT IDIOIMATIC RUST
+<p>当在失败情况下有有用的信息需要返回时，可以使用 <a href="https://doc.rust-lang.org/std/result/"><code>Result</code> 类型</a>。详见<a href="../exceptions.html">错误处理章节</a>对 <code>Result</code> 的介绍。</p>
+<h2 id="返回指针"><a class="header" href="#返回指针">返回指针</a></h2>
+<p>当返回值是指针时，C++ 中的另一种常见惯用法是用 <code>nullptr</code> 表示可选情况。在 Rust 中，这一惯用法的对应实现也是用 <code>Option</code>，配合引用类型（如 <code>&amp;</code> 或 <code>Box</code>）。详见<a href="../null/sentinel_values.html#nullptr">将 <code>nullptr</code> 作为哨兵值章节</a>。</p>
+<h2 id="直接翻译的弊端"><a class="header" href="#直接翻译的弊端">直接翻译的弊端</a></h2>
+<p>可以将使用 out 参数的原始示例直接翻译为 Rust，但这样得到的代码并不符合 Rust 的惯用风格。</p>
+<pre><pre class="playground"><code class="language-rust">// 非惯用 Rust
 fn safe_divide(dividend: u32, divisor: u32, quotient: &amp;mut u32) -&gt; bool {
     if divisor != 0 {
         *quotient = dividend / divisor;
@@ -255,7 +243,7 @@ fn safe_divide(dividend: u32, divisor: u32, quotient: &amp;mut u32) -&gt; bool {
 }
 
 fn go(dividend: u32, divisor: u32) {
-    let mut quotient: u32 = 0; // initliazed to arbitrary value
+    let mut quotient: u32 = 0; // 初始化为任意值
     if safe_divide(dividend, divisor, &amp;mut quotient) {
         println!("{}", quotient);
     } else {
@@ -267,11 +255,9 @@ fn main() {
     go(10, 2);
     go(10, 0);
 }</code></pre></pre>
-<p>This shares the same problems as with using out-parameters for <a href="./multiple_return.html#problems-with-the-direct-transliteration">multiple return
-values</a>.</p>
-<h2 id="similarities-with-c-since-c17"><a class="header" href="#similarities-with-c-since-c17">Similarities with C++ since C++17</a></h2>
-<p>C++17 and later offer <code>std::optional</code>, which can be used to express optional
-return values in a way similar to the idiomatic Rust example.</p>
+<p>这与<a href="./multiple_return.html#problems-with-the-direct-transliteration">多返回值 out 参数直接翻译</a>存在相同的问题。</p>
+<h2 id="c17-及之后的相似做法"><a class="header" href="#c17-及之后的相似做法">C++17 及之后的相似做法</a></h2>
+<p>C++17 及之后版本提供了 <code>std::optional</code>，可以用来表达可选返回值，其用法与 Rust 的惯用示例类似。</p>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;optional&gt;
 
@@ -297,8 +283,8 @@ int main() {
   go(10, 0);
 }
 </code></pre>
-<h2 id="helpful-option-utilities"><a class="header" href="#helpful-option-utilities">Helpful <code>Option</code> utilities</a></h2>
-<p>Rust provides several syntactic sugars for simplifying use of functions that return <code>Option</code>. If a failure should be propagated to the caller, then use the <code>?</code> operator:</p>
+<h2 id="有用的-option-工具方法"><a class="header" href="#有用的-option-工具方法">有用的 <code>Option</code> 工具方法</a></h2>
+<p>Rust 提供了多种语法糖来简化对返回 <code>Option</code> 的函数的使用。如果需要将失败情况传递给调用者，可以使用 <code>?</code> 运算符：</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">fn safe_divide(dividend: u32, divisor: u32) -&gt; Option&lt;u32&gt; {
@@ -315,8 +301,7 @@ int main() {
     Some(())
 }
 <span class="boring">}</span></code></pre></pre>
-<p>If <code>None</code> should not be propagated, it is sometimes clearer to use <a href="https://doc.rust-lang.org/rust-by-example/flow_control/let_else.html"><code>let-else</code>
-syntax</a>:</p>
+<p>如果不需要传递 <code>None</code>，有时使用 <a href="https://doc.rust-lang.org/rust-by-example/flow_control/let_else.html"><code>let-else</code> 语法</a>会更清晰：</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">fn safe_divide(dividend: u32, divisor: u32) -&gt; Option&lt;u32&gt; {
 </span><span class="boring">    if divisor != 0 {
 </span><span class="boring">        Some(dividend / divisor)
@@ -337,13 +322,11 @@ syntax</a>:</p>
 </span><span class="boring">    go(10, 2);
 </span><span class="boring">    go(10, 0);
 </span><span class="boring">}</span></code></pre></pre>
-<p>If there is a default value that should be used in the <code>None</code> case, the
-<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or"><code>Option::unwrap_or</code></a>,
-<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_else"><code>Option::unwrap_or_else</code></a>,
-<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_default"><code>Option::unwrap_or_default</code></a>,
-or
-<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap"><code>Option::unwrap</code></a>
-methods can be used:</p>
+<p>如果在 <code>None</code> 情况下需要使用默认值，可以使用
+<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or"><code>Option::unwrap_or</code></a>、
+<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_else"><code>Option::unwrap_or_else</code></a>、
+<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_default"><code>Option::unwrap_or_default</code></a> 或
+<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap"><code>Option::unwrap</code></a> 方法：</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">fn safe_divide(dividend: u32, divisor: u32) -&gt; Option&lt;u32&gt; {
 </span><span class="boring">    if divisor != 0 {
 </span><span class="boring">        Some(dividend / divisor)
@@ -358,16 +341,16 @@ methods can be used:</p>
 </span>}
 
 fn go(dividend: u32, divisor: u32) {
-    // If None, returns the given value.
+    // 如果为 None，返回给定值。
     let result = safe_divide(dividend, divisor).unwrap_or(0);
 
-    // If None, returns the result of calling the given function.
+    // 如果为 None，返回调用给定函数的结果。
     let result2 = safe_divide(dividend, divisor).unwrap_or_else(expensive_computation);
 
-    // If None, returns Default::default(), which is 0 for u32.
+    // 如果为 None，返回 Default::default()，对于 u32 即为 0。
     let result3 = safe_divide(dividend, divisor).unwrap_or_default();
 
-    // If None, panics. Prefer the other methods!
+    // 如果为 None，panic。更推荐使用其他方法！
     // let result3 = safe_divide(dividend, divisor).unwrap();
 }
 <span class="boring">
@@ -375,28 +358,17 @@ fn go(dividend: u32, divisor: u32) {
 </span><span class="boring">    go(10, 2);
 </span><span class="boring">    go(10, 0);
 </span><span class="boring">}</span></code></pre></pre>
-<p>In performance-sensitive code where you have manually checked that the result is
-guaranteed to be <code>Some</code>,
-<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_unchecked"><code>Option::unwrap_unchecked</code></a>
-can be used, but is an unsafe method.</p>
-<p>There are <a href="https://doc.rust-lang.org/std/option/#boolean-operators">additional utility
-methods</a> that enable
-concise handling of <code>Option</code> values, which this book covers in the chapter on
-<a href="../exceptions.html">exceptions and error handling</a>.</p>
-<h2 id="an-alternative-approach"><a class="header" href="#an-alternative-approach">An alternative approach</a></h2>
-<p>An alternative approach in Rust to returning optional values is to require that
-the caller of a function prove that the value with which they call a function
-will not result in the failing case.</p>
-<p>For the above safe division example, this involves the caller guaranteeing that
-the provided divisor is non-zero. In the following example this is done with a
-dynamic check. In other contexts the evidence needed may be available
-statically, provided from callers further upstream, or used more than once. In
-those cases, this approach reduces both runtime cost and code complexity.</p>
+<p>在对性能敏感的代码中，如果你已经手动确保结果一定为 <code>Some</code>，可以使用
+<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_unchecked"><code>Option::unwrap_unchecked</code></a>，但这是一个不安全的方法。</p>
+<p>还有<a href="https://doc.rust-lang.org/std/option/#boolean-operators">更多的工具方法</a>可以简洁地处理 <code>Option</code> 值，详见本书<a href="../exceptions.html">异常与错误处理章节</a>。</p>
+<h2 id="替代方案"><a class="header" href="#替代方案">替代方案</a></h2>
+<p>Rust 中另一种返回可选值的方式是，要求函数调用者证明其传入的参数不会导致失败情况。</p>
+<p>对于上述安全除法的例子，这意味着调用者要保证传入的除数不为零。如下例中通过动态检查实现。在其他场景下，所需的证明可能可以静态获得，由更上游的调用者提供，或被多次使用。在这些情况下，这种方式可以减少运行时开销和代码复杂度。</p>
 <pre><pre class="playground"><code class="language-rust">use std::convert::TryFrom;
 use std::num::NonZero;
 
 fn safe_divide(dividend: u32, divisor: NonZero&lt;u32&gt;) -&gt; u32 {
-    // This is more efficient because the overflow check is skipped.
+    // 更高效，因为省略了溢出检查。
     dividend / divisor
 }
 
@@ -414,10 +386,10 @@ fn main() {
     go(10, 2);
     go(10, 0);
 }</code></pre></pre>
-<div class="quiz-placeholder" data-quiz-name="&quot;optional_return&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;6471e372-6552-41e9-88c6-7b7f6665928e&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nfn choose_buffer&lt;'a&gt;(\n    needed_len: usize,\n    buf1: &amp;'a mut [u8],\n    buf2: &amp;'a mut [u8],\n) -&gt; Option&lt;&amp;'a mut [u8]&gt; {\n    if buf1.len() &gt;= needed_len {\n        Some(buf1)\n    } else if buf2.len() &gt;= needed_len {\n        Some(buf2)\n    } else {\n        None\n    }\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nfn choose_buffer&lt;'a&gt;(\n    needed_len: usize,\n    buffer: &amp;mut &amp;'a mut [u8],\n    buf1: &amp;'a mut [u8],\n    buf2: &amp;'a mut [u8],\n) {\n    if buf1.len() &gt;= needed_len {\n        *buffer = buf1;\n    } else if buf2.len() &gt;= needed_len {\n        *buffer = buf2;\n    }\n}\n```\n&quot;,&quot;```rust\nfn choose_buffer&lt;'a&gt;(\n    needed_len: usize,\n    buffer: &amp;mut &amp;'a mut [u8],\n    buf1: &amp;'a mut [u8],\n    buf2: &amp;'a mut [u8],\n) -&gt; bool {\n    if buf1.len() &gt;= needed_len {\n        *buffer = buf1;\n        return true;\n    } else if buf2.len() &gt;= needed_len {\n        *buffer = buf2;\n        return true;\n    }\n\n    return false;\n}\n```\n&quot;,&quot;```rust\nfn choose_buffer&lt;'a&gt;(\n    needed_len: usize,\n    buffer: &amp;mut Option&lt;&amp;'a mut [u8]&gt;,\n    buf1: &amp;'a mut [u8],\n    buf2: &amp;'a mut [u8],\n) {\n    if buf1.len() &gt;= needed_len {\n        *buffer = Some(buf1);\n    } else if buf2.len() &gt;= needed_len {\n        *buffer = Some(buf2);\n    } else {\n        *buffer = None;\n    }\n}\n```\n&quot;],&quot;prompt&quot;:&quot;Which of the following is the most idiomatic translation of C++ function into\nRust?\n\n```cpp\n#include &lt;cstdint&gt;\n\nvoid chooseBuffer(std::size_t neededLen,\n                  std::uint8_t **buffer,\n                  std::size_t *bufferLen,\n                  uint8_t *buf1,\n                  std::size_t buf1Len,\n                  uint8_t *buf2,\n                  std::size_t buf2Len) {\n\tif (buf1Len &gt;= neededLen) {\n\t\t*buffer = buf1;\n\t\t*bufferLen = buf1Len;\n\t} else if (buf2Len &gt;= neededLen) {\n\t\t*buffer = buf2;\n\t\t*bufferLen = buf2Len;\n\t} else {\n\t\t*buffer = nullptr;\n\t\t*bufferLen = 0;\n\t}\n}\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
+<div class="quiz-placeholder" data-quiz-name="&quot;optional_return&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;6471e372-6552-41e9-88c6-7b7f6665928e&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nfn choose_buffer&lt;'a&gt;(\n    needed_len: usize,\n    buf1: &amp;'a mut [u8],\n    buf2: &amp;'a mut [u8],\n) -&gt; Option&lt;&amp;'a mut [u8]&gt; {\n    if buf1.len() &gt;= needed_len {\n        Some(buf1)\n    } else if buf2.len() &gt;= needed_len {\n        Some(buf2)\n    } else {\n        None\n    }\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nfn choose_buffer&lt;'a&gt;(\n    needed_len: usize,\n    buffer: &amp;mut &amp;'a mut [u8],\n    buf1: &amp;'a mut [u8],\n    buf2: &amp;'a mut [u8],\n) {\n    if buf1.len() &gt;= needed_len {\n        *buffer = buf1;\n    } else if buf2.len() &gt;= needed_len {\n        *buffer = buf2;\n    }\n}\n```\n&quot;,&quot;```rust\nfn choose_buffer&lt;'a&gt;(\n    needed_len: usize,\n    buffer: &amp;mut &amp;'a mut [u8],\n    buf1: &amp;'a mut [u8],\n    buf2: &amp;'a mut [u8],\n) -&gt; bool {\n    if buf1.len() &gt;= needed_len {\n        *buffer = buf1;\n        return true;\n    } else if buf2.len() &gt;= needed_len {\n        *buffer = buf2;\n        return true;\n    }\n\n    return false;\n}\n```\n&quot;,&quot;```rust\nfn choose_buffer&lt;'a&gt;(\n    needed_len: usize,\n    buffer: &amp;mut Option&lt;&amp;'a mut [u8]&gt;,\n    buf1: &amp;'a mut [u8],\n    buf2: &amp;'a mut [u8],\n) {\n    if buf1.len() &gt;= needed_len {\n        *buffer = Some(buf1);\n    } else if buf2.len() &gt;= needed_len {\n        *buffer = Some(buf2);\n    } else {\n        *buffer = None;\n    }\n}\n```\n&quot;],&quot;prompt&quot;:&quot;以下哪一项是将 C++ 函数最符合惯用法地翻译为 Rust 的方式？\n\n```cpp\n#include &lt;cstdint&gt;\n\nvoid chooseBuffer(std::size_t neededLen,\n                  std::uint8_t **buffer,\n                  std::size_t *bufferLen,\n                  uint8_t *buf1,\n                  std::size_t buf1Len,\n                  uint8_t *buf2,\n                  std::size_t buf2Len) {\n\tif (buf1Len &gt;= neededLen) {\n\t\t*buffer = buf1;\n\t\t*bufferLen = buf1Len;\n\t} else if (buf2Len &gt;= neededLen) {\n\t\t*buffer = buf2;\n\t\t*bufferLen = buf2Len;\n\t} else {\n\t\t*buffer = nullptr;\n\t\t*bufferLen = 0;\n\t}\n}\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Optional return values">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=可选返回值">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Sentinel values - C++ to Rust Phrasebook</title>
+        <title>哨兵值 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,28 +163,24 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="sentinel-values"><a class="header" href="#sentinel-values">Sentinel values</a></h1>
-<p>Sentinel values are in-band value that indicates a special situation, such as
-having reached the end of valid data in an iterator.</p>
+                        <h1 id="哨兵值"><a class="header" href="#哨兵值">哨兵值</a></h1>
+<p>哨兵值是一种带内值，用于指示特殊情况，例如在迭代器中已到达有效数据的末尾。</p>
 <h2 id="nullptr"><a class="header" href="#nullptr"><code>nullptr</code></a></h2>
-<p>Many designs in C++ borrow the convention from C of using a null pointer as a
-sentinel value for a method that returns owned pointers. For example, a method
-that parses a large structure may produce <code>std::nullptr</code> in the case of failure.</p>
-<p>A similar situation in Rust would make use of the type
-<code>Option&lt;Box&lt;LargeStructure&gt;&gt;</code>.</p>
+<p>C++ 中的许多设计借鉴了 C 的惯例，使用空指针作为返回拥有指针的方法的哨兵值。例如，一个解析大型结构的方法在失败时可能会返回 <code>std::nullptr</code>。</p>
+<p>在 Rust 中，类似的情况会使用类型 <code>Option&lt;Box&lt;LargeStructure&gt;&gt;</code>。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;memory&gt;
 
 class LargeStructure {
   int field;
-  // many fields ...
+  // 还有许多字段 ...
 };
 
 std::unique_ptr&lt;LargeStructure&gt;
 parse(char *data, size_t len) {
   // ...
 
-  // on failure
+  // 失败时
   return nullptr;
 }
 </code></pre>
@@ -192,7 +188,7 @@ parse(char *data, size_t len) {
 </span><span class="boring">fn main() {
 </span>struct LargeStructure {
     field: i32,
-    // many fields ...
+    // 还有许多字段 ...
 }
 
 fn parse(
@@ -200,38 +196,22 @@ fn parse(
 ) -&gt; Option&lt;Box&lt;LargeStructure&gt;&gt; {
     // ...
 
-    // on failure
+    // 失败时
     None
 }
 <span class="boring">}</span></code></pre></pre>
 </div>
-<p>The <code>Box&lt;T&gt;</code> type has the same meaning as <code>std::unique_ptr&lt;T&gt;</code> in terms of being
-an uniquely owned pointer to some <code>T</code> on the heap, but unlike <code>std::unique_ptr</code>,
-it cannot be null. Rust's <code>Option&lt;T&gt;</code> is like <code>std::optional&lt;T&gt;</code> in C++, except
-that it can be used with pointers and references. In <a href="../data_modeling/template_specialization.html#niche-optimization">those cases (and in some
-other
-cases)</a> the
-compiler optimizes the representation to be the same size as <code>Box&lt;T&gt;</code> by
-leveraging the fact that <code>Box</code> cannot be null.</p>
-<p>In Rust it is also common to pay the cost for the extra byte to use a return
-type of <code>Result&lt;T, E&gt;</code> (which is akin to <code>std::expected</code> in C++23) in order to
-make the reason for the failure available at runtime.</p>
-<h2 id="integer-sentinels"><a class="header" href="#integer-sentinels">Integer sentinels</a></h2>
-<p>When a possibly-failing function produces an integer, it is also common to use
-an otherwise unused or unlikely integer value as a sentinel value, such as <code>0</code>
-or <code>INT_MAX</code>.</p>
-<p>In Rust, the <code>Option</code> type is used for this purpose. In cases where the zero
-value really is not possible to produce, as with the gcd algorithm above, the
-type <code>NonZero&lt;T&gt;</code> can be used to indicate that fact. As with <code>Option&lt;Box&lt;T&gt;&gt;</code>,
-the compiler optimizes the representation to make use of the unused value (in
-this case <code>0</code>) to represent the <code>None</code> case to ensure that the representation of
-<code>Option&lt;NonZero&lt;T&gt;&gt;</code> is the same as the representation of <code>Option&lt;T&gt;</code>.</p>
+<p><code>Box&lt;T&gt;</code> 类型与 <code>std::unique_ptr&lt;T&gt;</code> 的含义相同，都是对堆上某个 <code>T</code> 的唯一所有权指针，但与 <code>std::unique_ptr</code> 不同的是，<code>Box</code> 不能为 null。Rust 的 <code>Option&lt;T&gt;</code> 类似于 C++ 的 <code>std::optional&lt;T&gt;</code>，但它可以与指针和引用一起使用。在<a href="../data_modeling/template_specialization.html#niche-optimization">这些情况（以及其他一些情况）</a>下，编译器会优化表示方式，使其与 <code>Box&lt;T&gt;</code> 的大小相同，利用了 <code>Box</code> 不能为 null 的事实。</p>
+<p>在 Rust 中，也常常愿意多付出一个字节的代价，使用 <code>Result&lt;T, E&gt;</code>（类似于 C++23 的 <code>std::expected</code>）作为返回类型，以便在运行时提供失败原因。</p>
+<h2 id="整数哨兵"><a class="header" href="#整数哨兵">整数哨兵</a></h2>
+<p>当一个可能失败的函数返回整数时，也常常使用一个未被使用或不太可能出现的整数值作为哨兵值，比如 <code>0</code> 或 <code>INT_MAX</code>。</p>
+<p>在 Rust 中，<code>Option</code> 类型用于此目的。如果零值确实不可能出现，比如上面的最大公约数（gcd）算法，可以使用类型 <code>NonZero&lt;T&gt;</code> 来表示这一事实。与 <code>Option&lt;Box&lt;T&gt;&gt;</code> 类似，编译器会优化表示方式，利用未使用的值（此处为 <code>0</code>）来表示 <code>None</code>，从而保证 <code>Option&lt;NonZero&lt;T&gt;&gt;</code> 的表示与 <code>Option&lt;T&gt;</code> 相同。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;algorithm&gt;
 
 int gcd(int a, int b) {
   if (b == 0 || a == 0) {
-    // returns 0 to indicate invalid input
+    // 返回 0 表示输入无效
     return 0;
   }
 
@@ -258,11 +238,7 @@ fn gcd(
         b = a % b;
         a = temp;
     }
-    // At this point, a is guaranteed to not be
-    // zero. The `Some` case from `NonZero::new`
-    // has a different meaning than the `Some`
-    // returned from this function, but here it
-    // happens to coincide.
+    // 此时 a 保证不为零。`NonZero::new` 的 `Some` 与本函数返回的 `Some` 含义不同，但此处恰好一致。
     NonZero::new(a.abs())
 }
 <span class="boring">
@@ -275,9 +251,7 @@ fn gcd(
 </span><span class="boring">    assert!(gcd(2 * 2 * 7 * 11, 2 * 2 * 3 * 5 * 7) == NonZero::new(2 * 2 * 7));
 </span><span class="boring">}</span></code></pre></pre>
 </div>
-<p>As an aside, it is also possible to avoid the redundant check for zero at the end, and
-without using unsafe Rust, by preserving the non-zeroness property throughout
-the algorithm.</p>
+<p>另外，也可以在不使用 unsafe Rust 的情况下，通过在算法中始终保持非零性，避免最后的冗余零值检查。</p>
 <pre><pre class="playground"><code class="language-rust">use std::num::NonZero;
 
 fn gcd(x: i32, mut b: i32) -&gt; Option&lt;NonZero&lt;i32&gt;&gt; {
@@ -285,7 +259,7 @@ fn gcd(x: i32, mut b: i32) -&gt; Option&lt;NonZero&lt;i32&gt;&gt; {
         return None;
     }
 
-    // a is guaranteed to be non-zero, so we record the fact in the type of a.
+    // a 保证非零，因此用 NonZero 类型记录这一事实。
     let mut a = NonZero::new(x)?;
 
     while let Some(temp) = NonZero::new(b) {
@@ -304,15 +278,11 @@ fn gcd(x: i32, mut b: i32) -&gt; Option&lt;NonZero&lt;i32&gt;&gt; {
 </span><span class="boring">    assert!(gcd(2 * 2 * 7 * 11, 2 * 2 * 3 * 5 * 7) == NonZero::new(2 * 2 * 7));
 </span><span class="boring">}</span></code></pre></pre>
 <h2 id="stdoptional"><a class="header" href="#stdoptional"><code>std::optional</code></a></h2>
-<p>In situations where <code>std::optional</code> would be used as a sentinel value in C++,
-<code>Option</code> can be used for the same purpose in Rust. The main difference between
-the two is that safe Rust requires either explicitly checking whether the value is
-<code>None</code>, while in C++ one can attempt to access the value without checking (at
-the risk of undefined behavior).</p>
-<div class="quiz-placeholder" data-quiz-name="&quot;sentinel_values&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;context&quot;:&quot;The idiomatic Rust program to find the maximum value in a slice would just\ninvolve calling the `Iterator::max` method on the iterator for the slice.\n\n```rust\nfn find_max(arr: &amp;[i32]) -&gt; Option&lt;i32&gt; {\n    arr.into_iter().max().copied()\n}\n```\n&quot;,&quot;id&quot;:&quot;917b2f68-b4ea-486c-beab-5aa07101ea83&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nfn find_max(arr: &amp;[i32]) -&gt; Option&lt;i32&gt; {\n    if arr.is_empty() {\n        return None;\n    }\n\n    let mut max = arr[0];\n    for &amp;num in &amp;arr[1..] {\n        if num &gt; max {\n            max = num;\n        }\n    }\n    Some(max)\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nfn find_max(arr: &amp;[i32]) -&gt; i32 {\n    if arr.is_empty() {\n        return i32::MIN;\n    }\n\n    let mut max = arr[0];\n    for &amp;num in &amp;arr[1..] {\n        if num &gt; max {\n            max = num;\n        }\n    }\n    max\n}\n```\n&quot;,&quot;```rust\nuse std::num::NonZero;\n\nfn find_max(arr: &amp;[i32]) -&gt; Option&lt;NonZero&lt;i32&gt;&gt; {\n    if arr.is_empty() {\n        return None;\n    }\n\n    let mut max = arr[0];\n    for &amp;num in &amp;arr[1..] {\n        if num &gt; max {\n            max = num;\n        }\n    }\n    NonZero::new(max)\n}\n```\n&quot;],&quot;prompt&quot;:&quot;Which is the most idiomatic translation of the following C++ program?\n\n```cpp\n#include &lt;limits&gt;\n\nint findMax(int arr[], int size) {\n  if (size &lt;= 0) {\n    return std::numeric_limits&lt;int&gt;::min();\n  }\n\n  int max = arr[0];\n  for (int i = 1; i &lt; size; ++i) {\n    if (arr[i] &gt; max) {\n      max = arr[i];\n    }\n  }\n  return max;\n}\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
+<p>在 C++ 中使用 <code>std::optional</code> 作为哨兵值的场景下，Rust 可以用 <code>Option</code> 实现同样的目的。两者的主要区别在于，安全的 Rust 要求必须显式检查值是否为 <code>None</code>，而在 C++ 中可以在未检查的情况下尝试访问值（有导致未定义行为的风险）。</p>
+<div class="quiz-placeholder" data-quiz-name="&quot;sentinel_values&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;context&quot;:&quot;在 Rust 中，查找切片最大值的惯用方法是直接对切片的迭代器调用 `Iterator::max` 方法。\n\n```rust\nfn find_max(arr: &amp;[i32]) -&gt; Option&lt;i32&gt; {\n    arr.into_iter().max().copied()\n}\n```\n&quot;,&quot;id&quot;:&quot;917b2f68-b4ea-486c-beab-5aa07101ea83&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nfn find_max(arr: &amp;[i32]) -&gt; Option&lt;i32&gt; {\n    if arr.is_empty() {\n        return None;\n    }\n\n    let mut max = arr[0];\n    for &amp;num in &amp;arr[1..] {\n        if num &gt; max {\n            max = num;\n        }\n    }\n    Some(max)\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nfn find_max(arr: &amp;[i32]) -&gt; i32 {\n    if arr.is_empty() {\n        return i32::MIN;\n    }\n\n    let mut max = arr[0];\n    for &amp;num in &amp;arr[1..] {\n        if num &gt; max {\n            max = num;\n        }\n    }\n    max\n}\n```\n&quot;,&quot;```rust\nuse std::num::NonZero;\n\nfn find_max(arr: &amp;[i32]) -&gt; Option&lt;NonZero&lt;i32&gt;&gt; {\n    if arr.is_empty() {\n        return None;\n    }\n\n    let mut max = arr[0];\n    for &amp;num in &amp;arr[1..] {\n        if num &gt; max {\n            max = num;\n        }\n    }\n    NonZero::new(max)\n}\n```\n&quot;],&quot;prompt&quot;:&quot;以下 C++ 程序最地道的 Rust 翻译是哪一个？\n\n```cpp\n#include &lt;limits&gt;\n\nint findMax(int arr[], int size) {\n  if (size &lt;= 0) {\n    return std::numeric_limits&lt;int&gt;::min();\n  }\n\n  int max = arr[0];\n  for (int i = 1; i &lt; size; ++i) {\n    if (arr[i] &gt; max) {\n      max = arr[i];\n    }\n  }\n  return max;\n}\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Sentinel values">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=哨兵值">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

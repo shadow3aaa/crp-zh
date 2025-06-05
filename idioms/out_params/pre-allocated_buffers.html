@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Pre-allocated buffers - C++ to Rust Phrasebook</title>
+        <title>预分配缓冲区 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,22 +163,16 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="pre-allocated-buffers"><a class="header" href="#pre-allocated-buffers">Pre-allocated buffers</a></h1>
-<p>There are situations where large quantities of data need to be returned from a
-function that will be called repeatedly, so that incurring the copies involved
-in returning by value or repeated heap allocations would be cost prohibitive.
-Some of these situations include:</p>
+                        <h1 id="预分配缓冲区"><a class="header" href="#预分配缓冲区">预分配缓冲区</a></h1>
+<p>在某些情况下，需要从一个会被反复调用的函数中返回大量数据，此时如果每次都通过值返回或频繁进行堆分配，所带来的拷贝和分配开销将难以接受。这类场景包括：</p>
 <ul>
-<li>performing file or network IO,</li>
-<li>communicating with graphics hardware,</li>
-<li>communicating with hardware on embedded systems, or</li>
-<li>implementing cryptography algorithms.</li>
+<li>执行文件或网络 IO，</li>
+<li>与图形硬件通信，</li>
+<li>与嵌入式系统的硬件通信，或</li>
+<li>实现加密算法。</li>
 </ul>
-<p>In these situations, C++ programs tend to pre-allocate buffers that are reused
-for all calls. This also usually enables allocating the buffer on the stack,
-rather than having to use dynamic storage.</p>
-<p>The following example pre-allocates a buffer and reads a large file into it
-within a loop.</p>
+<p>在这些情况下，C++ 程序通常会预先分配一个缓冲区，并在所有调用中复用它。这通常也意味着可以将缓冲区分配在栈上，而无需使用动态存储。</p>
+<p>下面的示例演示了如何预先分配一个缓冲区，并在循环中将大文件读取到该缓冲区中。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;fstream&gt;
 
@@ -193,7 +187,7 @@ int main() {
     file.read(buf, sizeof buf);
     std::streamsize count = file.gcount();
 
-    // use data in buf
+    // 使用 buf 中的数据
   }
 
   return 0;
@@ -215,52 +209,25 @@ fn main() -&gt; Result&lt;(), std::io::Error&gt; {
             break;
         }
 
-        // use data in buf
+        // 使用 buf 中的数据
     }
 
     Ok(())
 }</code></pre></pre>
 </div>
-<p>The major difference between the C++ program and the Rust program is that in the
-Rust program the buffer must be initialized before it can be used. In most
-cases, this one-time initialization cost is not significant. When it is, unsafe
-Rust is required to avoid the initialization.</p>
-<p>The technique for avoiding initialization makes use of
-<a href="https://doc.rust-lang.org/std/mem/union.MaybeUninit.html"><code>std::mem::MaybeUninit</code></a>.
-<a href="https://doc.rust-lang.org/std/mem/union.MaybeUninit.html#examples">Examples of safe usage of
-<code>MaybeUninit</code></a>
-are given in the API documentation for the type.</p>
-<p>The IO API in stable Rust does not include support for <code>MaybeUninit</code>. Instead,
-there is a <a href="#upcoming-changes-and-borrowedbuf">new safe API being developed</a>
-that will enable avoiding initialization without requiring unsafe Rust in code
-that uses the API.</p>
-<p>If the callee might need to grow the provided buffer and dynamic allocation is
-allowed, then a <code>&amp;mut Vec&lt;T&gt;</code> can be used instead of <code>&amp;mut [T]</code>. This is similar
-to providing a <code>std::vector&lt;T&gt;&amp;</code> in C++. To avoid unnecessary reallocation, the
-vector can be created using <code>Vec::&lt;T&gt;::with_capacity(n)</code>.</p>
-<h2 id="a-note-on-reading-files"><a class="header" href="#a-note-on-reading-files">A note on reading files</a></h2>
-<p>While the examples here use IO to demonstrate re-using pre-allocated buffers,
-there are higher-level interfaces available for reading from <code>File</code>s, both from
-the <a href="https://doc.rust-lang.org/std/io/trait.Read.html"><code>Read</code></a> and
-<a href="https://doc.rust-lang.org/std/io/trait.BufRead.html"><code>BufRead</code></a> traits, and
-from convenience functions in
-<a href="https://doc.rust-lang.org/std/io/index.html#functions-1"><code>std::io</code></a> and in
-<a href="https://doc.rust-lang.org/std/fs/index.html#functions-1"><code>std::fs</code></a>.</p>
-<p>The techniques described here are useful, however, in other situations where a
-reusable buffer is required, such as when interacting with hardware APIs, when
-using existing C or C++ libraries, or when implementing algorithms that produce
-larges amount of data in chunks, such as cryptography algorithms.</p>
-<h2 id="upcoming-changes-and-borrowedbuf"><a class="header" href="#upcoming-changes-and-borrowedbuf">Upcoming changes and <code>BorrowedBuf</code></a></h2>
-<p>The Rust community is refining approaches to working with uninitialized buffers.
-On the nightly branch of Rust, one can use
-<a href="https://doc.rust-lang.org/std/io/struct.BorrowedBuf.html"><code>BorrowedBuf</code></a> to
-achieve the same results as when using slices of <code>MaybeUninit</code>, but without
-having to write any unsafe code. The IO APIs for avoiding unnecessary
-initialization use <code>BorrowedBuf</code> instead of slices of <code>MaybeUninit</code>.</p>
-<div class="quiz-placeholder" data-quiz-name="&quot;pre-allocated_buffers&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;5b23f54f-b4a2-46f5-87b4-5551a2c93be8&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nlet mut buf = [0u8; 1024];\n\nwhile let Some(count) = fetch(&amp;mut buf) {\n    // use data in buf\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nlet mut buf;\n\nwhile let Some(count) = fetch(&amp;mut buf) {\n    // use data in buf\n}\n```\n&quot;,&quot;```rust\nloop {\n    let mut buf = [0u8; 1024];\n    let Some(count) = fetch(&amp;mut buf) else {\n        break;\n    };\n    // use data in buf\n}\n```\n&quot;],&quot;prompt&quot;:&quot;Which of the following is the most idiomatic way in Rust to use the following\nfunction?\n\n```rust\n/// Fetches data into the given buffer. Returns the number of bytes populated,\n/// or `None` when the end of the data is reached. The contents of `buf` will\n/// not be read.\nfn fetch(buf: &amp;mut [u8]) -&gt; Option&lt;usize&gt;\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
+<p>C++ 程序与 Rust 程序的主要区别在于，Rust 程序中的缓冲区在使用前必须初始化。大多数情况下，这种一次性的初始化开销并不显著。如果确实有影响，则需要使用 unsafe Rust 来避免初始化。</p>
+<p>避免初始化的技术依赖于 <a href="https://doc.rust-lang.org/std/mem/union.MaybeUninit.html"><code>std::mem::MaybeUninit</code></a>。该类型的 <a href="https://doc.rust-lang.org/std/mem/union.MaybeUninit.html#examples">安全用法示例</a> 可在其 API 文档中找到。</p>
+<p>目前稳定版 Rust 的 IO API 并不支持 <code>MaybeUninit</code>。不过，<a href="#upcoming-changes-and-borrowedbuf">有一个新的安全 API 正在开发中</a>，它将允许在使用该 API 的代码中避免初始化，而无需使用 unsafe Rust。</p>
+<p>如果被调用方可能需要扩展所提供的缓冲区，并且允许动态分配，则可以使用 <code>&amp;mut Vec&lt;T&gt;</code> 替代 <code>&amp;mut [T]</code>。这类似于在 C++ 中传递 <code>std::vector&lt;T&gt;&amp;</code>。为了避免不必要的重新分配，可以使用 <code>Vec::&lt;T&gt;::with_capacity(n)</code> 创建向量。</p>
+<h2 id="关于读取文件的说明"><a class="header" href="#关于读取文件的说明">关于读取文件的说明</a></h2>
+<p>虽然这里的示例使用 IO 来演示复用预分配缓冲区，但实际上有更高级的接口可用于从 <code>File</code> 读取数据，包括 <a href="https://doc.rust-lang.org/std/io/trait.Read.html"><code>Read</code></a> 和 <a href="https://doc.rust-lang.org/std/io/trait.BufRead.html"><code>BufRead</code></a> trait，以及 <a href="https://doc.rust-lang.org/std/io/index.html#functions-1"><code>std::io</code></a> 和 <a href="https://doc.rust-lang.org/std/fs/index.html#functions-1"><code>std::fs</code></a> 中的便捷函数。</p>
+<p>然而，这里描述的技术在其他需要复用缓冲区的场景下也很有用，比如与硬件 API 交互、使用现有的 C 或 C++ 库，或实现以分块方式产生大量数据的算法（如加密算法）时。</p>
+<h2 id="即将到来的变化与-borrowedbuf"><a class="header" href="#即将到来的变化与-borrowedbuf">即将到来的变化与 <code>BorrowedBuf</code></a></h2>
+<p>Rust 社区正在不断完善对未初始化缓冲区的处理方式。在 Rust 的 nightly 分支上，可以使用 <a href="https://doc.rust-lang.org/std/io/struct.BorrowedBuf.html"><code>BorrowedBuf</code></a> 实现与使用 <code>MaybeUninit</code> 切片类似的效果，但无需编写任何 unsafe 代码。用于避免不必要初始化的 IO API 采用 <code>BorrowedBuf</code>，而不是 <code>MaybeUninit</code> 的切片。</p>
+<div class="quiz-placeholder" data-quiz-name="&quot;pre-allocated_buffers&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;5b23f54f-b4a2-46f5-87b4-5551a2c93be8&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nlet mut buf = [0u8; 1024];\n\nwhile let Some(count) = fetch(&amp;mut buf) {\n    // 使用 buf 中的数据\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nlet mut buf;\n\nwhile let Some(count) = fetch(&amp;mut buf) {\n    // 使用 buf 中的数据\n}\n```\n&quot;,&quot;```rust\nloop {\n    let mut buf = [0u8; 1024];\n    let Some(count) = fetch(&amp;mut buf) else {\n        break;\n    };\n    // 使用 buf 中的数据\n}\n```\n&quot;],&quot;prompt&quot;:&quot;在 Rust 中，以下哪种方式是最符合惯用法地使用如下函数？\n\n```rust\n/// 将数据获取到给定的缓冲区中。返回填充的字节数，\n/// 或在数据结束时返回 `None`。`buf` 的内容不会被读取。\nfn fetch(buf: &amp;mut [u8]) -&gt; Option&lt;usize&gt;\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Pre-allocated buffers">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=预分配缓冲区">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

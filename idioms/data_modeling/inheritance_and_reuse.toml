@@ -1,8 +1,5 @@
 [[questions]]
-# This question checks to make sure readers understand that while traits offer
-# some re-use via default methods, they do not have other aspects of
-# inheritance. In particular, the default method is not part of BareLogger at
-# all, so no slicing, etc. can be done to access it.
+# 本题考查读者是否理解 trait 虽然通过默认方法提供了一些复用，但并不具备继承的其他特性。特别是，默认方法并不是 BareLogger 的一部分，因此无法像切片等方式访问它。
 type = "Tracing"
 prompt.program = """
 trait Logger {
@@ -21,7 +18,7 @@ impl Logger for BareLogger {
     }
 
     fn error(&self, message: &str) {
-        // Omits the ERROR: prefix
+        // 省略了 ERROR: 前缀
         println!("{}", message)
     }
 }
@@ -42,15 +39,14 @@ another message
 another error
 """
 context = """
-Unlike with a C++ parent class, the default method is not part of `BareLogger`,
-even when accessed statically via the trait.
+与 C++ 父类不同，默认方法并不是 `BareLogger` 的一部分，即使通过 trait 静态访问也是如此。
 """
 id = "2bc058d0-99e4-44e0-9abe-5497b713731e"
 
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt = """
-Does the following program compile? If not, why not?
+以下程序能否编译？如果不能，原因是什么？
 
 ```rust
 trait Damageable {
@@ -70,27 +66,23 @@ fn main() {
 ```
 """
 prompt.distractors = [
-# Thinking traits are like C++ abstract classes
+# 误以为 trait 类似于 C++ 抽象类
 """
-It does compile.
+可以编译。
 """,
-# Thinking that the problem is with how the trait is implemented
+# 误以为问题出在 trait 的实现方式
 """
-It does not compile, because `health` isn't initialized when `Enemy` implements
-`Damageable`.
+不能编译，因为 `Enemy` 实现 `Damageable` 时 `health` 没有初始化。
 """,
-# Thinking that the problem is with the use, rather than the definition
+# 误以为问题出在使用方式而不是定义方式
 """
-It does not compile, because `e.health` isn't initialized before using `e` in
-`main`.
+不能编译，因为在 `main` 中使用 `e` 前，`e.health` 没有初始化。
 """,
 ]
 answer.answer = """
-It does not compile because in Rust traits cannot have fields.
+不能编译，因为在 Rust 中 trait 不能包含字段。
 """
 context = """
-A trait only defines an interface, with the ability to define default methods as
-a convenience for when some methods on the trait can be defined in terms of
-others.
+trait 只定义接口，可以为某些方法提供默认实现，便于用其他 trait 方法实现部分功能。
 """
 id = "78c03495-5d3d-4faf-8375-b9f338a377ff"

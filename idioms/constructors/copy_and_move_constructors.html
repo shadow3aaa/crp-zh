@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Copy and move constructors - C++ to Rust Phrasebook</title>
+        <title>拷贝与移动构造函数 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,29 +163,20 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="copy-and-move-constructors"><a class="header" href="#copy-and-move-constructors">Copy and move constructors</a></h1>
-<p>In both C++ and Rust, one rarely has to write copy or move constructors (or
-their Rust equivalents) by hand. In C++ this is because the implicit definitions
-are good enough for most purposes, especially when using smart pointers (i.e.,
-following <a href="https://en.cppreference.com/w/cpp/language/rule_of_three">the rule of
-zero</a>). In Rust this
-is because move semantics are the default, and the automatically derived
-implementations of the <code>Clone</code> and <code>Copy</code> traits are good enough for most
-purposes.</p>
-<p>For the following C++ classes, the implicitly defined copy and move constructors
-are sufficient. The equivalent in Rust uses a derive macro provided by the
-standard library to implement the corresponding traits.</p>
+                        <h1 id="拷贝与移动构造函数"><a class="header" href="#拷贝与移动构造函数">拷贝与移动构造函数</a></h1>
+<p>在 C++ 和 Rust 中，通常很少需要手动编写拷贝或移动构造函数（或其 Rust 等价物）。在 C++ 中，这是因为隐式定义对于大多数用途已经足够，尤其是在使用智能指针时（即遵循<a href="https://en.cppreference.com/w/cpp/language/rule_of_three">零规则</a>）。在 Rust 中，这是因为移动语义是默认的，并且自动派生的 <code>Clone</code> 和 <code>Copy</code> trait 实现对于大多数用途也已足够。</p>
+<p>对于以下 C++ 类，隐式定义的拷贝和移动构造函数就已足够。Rust 中的等价实现使用标准库提供的 derive 宏来实现相应的 trait。</p>
 <div class="comparison">
-<pre><code class="language-cpp"><span class="boring">#include &lt;memory&gt;
-</span><span class="boring">#include &lt;string&gt;
-</span><span class="boring">
-</span>struct Age {
+<pre><code class="language-cpp">#include &lt;memory&gt;
+#include &lt;string&gt;
+
+struct Age {
   unsigned int years;
 
   Age(unsigned int years) : years(years) {}
 
-  // copy and move constructors and destructor
-  // implicitly declared and defined
+  // 拷贝和移动构造函数及析构函数
+  // 隐式声明和定义
 };
 
 struct Person {
@@ -199,8 +190,8 @@ struct Person {
       : age(age), name(name),
         best_friend(best_friend) {}
 
-  // copy and move constructors and destructor
-  // implicitly declared and defined
+  // 拷贝和移动构造函数及析构函数
+  // 隐式声明和定义
 };
 </code></pre>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
@@ -220,10 +211,8 @@ struct Person {
 }
 <span class="boring">}</span></code></pre></pre>
 </div>
-<h2 id="user-defined-constructors"><a class="header" href="#user-defined-constructors">User-defined constructors</a></h2>
-<p>On the other hand, the following example requires a user-defined copy and move
-constructor because it manages a resource (a pointer acquired from a C library).
-The equivalent in Rust requires a custom implementation of the <code>Clone</code> trait.</p>
+<h2 id="用户自定义构造函数"><a class="header" href="#用户自定义构造函数">用户自定义构造函数</a></h2>
+<p>另一方面，以下示例由于管理资源（从 C 库获取的指针），因此需要用户自定义的拷贝和移动构造函数。Rust 中的等价实现则需要自定义实现 <code>Clone</code> trait。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;cstdlib&gt;
 #include &lt;cstring&gt;
@@ -258,8 +247,8 @@ public:
 </span><span class="boring">fn main() {
 </span><span class="boring">mod example {
 </span>mod widget_ffi {
-    // Models an opaque type.
-    // See https://doc.rust-lang.org/nomicon/ffi.html#representing-opaque-structs
+    // 模拟不透明类型。
+    // 参考 https://doc.rust-lang.org/nomicon/ffi.html#representing-opaque-structs
     #[repr(C)]
     pub struct CWidget {
         _data: [u8; 0],
@@ -311,69 +300,27 @@ impl Drop for Widget {
 <span class="boring">}
 </span><span class="boring">}</span></code></pre></pre>
 </div>
-<p>Just as with how in C++ it is uncommon to need user-defined implementations for
-copy and move constructors or user-defined implementations for destructors, in
-Rust it is rare to need to implement the <code>Clone</code> and <code>Drop</code> traits by hand for
-types that do not represent resources.</p>
-<p>There is one exception to this. If the type has type parameters, it might be
-desirable to implement <code>Clone</code> (and <code>Copy</code>) manually even if the clone should be
-done field-by-field. See the <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html#how-can-i-implement-clone">standard library documentation of
-<code>Clone</code></a>
-and <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html#how-can-i-implement-copy">of
-<code>Copy</code></a>
-for details.</p>
-<h2 id="trivially-copyable-types"><a class="header" href="#trivially-copyable-types">Trivially copyable types</a></h2>
-<p>In C++, a class type is trivially copyable when it has no non-trivial copy
-constructors, move constructors, copy assignment operators, move assignment
-operators and it has a trivial destructor. Values of a trivially copyable type
-are able to be copied by copying their bytes.</p>
-<p>In the first C++ example above, <code>Age</code> is trivially copyable, but <code>Person</code> is
-not. This is because despite using a default copy constructor, the constructor
-is not trivial because <code>std::string</code> and <code>std::shared_ptr</code> are not trivially
-copyable.</p>
-<p>Rust indicates whether types are trivially copyable with the <code>Copy</code> trait. Just
-as with trivially copyable types in C++, values of types that implement <code>Copy</code>
-in Rust can be copied by copying their bytes. Rust requires explicit calls to
-the <code>clone</code> method to make copies of values of types that do not implement
-<code>Copy</code>.</p>
-<p>In the first Rust example above, <code>Age</code> implements the <code>Copy</code> trait but <code>Person</code>
-does not. This is because neither <code>std::String</code> nor <code>Rc&lt;Person&gt;</code> implement
-<code>Copy</code>. They do not implement <code>Copy</code> because they own data that lives on the
-heap, and so are not trivially copyable.</p>
-<p>Rust prevents implementing <code>Copy</code> for a type if any of its fields are not
-<code>Copy</code>, but does not prevent implementing <code>Copy</code> for types that should not be
-copied bit-for-bit due to their intended meaning, which is usually indicated by
-a user-defined <code>Clone</code> implementation.</p>
-<p>Rust does not permit the implementation of both <code>Copy</code> and <code>Drop</code> for the same
-type. This aligns with the C++ standard's requirement that trivially copyable
-types not implement a user-defined destructor.</p>
-<h2 id="move-constructors"><a class="header" href="#move-constructors">Move constructors</a></h2>
-<p>In Rust, all types support move semantics by default, and custom move semantics
-cannot be (and do not need to be) defined. This is because what "move" means in
-Rust is not the same as it is in C++. In Rust, moving a value means changing
-what owns the value. In particular, there is no "old" object to be destructed
-after a move, because the compiler will prevent the use of a variable whose
-value has been moved.</p>
-<h2 id="assignment-operators"><a class="header" href="#assignment-operators">Assignment operators</a></h2>
-<p>Rust does not have a copy or move assignment operator. Instead, assignment
-either moves (by transferring ownership), explicitly clones and then moves, or
-implicitly copies and then moves.</p>
+<p>正如在 C++ 中很少需要为拷贝和移动构造函数或析构函数手动实现一样，在 Rust 中，对于不表示资源的类型，也很少需要手动实现 <code>Clone</code> 和 <code>Drop</code> trait。</p>
+<p>有一个例外。如果类型有类型参数，即使克隆操作只是字段逐个克隆，有时也希望手动实现 <code>Clone</code>（和 <code>Copy</code>）。详情可参考 <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html#how-can-i-implement-clone">标准库文档 <code>Clone</code></a> 和 <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html#how-can-i-implement-copy"><code>Copy</code></a>。</p>
+<h2 id="可平凡拷贝类型"><a class="header" href="#可平凡拷贝类型">可平凡拷贝类型</a></h2>
+<p>在 C++ 中，当一个类类型没有非平凡的拷贝构造函数、移动构造函数、拷贝赋值运算符、移动赋值运算符，并且拥有平凡的析构函数时，该类型被认为是可平凡拷贝的。可平凡拷贝类型的值可以通过字节拷贝来复制。</p>
+<p>在上面的第一个 C++ 示例中，<code>Age</code> 是可平凡拷贝的，但 <code>Person</code> 不是。这是因为虽然 <code>Person</code> 使用了默认的拷贝构造函数，但由于 <code>std::string</code> 和 <code>std::shared_ptr</code> 不是可平凡拷贝的，所以其构造函数也不是平凡的。</p>
+<p>Rust 通过 <code>Copy</code> trait 来标识类型是否可平凡拷贝。与 C++ 中的可平凡拷贝类型类似，实现了 <code>Copy</code> trait 的 Rust 类型的值可以通过字节拷贝来复制。对于未实现 <code>Copy</code> 的类型，Rust 需要显式调用 <code>clone</code> 方法来复制值。</p>
+<p>在上面的第一个 Rust 示例中，<code>Age</code> 实现了 <code>Copy</code> trait，而 <code>Person</code> 没有。这是因为 <code>String</code> 和 <code>Rc&lt;Person&gt;</code> 都没有实现 <code>Copy</code>。它们没有实现 <code>Copy</code>，是因为它们拥有堆上的数据，因此不是可平凡拷贝的。</p>
+<p>如果某个类型的字段中有任何一个不是 <code>Copy</code>，Rust 会阻止为该类型实现 <code>Copy</code>，但不会阻止为那些本不该按位拷贝的类型实现 <code>Copy</code>，这通常通过用户自定义的 <code>Clone</code> 实现来体现。</p>
+<p>Rust 不允许同一个类型同时实现 <code>Copy</code> 和 <code>Drop</code>。这与 C++ 标准要求可平凡拷贝类型不能有用户自定义析构函数是一致的。</p>
+<h2 id="移动构造函数"><a class="header" href="#移动构造函数">移动构造函数</a></h2>
+<p>在 Rust 中，所有类型默认都支持移动语义，且无法（也无需）自定义移动语义。这是因为 Rust 中的“移动”与 C++ 中的含义不同。在 Rust 中，移动一个值意味着改变其所有权。特别地，移动后不会有“旧”对象需要析构，因为编译器会阻止对已被移动的变量的使用。</p>
+<h2 id="赋值运算符"><a class="header" href="#赋值运算符">赋值运算符</a></h2>
+<p>Rust 没有拷贝或移动赋值运算符。赋值操作要么是移动（转移所有权），要么是显式克隆后再移动，要么是隐式拷贝后再移动。</p>
 <pre><pre class="playground"><code class="language-rust">fn main() {
     let x = Box::&lt;u32&gt;::new(5);
-    let y = x; // moves
-    let z = y.clone(); // explicitly clones and then moves the clone
-    let w = *y; // implicitly copies the content of the Box and then moves the copy
+    let y = x; // 移动
+    let z = y.clone(); // 显式克隆后移动
+    let w = *y; // 隐式拷贝 Box 的内容后移动
 }</code></pre></pre>
-<p>For situations where something like a user-defined copy assignment could avoid
-allocations, the <code>Clone</code> trait has an additional method called <code>clone_from</code>. The
-method is automatically defined, but can be overridden when implementing the
-<code>Clone</code> trait to provide an efficient implementation.</p>
-<p>The method is not used for normal assignments, but can be explicitly used in
-situations where the performance of the assignment is significant and would be
-improved by using the more efficient implementation, if one is defined. The
-implementation can be made more efficient because <code>clone_from</code> takes ownership
-of the object to which the values are being assigned, and so can do things like
-reuse memory to avoid allocations.</p>
+<p>在某些情况下，如果类似用户自定义的拷贝赋值可以避免分配，<code>Clone</code> trait 提供了一个额外的方法 <code>clone_from</code>。该方法会自动定义，但在实现 <code>Clone</code> trait 时可以重写以提供更高效的实现。</p>
+<p>该方法不会用于普通赋值，但在赋值性能很重要且可以通过更高效的实现提升性能时，可以显式调用。由于 <code>clone_from</code> 拥有被赋值对象的所有权，因此可以复用内存以避免分配，从而提升效率。</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>fn go(x: &amp;Vec&lt;u32&gt;) {
@@ -383,18 +330,12 @@ reuse memory to avoid allocations.</p>
     // ...
 }
 <span class="boring">}</span></code></pre></pre>
-<h2 id="performance-concerns-and-copy"><a class="header" href="#performance-concerns-and-copy">Performance concerns and <code>Copy</code></a></h2>
-<p>The decision to implement <code>Copy</code> should be based on the semantics of the type,
-not on performance. If the size of objects being copied is a concern, then one
-should instead use a reference (<code>&amp;T</code> or <code>&amp;mut T</code>) or put the value on the heap
-(<a href="https://doc.rust-lang.org/std/boxed/index.html"><code>Box&lt;T&gt;</code></a> or
-<a href="https://doc.rust-lang.org/std/rc/index.html"><code>Rc&lt;T&gt;</code></a>). These approaches
-correspond to passing by reference, or using a <code>std::unique_ptr</code> or
-<code>std::shared_ptr</code> in C++.</p>
-<div class="quiz-placeholder" data-quiz-name="&quot;copy_and_move_constructors&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;context&quot;:&quot;A type can only implement `Copy` if all of its fields implement `Copy`, just how\nin C++ a type is only trivially copyable if all of its members are. `Box` does\nnot implement `Copy`.\n&quot;,&quot;id&quot;:&quot;ec3c58d9-cb13-4f88-ac67-7c1d5baf46e2&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;It does not compile because `Box` doesn't implement `Copy`, so `Copy` can't be\nimplemented for `BinaryTreeNode`.\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;It does compile.\n&quot;,&quot;It does not compile because `Box` doesn't implement `Clone`, so `Clone` can't be\nderived for `BinaryTreeNode`.\n&quot;,&quot;It does not compile because only one of `Clone` or `Copy` can be implemented for\na type.\n&quot;,&quot;It does not compile because `Drop` is not implemented for `BinaryTreeNode`\neven though `Clone` is.\n&quot;],&quot;prompt&quot;:&quot;Does the following program compile?\n\n```rust\n#[derive(Clone, Copy)]\nstruct BinaryTreeNode {\n    value: i32,\n    left_child: Option&lt;Box&lt;BinaryTreeNode&gt;&gt;,\n    right_child: Option&lt;Box&lt;BinaryTreeNode&gt;&gt;,\n}\n```\n&quot;}},{&quot;context&quot;:&quot;While `Copy` requires `Clone`, it does not pose any constraints on the\nimplementation of clone. Even though the given implementation of `Clone` is most\ncertainly wrong, the program will still compile.\n&quot;,&quot;id&quot;:&quot;0a4bc647-44c9-4244-9dfc-3002d6abc069&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;It does compile, but implementing `Clone` in a way that doesn't match `Copy` is\na bad idea.\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;It does not compile because only one of `Clone` or `Copy` can be implemented\nfor a type.\n&quot;,&quot;It does not compile because `Clone` must be derived in order to derive `Copy`.\n&quot;,&quot;It does not compile because `Drop` is not implemented for `Age` even though\n`Clone` is.\n&quot;],&quot;prompt&quot;:&quot;Does this program compile? If not, why not?\n\n```rust\n#[derive(Copy)]\nstruct Age {\n    value: u32,\n}\n\nimpl Clone for Age {\n    fn clone(&amp;self) -&gt; Self {\n       Age {\n           value: 1 + self.value,\n       }\n    }\n}\n```\n&quot;}},{&quot;context&quot;:&quot;The C++ `Vec2` implements a copy constructor which corresponds to the `Clone`\ntrait in Rust. It is also trivially copyable, which corresponds to implementing\nthe `Copy` trait in Rust.\n&quot;,&quot;id&quot;:&quot;4636f71a-599b-46d3-a6e6-e0c35b344140&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\n#[derive(Clone, Copy)]\npub struct Vec2 {\n    pub x: f64,\n    pub y: f64,\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\n#[derive(Clone)]\npub struct Vec2 {\n    pub x: f64,\n    pub y: f64,\n}\n```\n&quot;,&quot;```rust\n#[derive(Copy)]\npub struct Vec2 {\n    pub x: f64,\n    pub y: f64,\n}\n```\n&quot;,&quot;```rust\npub struct Vec2 {\n    pub x: f64,\n    pub y: f64,\n}\n```\n&quot;],&quot;prompt&quot;:&quot;Which is the most idiomatic translation of the following C++ program?\n\n```cpp\nstruct Vec2 {\n    double x;\n    double y;\n};\n```\n&quot;}},{&quot;context&quot;:&quot;The C++ `Vec2` has a user-defined copy constructor which corresponds to the\n`Clone` trait in Rust. Despite being user-defined, it does exactly what the\ndefault trait would do. Because the implementation is user-defined, it prevents\nthe type from being trivially copyable, which corresponds to not implementing\nthe `Copy` trait in Rust.\n&quot;,&quot;id&quot;:&quot;c8e3b4da-19a1-42e9-97d4-bbb61dcd5652&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\n#[derive(Clone)]\npub struct Vec2 {\n    pub x: f64,\n    pub y: f64,\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\n#[derive(Clone, Copy)]\npub struct Vec2 {\n    pub x: f64,\n    pub y: f64,\n}\n```\n&quot;,&quot;```rust\n#[derive(Copy)]\npub struct Vec2 {\n    pub x: f64,\n    pub y: f64,\n}\n```\n&quot;,&quot;```rust\npub struct Vec2 {\n    pub x: f64,\n    pub y: f64,\n}\n```\n&quot;],&quot;prompt&quot;:&quot;Which is the most idiomatic translation of the following C++ program?\n\n```cpp\nstruct Vec2 {\n    double x;\n    double y;\n\n    Vec2(Vec2&amp; other) : x(other.x), y(other.y) {};\n};\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
+<h2 id="性能考量与-copy"><a class="header" href="#性能考量与-copy">性能考量与 <code>Copy</code></a></h2>
+<p>是否实现 <code>Copy</code> 应基于类型的语义，而不是性能。如果对象的大小成为性能瓶颈，应考虑使用引用（<code>&amp;T</code> 或 <code>&amp;mut T</code>），或将值放在堆上（<a href="https://doc.rust-lang.org/std/boxed/index.html"><code>Box&lt;T&gt;</code></a> 或 <a href="https://doc.rust-lang.org/std/rc/index.html"><code>Rc&lt;T&gt;</code></a>）。这些方式分别对应于按引用传递，或在 C++ 中使用 <code>std::unique_ptr</code> 或 <code>std::shared_ptr</code>。</p>
+<div class="quiz-placeholder" data-quiz-name="&quot;copy_and_move_constructors&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;context&quot;:&quot;只有当所有字段都实现了 `Copy`，类型才能实现 `Copy`，就像在 C++ 中，只有所有成员都可平凡拷贝时类型才是可平凡拷贝的。`Box` 没有实现 `Copy`。\n&quot;,&quot;id&quot;:&quot;ec3c58d9-cb13-4f88-ac67-7c1d5baf46e2&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;不能编译，因为 `Box` 没有实现 `Copy`，所以 `BinaryTreeNode` 也无法实现 `Copy`。\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;可以编译通过。\n&quot;,&quot;不能编译，因为 `Box` 没有实现 `Clone`，所以 `BinaryTreeNode` 不能派生 `Clone`。\n&quot;,&quot;不能编译，因为一个类型只能实现 `Clone` 或 `Copy` 其中之一。\n&quot;,&quot;不能编译，因为 `BinaryTreeNode` 没有实现 `Drop`，即使实现了 `Clone`。\n&quot;],&quot;prompt&quot;:&quot;以下程序能编译通过吗？\n\n```rust\n#[derive(Clone, Copy)]\nstruct BinaryTreeNode {\n    value: i32,\n    left_child: Option&lt;Box&lt;BinaryTreeNode&gt;&gt;,\n    right_child: Option&lt;Box&lt;BinaryTreeNode&gt;&gt;,\n}\n```\n&quot;}},{&quot;context&quot;:&quot;虽然 `Copy` 要求实现 `Clone`，但对 clone 的实现没有约束。即使这里的 `Clone` 实现明显有问题，程序依然可以编译通过。\n&quot;,&quot;id&quot;:&quot;0a4bc647-44c9-4244-9dfc-3002d6abc069&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;能编译，但以与 `Copy` 不一致的方式实现 `Clone` 并不是好主意。\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;不能编译，因为一个类型只能实现 `Clone` 或 `Copy` 其中之一。\n&quot;,&quot;不能编译，因为必须先派生 `Clone` 才能派生 `Copy`。\n&quot;,&quot;不能编译，因为 `Age` 没有实现 `Drop`，即使实现了 `Clone`。\n&quot;],&quot;prompt&quot;:&quot;这个程序能编译吗？如果不能，原因是什么？\n\n```rust\n#[derive(Copy)]\nstruct Age {\n    value: u32,\n}\n\nimpl Clone for Age {\n    fn clone(&amp;self) -&gt; Self {\n       Age {\n           value: 1 + self.value,\n       }\n    }\n}\n```\n&quot;}},{&quot;context&quot;:&quot;C++ 的 `Vec2` 实现了拷贝构造函数，对应 Rust 的 `Clone` trait。同时它也是可平凡拷贝的，对应 Rust 的 `Copy` trait。\n&quot;,&quot;id&quot;:&quot;4636f71a-599b-46d3-a6e6-e0c35b344140&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\n#[derive(Clone, Copy)]\npub struct Vec2 {\n    pub x: f64,\n    pub y: f64,\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\n#[derive(Clone)]\npub struct Vec2 {\n    pub x: f64,\n    pub y: f64,\n}\n```\n&quot;,&quot;```rust\n#[derive(Copy)]\npub struct Vec2 {\n    pub x: f64,\n    pub y: f64,\n}\n```\n&quot;,&quot;```rust\npub struct Vec2 {\n    pub x: f64,\n    pub y: f64,\n}\n```\n&quot;],&quot;prompt&quot;:&quot;以下 C++ 程序最地道的 Rust 翻译是哪一个？\n\n```cpp\nstruct Vec2 {\n    double x;\n    double y;\n};\n```\n&quot;}},{&quot;context&quot;:&quot;C++ 的 `Vec2` 有用户自定义的拷贝构造函数，对应 Rust 的 `Clone` trait。虽然实现与默认 trait 行为一致，但由于是用户自定义实现，因此不再是可平凡拷贝类型，对应 Rust 不实现 `Copy` trait。\n&quot;,&quot;id&quot;:&quot;c8e3b4da-19a1-42e9-97d4-bbb61dcd5652&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\n#[derive(Clone)]\npub struct Vec2 {\n    pub x: f64,\n    pub y: f64,\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\n#[derive(Clone, Copy)]\npub struct Vec2 {\n    pub x: f64,\n    pub y: f64,\n}\n```\n&quot;,&quot;```rust\n#[derive(Copy)]\npub struct Vec2 {\n    pub x: f64,\n    pub y: f64,\n}\n```\n&quot;,&quot;```rust\npub struct Vec2 {\n    pub x: f64,\n    pub y: f64,\n}\n```\n&quot;],&quot;prompt&quot;:&quot;以下 C++ 程序最地道的 Rust 翻译是哪一个？\n\n```cpp\nstruct Vec2 {\n    double x;\n    double y;\n\n    Vec2(Vec2&amp; other) : x(other.x), y(other.y) {};\n};\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Copy and move constructors">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=拷贝与移动构造函数">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Anonymous namespaces and static - C++ to Rust Phrasebook</title>
+        <title>匿名命名空间与 static - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,14 +163,9 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="anonymous-namespaces-and-static"><a class="header" href="#anonymous-namespaces-and-static">Anonymous namespaces and <code>static</code></a></h1>
-<p>Anonymous namespaces in C++ are used to avoid symbol collisions between
-different translation units. Such collisions violate <a href="https://timsong-cpp.github.io/cppwp/n4950/basic.def.odr#14">the one definition
-rule</a> and result in
-undefined behavior (which at best manifests as linking errors).</p>
-<p>For example, without the use of anonymous namespaces, the following would result
-in undefined behavior (and no linking error, due to the use of <code>inline</code> producing
-weak symbols in the object files).</p>
+                        <h1 id="匿名命名空间与-static"><a class="header" href="#匿名命名空间与-static">匿名命名空间与 <code>static</code></a></h1>
+<p>C++ 中的匿名命名空间用于避免不同翻译单元之间的符号冲突。这类冲突会违反<a href="https://timsong-cpp.github.io/cppwp/n4950/basic.def.odr#14">单一定义规则（ODR）</a>，导致未定义行为（最好的情况是链接错误）。</p>
+<p>例如，如果不使用匿名命名空间，下面的代码会导致未定义行为（由于 <code>inline</code> 产生弱符号，目标文件不会报链接错误）。</p>
 <pre><code class="language-cpp">/// a.cc
 namespace {
     inline void common_function_name() {
@@ -185,18 +180,9 @@ namespace {
     }
 }
 </code></pre>
-<p>C++ static declarations are also used to achieve the same goal by making it so that
-a declaration has internal linkage (and so is not visible outside of the
-translation unit).</p>
-<p>Rust avoids the linkage problem by controlling linkage and visibility
-simultaneously, with declarations always also being definitions. Instead of
-translation units, programs are structured in terms of
-<a href="./headers.html">modules</a>, which provide both namespaces and
-visibility controls over definitions, enabling the Rust compiler to guarantee
-that symbol collision issues cannot happen.</p>
-<p>The following Rust program achieves the same goal as the C++ program above, in
-terms of avoiding the collision of the two functions while making them available
-for use within the defining files.</p>
+<p>C++ 的 <code>static</code> 声明也可以实现相同的目的，使声明具有内部链接属性（即在翻译单元外不可见）。</p>
+<p>Rust 通过同时控制链接属性和可见性来避免此类问题，声明总是即为定义。Rust 不使用翻译单元，而是以<a href="./headers.html">模块</a>为结构单位，模块既提供命名空间，也控制定义的可见性，从而让编译器保证不会发生符号冲突。</p>
+<p>下面的 Rust 程序实现了与上面 C++ 程序相同的目标，即避免两个函数发生冲突，同时允许它们在各自定义的文件中使用。</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// a.rs
@@ -213,30 +199,19 @@ for use within the defining files.</p>
 }
 <span class="boring">}
 </span><span class="boring">}</span></code></pre></pre>
-<p>Additionally,</p>
+<p>此外，</p>
 <ol>
-<li>Unlike C++ namespaces, Rust modules (which provide namespacing as well as
-visibility controls) can only be defined once, and this is checked by the
-compiler.</li>
-<li>Each file <a href="https://doc.rust-lang.org/stable/book/ch07-05-separating-modules-into-different-files.html">defines a module which has to be explicitly included in the module
-hierarchy</a>.</li>
-<li>Modules from Rust crates (libraries) are always qualified with some root
-module name, so they cannot conflict. If they would conflict, <a href="https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#renaming-dependencies-in-cargotoml">the root
-module name must be replaced with some user-chosen
-name</a>.</li>
+<li>与 C++ 命名空间不同，Rust 的模块（既提供命名空间也控制可见性）只能定义一次，编译器会进行检查。</li>
+<li>每个文件<a href="https://doc.rust-lang.org/stable/book/ch07-05-separating-modules-into-different-files.html">定义一个模块，且必须显式包含在模块层级中</a>。</li>
+<li>来自 Rust crate（库）的模块总是带有某个根模块名进行限定，因此不会发生冲突。如果会冲突，<a href="https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#renaming-dependencies-in-cargotoml">根模块名必须被用户自定义名称替换</a>。</li>
 </ol>
-<h2 id="caveats-about-c-interoperability"><a class="header" href="#caveats-about-c-interoperability">Caveats about C interoperability</a></h2>
-<p>When using libraries not managed by Rust, the usual problems can occur if there are symbol collisions in the
-object files. This can arise when using C or C++ static or dynamic libraries.
-It can also arise when using Rust static or dynamic libraries built for use in C or
-C++ programs.</p>
-<p>Rust provides <a href="https://doc.rust-lang.org/reference/abi.html#the-no_mangle-attribute"><code>#[unsafe(no_mangle)]</code></a> to bypass name mangling
-in order to produce functions that can be easily
-referred to from C or C++. This can also cause undefined behavior due to name collision.</p>
+<h2 id="关于-c-语言互操作的注意事项"><a class="header" href="#关于-c-语言互操作的注意事项">关于 C 语言互操作的注意事项</a></h2>
+<p>当使用非 Rust 管理的库时，如果目标文件中出现符号冲突，通常会出现上述问题。这在使用 C 或 C++ 的静态或动态库时可能发生，也可能在将 Rust 静态或动态库用于 C 或 C++ 程序时发生。</p>
+<p>Rust 提供了 <a href="https://doc.rust-lang.org/reference/abi.html#the-no_mangle-attribute"><code>#[unsafe(no_mangle)]</code></a> 属性，用于跳过名称修饰，以便生成可被 C 或 C++ 直接引用的函数。但这同样可能因名称冲突导致未定义行为。</p>
 <div class="quiz-placeholder" data-quiz-name="&quot;anonymous_namespaces&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;4ed5c1ed-81e3-448d-b20a-8f0eac301489&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\n// colors.rs\npub fn red() {}\nfn blue() {}\n\n// main.rs\nmod colors;\n\nuse colors::*;\n\nfn main() {}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\n// colors.rs\nmod colors {\n    pub fn red() {}\n    fn blue() {}\n}\n\n// main.rs\nmod colors;\n\nuse colors::*;\n\nfn main() {}\n```\n&quot;,&quot;```rust\n// colors.rs\nmod colors {\n    fn red() {}\n\n    mod {\n        fn blue() {}\n    }\n}\n\n// main.rs\nmod colors;\n\nuse colors::*;\n\nfn main() {}\n```\n&quot;],&quot;prompt&quot;:&quot;Which is an idiomatic translation of the following C++ program?\n\n```cpp\n// colors.h\nnamespace colors {\n  void red();\n}\n\n// colors.cc\n#include \&quot;colors.h\&quot;\n\nnamespace colors {\n  void red() {}\n\n  namespace {\n    void blue() {}\n  }\n}\n\n// main.cc\n#include \&quot;colors.h\&quot;\n\nusing namespace colors;\n\nint main() {}\n```\n&quot;}},{&quot;context&quot;:&quot;Even if in C++ you wouldn't use namespaces to structure the program, in Rust\nsplitting programs into separate files also means splitting them into separate\nmodules.\n&quot;,&quot;id&quot;:&quot;eb1bde49-9ca5-4e8d-b6f3-d49c95393dfb&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:[&quot;red&quot;,&quot;a::red&quot;,&quot;violet&quot;,&quot;b::violet&quot;,&quot;other_colors::green&quot;,&quot;a::other_colors::green&quot;]},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;orange&quot;,&quot;green&quot;,&quot;indigo&quot;,&quot;a::green&quot;],&quot;prompt&quot;:&quot;In the following Rust program, which items would be visible within the `main`\nfunction?\n\n```rust\n// a.rs\npub fn red() {}\nfn orange() {}\n\nmod other_colors {\n    pub fn green() {}\n    fn blue() {}\n}\n\n// b.rs\npub fn indigo() {};\npub fn violet() {};\n\n// main.rs\nmod a;\nmod b;\n\nuse a::*;\nuse b::violet;\n\nfn main() {\n   // What is visible here?\n}\n```\n&quot;}},{&quot;context&quot;:&quot;Lack of `pub` is like putting it in an anonymous namespace in terms of\nvisibility outside of the defining module.\n\n`mod` is not `#include`. `mod` defines a module, and using items from the module\nrequires either importing or qualification.\n\nResolving ambiguous items works the same as it does with C++ namespaces.\nAmbiguous use is the error, not having conflicting names in scope.\n&quot;,&quot;id&quot;:&quot;b3c2c70b-26b7-4396-8f8a-0e21541896cf&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:[&quot;```rust\n// a.rs\npub fn go() {}\n\n// b.rs\nfn go() {}\n\n// main.rs\nmod a;\nmod b;\n\nuse a::*;\nuse b::*;\n\nfn main() {\n    go();\n    println!(\&quot;{}\&quot;, 4);\n}\n```\n&quot;,&quot;```rust\n// a.rs\npub fn go() {}\n\n// b.rs\npub fn go() {}\n\n// main.rs\nmod a;\nmod b;\n\nuse a::*;\nuse b::*;\n\nfn main() {\n    a::go();\n    println!(\&quot;{}\&quot;, 4);\n}\n```\n&quot;,&quot;```rust\n// a.rs\npub fn go() {}\n\n// b.rs\npub fn go() {}\n\n// main.rs\nmod a;\nmod b;\n\nfn main() {\n    a::go();\n    println!(\&quot;{}\&quot;, 4);\n}\n```\n&quot;]},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\n// a.rs\npub fn go() {}\n\n// b.rs\npub fn go() {}\n\n// main.rs\nmod a;\nmod b;\n\nuse a::*;\nuse b::*;\n\nfn main() {\n    go();\n    println!(\&quot;{}\&quot;, 4);\n}\n```\n&quot;,&quot;```rust\n// a.rs\nfn go() {}\n\n// b.rs\nfn go() {}\n\n// main.rs\nmod a;\nmod b;\n\nuse a::*;\nuse b::*;\n\nfn main() {\n    go();\n    println!(\&quot;{}\&quot;, 4);\n}\n```\n&quot;,&quot;```rust\n// a.rs\npub fn go() {}\n\n// b.rs\nfn go() {}\n\n// main.rs\nmod a;\nmod b;\n\nfn main() {\n    go();\n    println!(\&quot;{}\&quot;, 4);\n}\n```\n&quot;],&quot;prompt&quot;:&quot;Which of the following Rust programs compile?\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Anonymous namespaces and static">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=匿名命名空间与 static">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

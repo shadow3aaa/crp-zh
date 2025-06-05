@@ -1,7 +1,7 @@
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt="""
-Which is the most idiomatic translation of the following C++ program?
+以下 C++ 程序最地道的 Rust 翻译是哪一个？
 
 ```cpp
 #include <limits>
@@ -77,8 +77,7 @@ fn find_max(arr: &[i32]) -> Option<i32> {
 ```
 """
 context = """
-The idiomatic Rust program to find the maximum value in a slice would just
-involve calling the `Iterator::max` method on the iterator for the slice.
+在 Rust 中，查找切片最大值的惯用方法是直接对切片的迭代器调用 `Iterator::max` 方法。
 
 ```rust
 fn find_max(arr: &[i32]) -> Option<i32> {

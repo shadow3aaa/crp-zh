@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Constructors - C++ to Rust Phrasebook</title>
+        <title>构造函数 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,22 +163,16 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="constructors"><a class="header" href="#constructors">Constructors</a></h1>
-<p>In C++, constructors initialize objects. At the point when a constructor is executed, storage for the object has been
-allocated and the constructor is only performing initialization.</p>
-<p>Rust does not have constructors in the same way as C++. In Rust, there is a
-single fundamental way to create an object, which is to initialize all of its
-members at once. The term "constructor" or "constructor method" in Rust refers
-to something more like a factory: a static method associated with a type (i.e.,
-a method that does not have a <code>self</code> parameter), which returns a value of the
-type.</p>
+                        <h1 id="构造函数"><a class="header" href="#构造函数">构造函数</a></h1>
+<p>在 C++ 中，构造函数用于初始化对象。当构造函数被执行时，对象的存储空间已经分配好，构造函数只负责初始化。</p>
+<p>Rust 并没有像 C++ 那样的构造函数。在 Rust 中，创建对象的基本方式是一次性初始化其所有成员。在 Rust 语境下，“构造函数”或“构造方法”更类似于工厂方法：即与类型关联的静态方法（即没有 <code>self</code> 参数的方法），返回该类型的一个值。</p>
 <div class="comparison">
-<pre><code class="language-cpp"><span class="boring">#include &lt;thread&gt;
-</span><span class="boring">unsigned int cpu_count() { 
-</span><span class="boring">    return std::thread::hardware_concurrency();
-</span><span class="boring">}
-</span><span class="boring">
-</span>class ThreadPool {
+<pre><code class="language-cpp">#include &lt;thread&gt;
+unsigned int cpu_count() { 
+    return std::thread::hardware_concurrency();
+}
+
+class ThreadPool {
   unsigned int num_threads;  
 
 public:
@@ -214,16 +208,8 @@ fn main() {
     let p2 = ThreadPool::with_threads(4);
 }</code></pre></pre>
 </div>
-<p>In Rust, typically the primary constructor for a type is named <code>new</code>, especially if it
-takes no arguments. (See the chapter on <a href="./constructors/default_constructors.html">default
-constructors</a>.) Constructors based on
-some specific property of the value are usually named <code>with_&lt;something&gt;</code>, e.g.,
-<code>ThreadPool::with_threads</code>. See the <a href="https://rust-lang.github.io/api-guidelines/naming.html">naming
-guidelines</a> for the
-conventions on how to name constructor methods in Rust.</p>
-<p>If the fields to be initialized are visible, there is a reasonable default
-value, and the value does not manage a resource, then it is also common to use
-record update syntax to initialize a value based on some default value.</p>
+<p>在 Rust 中，通常类型的主构造函数被命名为 <code>new</code>，尤其是在它不带参数时。（参见<a href="./constructors/default_constructors.html">默认构造函数</a>章节。）基于某些特定属性的构造函数通常命名为 <code>with_&lt;something&gt;</code>，例如 <code>ThreadPool::with_threads</code>。更多命名规范可参考 <a href="https://rust-lang.github.io/api-guidelines/naming.html">Rust 命名指南</a>。</p>
+<p>如果要初始化的字段是可见的，且有合理的默认值，并且该值不管理资源，那么也常用基于某个默认值的记录更新语法来初始化一个值。</p>
 <pre><pre class="playground"><code class="language-rust">struct Point {
     x: i32,
     y: i32,
@@ -242,24 +228,12 @@ fn main() {
         ..Point::zero()
     };
 }</code></pre></pre>
-<p>Despite the name, "record update syntax" does not modify a record but instead
-creates a new value based on another one, taking ownership of it in order to do
-so.</p>
-<h2 id="storage-allocation-vs-initialization"><a class="header" href="#storage-allocation-vs-initialization">Storage allocation vs initialization</a></h2>
-<p>In Rust, the actual construction of a structure or enum value occurs where the
-structure construction syntax <code>ThreadPool { ... }</code> is, after the evaluation of the
-expressions for the fields.</p>
-<p>A significant implication of this difference is that storage is not allocated
-for a struct in Rust at the point where the constructor method (such as
-<code>ThreadPool::with_threads</code>) is called, and in fact is not allocated until after the
-values of the fields of a struct have been computed (in terms of the semantics
-of the language — the optimizer may still avoid the copy). Therefore there is no
-straightforward way in Rust to translate patterns such as a class which stores a pointer to
-itself upon construction (in Rust, this requires tools like <a href="https://doc.rust-lang.org/std/pin/struct.Pin.html"><code>Pin</code></a> and <a href="https://doc.rust-lang.org/std/mem/union.MaybeUninit.html"><code>MaybeUninit</code></a>).</p>
-<h2 id="fallible-constructors"><a class="header" href="#fallible-constructors">Fallible constructors</a></h2>
-<p>In C++, the primary way constructors can indicate failure is by throwing exceptions. In Rust, because constructors are normal static methods, fallible constructors
-can instead return <code>Result</code> (akin to <code>std::expected</code>) or <code>Option</code> (akin to
-<code>std::optional</code>).</p>
+<p>尽管名字叫“记录更新语法”，但它并不会修改已有记录，而是基于另一个值创建一个新值，并取得其所有权。</p>
+<h2 id="存储分配与初始化"><a class="header" href="#存储分配与初始化">存储分配与初始化</a></h2>
+<p>在 Rust 中，结构体或枚举值的实际构造发生在结构体构造语法 <code>ThreadPool { ... }</code> 处，即字段表达式求值之后。</p>
+<p>这一差异的重要影响在于，在 Rust 中，结构体的存储空间并不会在构造方法（如 <code>ThreadPool::with_threads</code>）被调用时分配，实际上要等到结构体所有字段的值都已计算完成后才分配（从语言语义上讲——优化器可能会避免拷贝）。因此，在 Rust 中没有直接的方式翻译诸如“类在构造时存储自身指针”这样的模式（在 Rust 中，这需要借助 <a href="https://doc.rust-lang.org/std/pin/struct.Pin.html"><code>Pin</code></a> 和 <a href="https://doc.rust-lang.org/std/mem/union.MaybeUninit.html"><code>MaybeUninit</code></a> 等工具）。</p>
+<h2 id="可失败的构造函数"><a class="header" href="#可失败的构造函数">可失败的构造函数</a></h2>
+<p>在 C++ 中，构造函数指示失败的主要方式是抛出异常。而在 Rust 中，由于构造函数只是普通的静态方法，可失败的构造函数可以返回 <code>Result</code>（类似于 <code>std::expected</code>）或 <code>Option</code>（类似于 <code>std::optional</code>）。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;stdexcept&gt;
@@ -304,11 +278,10 @@ fn main() {
     }
 }</code></pre></pre>
 </div>
-<p>See <a href="./exceptions.html">the chapter on exceptions</a> for more information on
-how C++ exceptions and exception handling translate to Rust.</p>
+<p>更多关于 C++ 异常及其与 Rust 异常处理的对应关系，请参见<a href="./exceptions.html">异常章节</a>。</p>
 
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Constructors">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=构造函数">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

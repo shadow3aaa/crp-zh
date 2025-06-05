@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Multiple return values - C++ to Rust Phrasebook</title>
+        <title>多返回值 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,18 +163,15 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="multiple-return-values"><a class="header" href="#multiple-return-values">Multiple return values</a></h1>
-<p>One idiom for returning multiple values from a function or method in C++ is to
-pass in references to which the values can be assigned.</p>
-<p>There are several reasons why this idiom might be used:</p>
+                        <h1 id="多返回值"><a class="header" href="#多返回值">多返回值</a></h1>
+<p>在 C++ 中，从函数或方法返回多个值的一种惯用法是传入引用参数，由函数对这些引用赋值。</p>
+<p>这种惯用法可能被采用的原因有：</p>
 <ul>
-<li>compatibility with versions of C++ earlier than C++11,</li>
-<li>working in a codebase that uses C-style of C++, or</li>
-<li>performance concerns.</li>
+<li>需要兼容 C++11 之前的版本，</li>
+<li>代码库采用了 C 风格的 C++，</li>
+<li>或出于性能考虑。</li>
 </ul>
-<p>The idiomatic translation of this program into Rust makes use of either
-<a href="https://doc.rust-lang.org/std/primitive.tuple.html">tuples</a> or a named
-structure for the return type.</p>
+<p>将该模式惯用地翻译到 Rust 时，通常会使用 <a href="https://doc.rust-lang.org/std/primitive.tuple.html">元组</a> 或具名结构体作为返回类型。</p>
 <div class="comparison">
 <pre><code class="language-cpp">void get_point(int &amp;x, int &amp;y) {
   x = 5;
@@ -196,36 +193,26 @@ fn main() {
     // ...
 }</code></pre></pre>
 </div>
-<p>Rust has a dedicated tuple syntax and supports pattern matching with <code>let</code>
-bindings in part to support use cases like this one.</p>
-<h2 id="problems-with-the-direct-transliteration"><a class="header" href="#problems-with-the-direct-transliteration">Problems with the direct transliteration</a></h2>
-<p>It is possible to transliterate the original example that uses out parameters to
-Rust, but Rust requires the initialization of the variables before they can be
-passed to a function. The resulting program is not idiomatic Rust.</p>
-<pre><pre class="playground"><code class="language-rust">// NOT IDIOMATIC RUST
+<p>Rust 拥有专门的元组语法，并支持 <code>let</code> 绑定的模式匹配，部分原因正是为了支持类似这样的用例。</p>
+<h2 id="直接翻译的弊端"><a class="header" href="#直接翻译的弊端">直接翻译的弊端</a></h2>
+<p>虽然可以将原本使用输出参数的示例直接翻译为 Rust，但 Rust 要求变量在传递给函数前必须初始化。这样写出来的程序并不是惯用的 Rust。</p>
+<pre><pre class="playground"><code class="language-rust">// 非惯用 Rust
 fn get_point(x: &amp;mut i32, y: &amp;mut i32) {
     *x = 5;
     *y = 6;
 }
 
 fn main() {
-    let mut x = 0; // initialized to arbitrary values
+    let mut x = 0; // 必须初始化为任意值
     let mut y = 0;
     get_point(&amp;mut x, &amp;mut y);
     // ...
 }</code></pre></pre>
-<p>This approach requires assigning arbitrary initial values to the variables and
-making the variables mutable, both of which make it harder for the compiler to
-help with avoiding programming errors.</p>
-<p>Additionally, the Rust compiler is tuned for optimizing the idiomatic version of
-the program, and produces a significantly faster binary for that version.</p>
-<p>In situations where the performance of memory allocation is a concern (such as
-when it is necessary to reuse entire buffers in memory), the trade-offs may be
-different. That situation is discussed in the chapter on <a href="./pre-allocated_buffers.html">pre-allocated
-buffers</a>.</p>
-<h2 id="similarities-with-idiomatic-c-since-c11"><a class="header" href="#similarities-with-idiomatic-c-since-c11">Similarities with idiomatic C++ since C++11</a></h2>
-<p>In C++11 and later, <code>std::pair</code> and <code>std::tuple</code> are available for returning
-multiple values instead of assigning to reference parameters.</p>
+<p>这种方式要求变量赋予任意初值，并且必须是可变的，这会让编译器更难帮助开发者避免编程错误。</p>
+<p>此外，Rust 编译器对惯用写法的优化更好，生成的二进制文件也显著更快。</p>
+<p>在某些情况下（如需要复用整个内存缓冲区时），内存分配的性能可能成为关注点，这时权衡会有所不同。相关内容详见<a href="./pre-allocated_buffers.html">预分配缓冲区</a>章节。</p>
+<h2 id="与-c11-及之后惯用法的相似之处"><a class="header" href="#与-c11-及之后惯用法的相似之处">与 C++11 及之后惯用法的相似之处</a></h2>
+<p>自 C++11 起，<code>std::pair</code> 和 <code>std::tuple</code> 可用于返回多个值，而不是通过引用参数赋值。</p>
 <pre><code class="language-cpp">#include &lt;tuple&gt;
 #include &lt;utility&gt;
 
@@ -239,12 +226,11 @@ int main() {
   // ...
 }
 </code></pre>
-<p>This more closely aligns with the normal Rust idiom for returning multiple
-values.</p>
-<div class="quiz-placeholder" data-quiz-name="&quot;multiple_return&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;17e30276-7ebe-499e-b8b0-4acfb815feaa&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\npub fn split_at(\n    data: &amp;[u8],\n    mid: usize,\n) -&gt; (&amp;[u8], &amp;[u8]);\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\npub fn split_at(\n    data: &amp;[u8],\n    mid: usize,\n    left: &amp;mut &amp;[u8],\n    right: &amp;mut &amp;[u8],\n);\n```\n&quot;,&quot;```rust\nfn split_at(\n    data: &amp;[u8],\n    mid: usize,\n    left: &amp;mut &amp;[u8],\n    right: &amp;mut &amp;[u8],\n) -&gt; (usize, usize);\n```\n&quot;,&quot;```rust\nfn split_at(\n    data: &amp;[u8],\n    mid: usize,\n    remaining: &amp;mut &amp;[u8],\n) -&gt; &amp;[u8];\n```\n&quot;],&quot;prompt&quot;:&quot;Which of the following is the most idiomatic translation of this C++ function\nsignature into a Rust function signature?\n\n```cpp\nvoid main() {}\n```\n\n```cpp\n#include &lt;cstdint&gt;\n\nvoid splitAt(std::uint8_t *data,\n             std::size_t dataSize,\n             uint8_t **left,\n             std::size_t *leftSize,\n             uint8_t **right,\n             std::size_t *rightSize);\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
+<p>这种方式与 Rust 返回多个值的惯用法更为接近。</p>
+<div class="quiz-placeholder" data-quiz-name="&quot;multiple_return&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;17e30276-7ebe-499e-b8b0-4acfb815feaa&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\npub fn split_at(\n    data: &amp;[u8],\n    mid: usize,\n) -&gt; (&amp;[u8], &amp;[u8]);\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\npub fn split_at(\n    data: &amp;[u8],\n    mid: usize,\n    left: &amp;mut &amp;[u8],\n    right: &amp;mut &amp;[u8],\n);\n```\n&quot;,&quot;```rust\nfn split_at(\n    data: &amp;[u8],\n    mid: usize,\n    left: &amp;mut &amp;[u8],\n    right: &amp;mut &amp;[u8],\n) -&gt; (usize, usize);\n```\n&quot;,&quot;```rust\nfn split_at(\n    data: &amp;[u8],\n    mid: usize,\n    remaining: &amp;mut &amp;[u8],\n) -&gt; &amp;[u8];\n```\n&quot;],&quot;prompt&quot;:&quot;下列哪一项是将此 C++ 函数签名最符合惯用写法地翻译为 Rust 函数签名？\n\n```cpp\nvoid main() {}\n```\n\n```cpp\n#include &lt;cstdint&gt;\n\nvoid splitAt(std::uint8_t *data,\n             std::size_t dataSize,\n             uint8_t **left,\n             std::size_t *leftSize,\n             uint8_t **right,\n             std::size_t *rightSize);\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Multiple return values">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=多返回值">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

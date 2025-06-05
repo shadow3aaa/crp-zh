@@ -1,8 +1,7 @@
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt = """
-If the `Drop` trait is implemented for a type in Rust, which other traits should
-probably be implemented?
+如果在 Rust 中为某个类型实现了 `Drop` trait，还应该实现哪些其他 trait？
 """
 prompt.distractors = [
 "`Move`",

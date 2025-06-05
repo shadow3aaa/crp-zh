@@ -1,9 +1,7 @@
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt = """
-Which of the following Rust programs is the most idiomatic translation of the
-given C++ program?
-
+以下哪个 Rust 程序是对给定 C++ 程序最符合惯用写法的翻译？
 ```c++
 #include <chrono>
 #include <string>
@@ -29,7 +27,7 @@ public:
     } video;
   };
 
-  // constructors omitted for brevity
+  // 构造函数省略
 
   size_t size() const {
     switch (type) {
@@ -40,13 +38,13 @@ public:
     case MediaType::Video:
       return video.height * video.width;
     }
-    // Should not reach here
+    // 不应到达这里
     return 0;
   }
 };
 ```
 
-All of the Rust programs use this definition of `MediaFile`.
+所有 Rust 程序都使用如下 `MediaFile` 定义。
 
 ```rust
 enum MediaFile {
@@ -67,8 +65,8 @@ enum MediaFile {
 ```
 """
 prompt.distractors = [
-# Thinking fallthrough works like in C++.
-# Really this is testing knowledge of match, which goes hand-in-hand with enums.
+# 认为 match 可以像 C++ 那样 fallthrough。
+# 实际上这是考察 match 的知识点，而 match 与枚举密不可分。
 """
 ```rust
 impl MediaFile {
@@ -82,7 +80,7 @@ impl MediaFile {
 }
 ```
 """,
-# Thinking that fields can be accessed directly without checking.
+# 认为可以直接访问字段而无需判断类型。
 """
 ```rust
 impl MediaFile {

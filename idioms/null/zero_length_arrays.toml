@@ -1,8 +1,7 @@
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt = """
-Which is the most idiomatic translation of the following C++ program?
-
+以下 C++ 程序最地道的 Rust 翻译是哪一个？
 ```cpp
 #include <cstddef>
 
@@ -68,9 +67,7 @@ fn main() {
 ```
 """
 context = """
-An even more idiomatic implementation would be to use the
-[`fill`](https://doc.rust-lang.org/std/primitive.slice.html#method.fill) method
-on the slice type.
+更地道的实现方式是直接在切片类型上使用 [`fill`](https://doc.rust-lang.org/std/primitive.slice.html#method.fill) 方法。
 
 ```rust
 fn main() {

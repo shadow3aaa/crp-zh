@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Moved members - C++ to Rust Phrasebook</title>
+        <title>已移动成员 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,11 +163,8 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="moved-members"><a class="header" href="#moved-members">Moved members</a></h1>
-<p>Moving values out of variables or fields in Rust is more explicit than it is in
-C++. A value that might be moved with nothing left behind needs to be
-represented using an <code>Option&lt;Box&lt;T&gt;&gt;</code> type in Rust, while in C++ it would just
-be a <code>std::unique_ptr&lt;T&gt;</code>.</p>
+                        <h1 id="成员的移动"><a class="header" href="#成员的移动">成员的移动</a></h1>
+<p>在 Rust 中，将值从变量或字段中移出比在 C++ 中更加显式。一个可能被移动且不会留下任何内容的值，在 Rust 中需要用 <code>Option&lt;Box&lt;T&gt;&gt;</code> 类型来表示，而在 C++ 中只需用 <code>std::unique_ptr&lt;T&gt;</code>。</p>
 <div class="comparison">
 <pre><code class="language-c++">#include &lt;memory&gt;
 
@@ -197,19 +194,9 @@ fn read(mailbox: Arc&lt;Mutex&lt;Option&lt;i32&gt;&gt;&gt;) {
 }
 <span class="boring">}</span></code></pre></pre>
 </div>
-<p>Additionally, when taking ownership of a value from within a mutable reference,
-something has to be left in its place. This can be done using
-<a href="https://doc.rust-lang.org/std/mem/fn.swap.html"><code>std::mem::swap</code></a>, and many
-container-like types have methods for making common ownership-swapping more
-ergonomic, like
-<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.take"><code>Option::take</code></a>
-as seen in the earlier example,
-<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.replace"><code>Option::replace</code></a>
-or
-<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.swap_remove"><code>Vec::swap</code></a>.</p>
-<h2 id="deleting-moved-objects"><a class="header" href="#deleting-moved-objects">Deleting moved objects</a></h2>
-<p>Another common use of null pointers in modern C++ is as values for the members
-of moved objects so that the destructor can still safely be called. E.g.,</p>
+<p>此外，当你需要从一个可变引用中取得所有权时，必须在原位置留下某些内容。这可以通过 <a href="https://doc.rust-lang.org/std/mem/fn.swap.html"><code>std::mem::swap</code></a> 实现，许多类似容器的类型也提供了更方便的所有权交换方法，例如前面例子中的 <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.take"><code>Option::take</code></a>、<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.replace"><code>Option::replace</code></a> 或 <a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.swap_remove"><code>Vec::swap</code></a>。</p>
+<h2 id="删除已移动的对象"><a class="header" href="#删除已移动的对象">删除已移动的对象</a></h2>
+<p>现代 C++ 中另一个常见的空指针用法，是作为已移动对象成员的值，以便析构函数仍然可以安全调用。例如：</p>
 <pre><code class="language-cpp"><span class="boring">#include &lt;cstdlib&gt;
 </span><span class="boring">#include &lt;cstring&gt;
 </span><span class="boring">
@@ -238,14 +225,10 @@ public:
     }
 };
 </code></pre>
-<p>Rust's notion of moving objects does not involve leaving behind an object on
-which a destructor will be called, and so this use of null does not have a
-corresponding idiom. See the chapter on <a href="../constructors/copy_and_move_constructors.html">copy and move
-constructors</a> for more
-details.</p>
+<p>Rust 对象的移动不会留下一个需要调用析构函数的对象，因此这种空指针的用法在 Rust 中没有对应的惯用法。更多细节请参见 <a href="../constructors/copy_and_move_constructors.html">拷贝与移动构造函数</a> 章节。</p>
 
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Moved members">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=已移动成员">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

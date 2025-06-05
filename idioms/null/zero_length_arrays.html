@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Zero-length arrays - C++ to Rust Phrasebook</title>
+        <title>零长度数组 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,15 +163,9 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="zero-length-arrays"><a class="header" href="#zero-length-arrays">Zero-length arrays</a></h1>
-<p>In C++ codebases that are written in a C style or that make use of C libraries,
-null pointers may be used to represent empty arrays.</p>
-<p>In Rust, arrays of arbitrary size are represented as
-<a href="https://doc.rust-lang.org/book/ch04-03-slices.html">slices</a>. These slices can
-have zero length. Since <a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#impl-Deref-for-Vec%3CT,+A%3E">Rust vectors are convertible to
-slices</a>,
-defining functions that work with slices enables them to be used with vectors as
-well.</p>
+                        <h1 id="零长度数组"><a class="header" href="#零长度数组">零长度数组</a></h1>
+<p>在采用 C 风格编写或使用 C 库的 C++ 代码库中，空数组通常用空指针（null pointer）来表示。</p>
+<p>在 Rust 中，任意大小的数组通过 <a href="https://doc.rust-lang.org/book/ch04-03-slices.html">切片（slice）</a> 表示。切片可以具有零长度。而且 <a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#impl-Deref-for-Vec%3CT,+A%3E">Rust 的向量（Vec）可以自动转换为切片</a>，因此如果函数以切片作为参数，也可以直接传递向量。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;cstddef&gt;
 #include &lt;cassert&gt;
@@ -205,10 +199,10 @@ fn main() {
     assert!(sum2 == 0);
 }</code></pre></pre>
 </div>
-<div class="quiz-placeholder" data-quiz-name="&quot;zero_length_arrays&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;context&quot;:&quot;An even more idiomatic implementation would be to use the\n[`fill`](https://doc.rust-lang.org/std/primitive.slice.html#method.fill) method\non the slice type.\n\n```rust\nfn main() {\n    let mut x: [i32; 0] = [];\n    x.fill(5);\n}\n```\n&quot;,&quot;id&quot;:&quot;b1f64fba-b6d1-445e-85fb-08a1dfd29fc2&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nfn fill_from(arr: &amp;mut [i32], mut val: i32) {\n    for x in arr {\n        *x = val;\n        val += 1;\n    }\n}\n\nfn main() {\n    let mut x = [];\n    fill_from(&amp;mut x, 5);\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nfn fill_from(size: usize, arr: &amp;mut [i32], mut val: i32) {\n    for i in 0..size {\n        arr[i] = val;\n        val += 1;\n    }\n}\n\nfn main() {\n    let mut x = [];\n    fill_from(0, &amp;mut x, 5);\n}\n```\n&quot;,&quot;```rust\nfn fill_from(size: usize, opt_arr: Option&lt;&amp;mut [i32]&gt;, mut val: i32) {\n    if let Some(arr) = opt_arr {\n        for i in 0..size {\n            arr[i] = val;\n            val += 1;\n        }\n    }\n}\n\nfn main() {\n    fill_from(0, None, 5);\n}\n```\n&quot;],&quot;prompt&quot;:&quot;Which is the most idiomatic translation of the following C++ program?\n\n```cpp\n#include &lt;cstddef&gt;\n\nvoid fillFrom(std::size_t len, int arr[], int val) {\n  for (std::size_t i; i &lt; len; i++) {\n    arr[i] = val;\n    val++;\n  }\n}\n\nint main() {\n  fill(0, nullptr, 5);\n}\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
+<div class="quiz-placeholder" data-quiz-name="&quot;zero_length_arrays&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;context&quot;:&quot;更地道的实现方式是直接在切片类型上使用 [`fill`](https://doc.rust-lang.org/std/primitive.slice.html#method.fill) 方法。\n\n```rust\nfn main() {\n    let mut x: [i32; 0] = [];\n    x.fill(5);\n}\n```\n&quot;,&quot;id&quot;:&quot;b1f64fba-b6d1-445e-85fb-08a1dfd29fc2&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nfn fill_from(arr: &amp;mut [i32], mut val: i32) {\n    for x in arr {\n        *x = val;\n        val += 1;\n    }\n}\n\nfn main() {\n    let mut x = [];\n    fill_from(&amp;mut x, 5);\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nfn fill_from(size: usize, arr: &amp;mut [i32], mut val: i32) {\n    for i in 0..size {\n        arr[i] = val;\n        val += 1;\n    }\n}\n\nfn main() {\n    let mut x = [];\n    fill_from(0, &amp;mut x, 5);\n}\n```\n&quot;,&quot;```rust\nfn fill_from(size: usize, opt_arr: Option&lt;&amp;mut [i32]&gt;, mut val: i32) {\n    if let Some(arr) = opt_arr {\n        for i in 0..size {\n            arr[i] = val;\n            val += 1;\n        }\n    }\n}\n\nfn main() {\n    fill_from(0, None, 5);\n}\n```\n&quot;],&quot;prompt&quot;:&quot;以下 C++ 程序最地道的 Rust 翻译是哪一个？\n```cpp\n#include &lt;cstddef&gt;\n\nvoid fillFrom(std::size_t len, int arr[], int val) {\n  for (std::size_t i; i &lt; len; i++) {\n    arr[i] = val;\n    val++;\n  }\n}\n\nint main() {\n  fill(0, nullptr, 5);\n}\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Zero-length arrays">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=零长度数组">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

@@ -1,8 +1,7 @@
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt="""
-Which Rust program is the most idiomatic translation of the following C++
-program?
+以下哪个 Rust 程序是对下述 C++ 程序最地道的翻译？
 
 ```cpp
 #include <optional>

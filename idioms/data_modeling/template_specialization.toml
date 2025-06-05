@@ -1,8 +1,8 @@
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt="""
-The following Rust program is an approximate translation of the C++ program.
-Which statements are true about them?
+以下 Rust 程序是对 C++ 程序的近似翻译。
+关于它们，下列哪些说法是正确的？
 
 C++:
 
@@ -44,39 +44,32 @@ fn display_with_type<T: TypeDisplayName + Display>(x: T) {
 """
 prompt.distractors = [
 """
-Both `displayWithType` and `display_with_type` will display "Unknown type" for
-everything other than `int` or `i32`.
+`displayWithType` 和 `display_with_type` 都会对除 `int` 或 `i32` 以外的所有类型显示 "Unknown type"。
 """,
 """
-Both `displayWithType` and `display_with_type` can be called with ANY arguments
-whose types overload `<<` or implement `Display`.
+`displayWithType` 和 `display_with_type` 都可以被任何重载了 `<<` 或实现了 `Display` 的类型调用。
 """
 ]
 answer.answer = [
 """
-Both `displayWithType` and `display_with_type` can ONLY be called with arguments
-whose types overload `<<` or implement `Display`.
+`displayWithType` 和 `display_with_type` 只能被重载了 `<<` 或实现了 `Display` 的类型调用。
 """
 ]
 context = """
-> Both will display "Unknown type" for everything other than `int` or `i32`.
+> 都会对除 `int` 或 `i32` 以外的所有类型显示 "Unknown type"。
 
-In both cases what will be displayed for other types will depend on
-implementations/specializations elsewhere in the program.
+实际上，两者对于其他类型的显示内容取决于程序中其他地方的实现/特化。
 
-> Both `displayWithType` and `display_with_type` can be called with ANY
-> arguments whose types overload `<<` or implement `Display`.
+> `displayWithType` 和 `display_with_type` 都可以被任何重载了 `<<` 或实现了 `Display` 的类型调用。
 
-The default function implementation `type_display_name` in the `DisplayWithType`
-trait does not make it possible to call `display_with_type` on any type. Types
-still need to explicitly declare that they implement the trait.
+`DisplayWithType` trait 中 `type_display_name` 的默认实现并不意味着 `display_with_type` 可以被任意类型调用。类型仍需显式声明实现该 trait。
 """
 id = "6ac15484-9038-45b7-9b47-f08918551d3a"
 
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt = """
-Which of the following types is the largest?
+下列哪种类型占用的空间最大？
 """
 prompt.distractors = [
 """
@@ -95,16 +88,16 @@ u32
 ```
 """
 ]
-answer.answer = "They are all the same size."
+answer.answer = "它们的大小都相同。"
 context = """
-`Option<NonZero<u32>>` makes use of the niche optimization.
+`Option<NonZero<u32>>` 利用了 niche 优化。
 """
 id = "5523ba5a-2772-4700-946e-2028471ead73"
 
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt = """
-Which of the following types is the largest?
+下列哪种类型占用的空间最大？
 """
 prompt.distractors = [
 """
@@ -117,7 +110,7 @@ NonZero<u32>
 u32
 ```
 """,
-"They are all the same size."
+"它们的大小都相同。"
 ]
 answer.answer = """
 ```rust

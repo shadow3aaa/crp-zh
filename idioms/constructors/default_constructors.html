@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Default constructors - C++ to Rust Phrasebook</title>
+        <title>默认构造函数 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,17 +163,15 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="default-constructors"><a class="header" href="#default-constructors">Default constructors</a></h1>
-<p>C++ has a special concept of default constructors to support several scenarios
-in which they are implicitly called.
-Rust does not have the same notion of a default constructor. The most similar mechanism is the <a href="https://doc.rust-lang.org/std/default/trait.Default.html"><code>Default</code>
-trait</a>.</p>
+                        <h1 id="默认构造函数"><a class="header" href="#默认构造函数">默认构造函数</a></h1>
+<p>C++ 有一个特殊的默认构造函数概念，用于支持多种会隐式调用它的场景。<br />
+Rust 没有完全相同的默认构造函数机制，最接近的是 <a href="https://doc.rust-lang.org/std/default/trait.Default.html"><code>Default</code> trait</a>。</p>
 <div class="comparison">
 <pre><code class="language-cpp">class Person {
     int age;
 
 public:
-    // Default constructor
+    // 默认构造函数
     Person() : age(0) {}
 }
 </code></pre>
@@ -196,16 +194,11 @@ impl Default for Person {
 }
 <span class="boring">}</span></code></pre></pre>
 </div>
-<p>If a structure has a useful default value (such as would be constructed by a
-default constructor in C++), then the type should provide
-<a href="https://rust-lang.github.io/api-guidelines/interoperability.html?highlight=default#types-eagerly-implement-common-traits-c-common-traits">both</a>
-a <code>new</code> method that takes no arguments and an implementation of <code>Default</code>.</p>
-<h2 id="implicit-initialization-of-class-members"><a class="header" href="#implicit-initialization-of-class-members">Implicit initialization of class members</a></h2>
-<p>In C++, if a member is not explicitly initialized by a constructor, then it is
-default-initialized. When the type of the member is a class, the
-default-initialization invokes the default constructor.</p>
-<p>In Rust, if all of the fields of a struct implement the <code>Default</code> trait, then an
-implementation for the structure can be provided by the compiler.</p>
+<p>如果一个结构体有有意义的默认值（类似于 C++ 的默认构造函数），那么该类型应同时提供一个无参数的 <code>new</code> 方法和 <code>Default</code> trait 的实现。<br />
+详见 <a href="https://rust-lang.github.io/api-guidelines/interoperability.html?highlight=default#types-eagerly-implement-common-traits-c-common-traits">相关 API 指南</a>。</p>
+<h2 id="类成员的隐式初始化"><a class="header" href="#类成员的隐式初始化">类成员的隐式初始化</a></h2>
+<p>在 C++ 中，如果成员没有被构造函数显式初始化，则会被默认初始化。当成员类型是类时，默认初始化会调用其默认构造函数。</p>
+<p>在 Rust 中，如果结构体的所有字段都实现了 <code>Default</code> trait，则编译器可以为该结构体自动生成实现。</p>
 <div class="comparison">
 <pre><code class="language-cpp">class Person {
   int age;
@@ -231,7 +224,7 @@ struct Student {
 }
 <span class="boring">}</span></code></pre></pre>
 </div>
-<p>The <code>#[derive(Default)]</code> macros in Rust are equivalent to writing the following.</p>
+<p>Rust 中的 <code>#[derive(Default)]</code> 宏等价于如下手动实现：</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>struct Person {
@@ -258,16 +251,8 @@ impl Default for Student {
     }
 }
 <span class="boring">}</span></code></pre></pre>
-<p>Unlike C++ where the default initialization value for integers is indeterminate,
-in Rust the default value for the primitive integer and floating point types <a href="https://doc.rust-lang.org/std/primitive.i32.html#impl-Default-for-i32">is
-zero</a>.</p>
-<p><a name="struct-update"></a> Deriving the <code>Default</code> trait has a similar effect
-on code concision as eliding initialization in C++. In situations where all of
-the types implement the <code>Default</code> trait, but only some of the fields should have
-their default values, one can use <a href="https://doc.rust-lang.org/book/ch05-01-defining-structs.html#creating-instances-from-other-instances-with-struct-update-syntax">struct update
-syntax</a>
-to define a constructor method without enumerating the values for all of the
-fields.</p>
+<p>与 C++ 中整数默认初始化值不确定不同，Rust 的原始整数和浮点类型的默认值<a href="https://doc.rust-lang.org/std/primitive.i32.html#impl-Default-for-i32">为零</a>。</p>
+<p><a name="struct-update"></a> 派生 <code>Default</code> trait 在代码简洁性上类似于 C++ 省略初始化的写法。当所有字段类型都实现了 <code>Default</code>，但只希望部分字段使用默认值时，可以用 <a href="https://doc.rust-lang.org/book/ch05-01-defining-structs.html#creating-instances-from-other-instances-with-struct-update-syntax">结构体更新语法</a> 定义构造方法，无需枚举所有字段的值。</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[derive(Default)]
@@ -290,10 +275,9 @@ impl Student {
     }
 }
 <span class="boring">}</span></code></pre></pre>
-<h2 id="implicit-initialization-of-array-values"><a class="header" href="#implicit-initialization-of-array-values">Implicit initialization of array values</a></h2>
-<p>In C++, arrays without explicit initialization are default-initialized using the
-default constructors.</p>
-<p>In Rust, the value with which to initialize the array must be provided.</p>
+<h2 id="数组值的隐式初始化"><a class="header" href="#数组值的隐式初始化">数组值的隐式初始化</a></h2>
+<p>在 C++ 中，未显式初始化的数组会用默认构造函数进行默认初始化。</p>
+<p>在 Rust 中，必须显式指定数组的初始化值。</p>
 <div class="comparison">
 <pre><code class="language-cpp">class Person {
   int age;
@@ -313,15 +297,13 @@ struct Person {
 }
 
 fn main() {
-    // std::array::from_fn provides the index to the callback
+    // std::array::from_fn 提供索引给回调
     let people: [Person; 3] = 
         std::array::from_fn(|_| Default::default());
     // ...
 }</code></pre></pre>
 </div>
-<p>If the type happens to be <a href="./copy_and_move_constructors.html#trivially-copyable-types">trivially
-copyable</a>,
-then a shorthand can be used.</p>
+<p>如果类型是<a href="./copy_and_move_constructors.html#trivially-copyable-types">可平凡复制的</a>，可以使用更简洁的写法：</p>
 <pre><pre class="playground"><code class="language-rust">#[derive(Clone, Copy, Default)]
 struct Person {
     age: i32,
@@ -331,14 +313,9 @@ fn main() {
     let people: [Person; 3] = [Default::default(); 3];
     // ...
 }</code></pre></pre>
-<h2 id="container-element-initialization"><a class="header" href="#container-element-initialization">Container element initialization</a></h2>
-<p>In C++, the default constructor could be used to implicitly define collection
-types, such as <code>std::vector</code>. Before C++11, one value would be default
-constructed, and the elements would be copy constructed from that initial
-element. Since C++11, all elements are default constructed.</p>
-<p>As with array initialization, the values must be explicitly specified in Rust.
-The vector can be constructed from an array, enabling the same syntax as with
-arrays.</p>
+<h2 id="容器元素初始化"><a class="header" href="#容器元素初始化">容器元素初始化</a></h2>
+<p>在 C++ 中，默认构造函数可用于隐式定义集合类型，如 <code>std::vector</code>。C++11 之前，先构造一个值，再用它拷贝构造所有元素；C++11 及以后，所有元素都用默认构造函数初始化。</p>
+<p>在 Rust 中，和数组初始化一样，必须显式指定元素值。可以先构造数组，再转换为向量，实现与数组相同的语法。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;vector&gt;
 
@@ -366,7 +343,7 @@ fn main() {
     // ...
 }</code></pre></pre>
 </div>
-<p>In Rust, the vector can also be constructed from an iterator.</p>
+<p>在 Rust 中，也可以通过迭代器构造向量：</p>
 <pre><pre class="playground"><code class="language-rust">#[derive(Default)]
 struct Person {
     age: i32,
@@ -376,10 +353,7 @@ fn main() {
     let people: Vec&lt;Person&gt; = (0..3).map(|_| Default::default()).collect();
     // ...
 }</code></pre></pre>
-<p>If the type implements the <code>Clone</code> trait, then the array can be constructed
-using the <code>vec!</code> macro. See the chapter on <a href="./copy_and_move_constructors.html">copy
-constructors</a> for more
-details on <code>Clone</code>.</p>
+<p>如果类型实现了 <code>Clone</code> trait，则可以用 <code>vec!</code> 宏构造数组。详见<a href="./copy_and_move_constructors.html">拷贝构造函数章节</a>。</p>
 <pre><pre class="playground"><code class="language-rust">#[derive(Clone, Default)]
 struct Person {
     age: i32,
@@ -389,10 +363,9 @@ fn main() {
     let people: Vec&lt;Person&gt; = vec![Default::default(); 3];
     // ...
 }</code></pre></pre>
-<h2 id="implicit-initialization-of-local-variables"><a class="header" href="#implicit-initialization-of-local-variables">Implicit initialization of local variables</a></h2>
-<p>In C++, the default constructor is used to perform default-initialization of
-local variables that are not explicitly initialized.</p>
-<p>In Rust, initialization of local variables is always explicit.</p>
+<h2 id="局部变量的隐式初始化"><a class="header" href="#局部变量的隐式初始化">局部变量的隐式初始化</a></h2>
+<p>在 C++ 中，默认构造函数用于对未显式初始化的局部变量进行默认初始化。</p>
+<p>在 Rust 中，局部变量的初始化总是显式的。</p>
 <div class="comparison">
 <pre><code class="language-cpp">class Person {
     int age;
@@ -416,9 +389,8 @@ fn main() {
     // ...
 }</code></pre></pre>
 </div>
-<h2 id="implicit-initialization-of-the-base-class-object"><a class="header" href="#implicit-initialization-of-the-base-class-object">Implicit initialization of the base class object</a></h2>
-<p>In C++, the default constructor is used to initialize the base class object if
-no other constructor is specified.</p>
+<h2 id="基类对象的隐式初始化"><a class="header" href="#基类对象的隐式初始化">基类对象的隐式初始化</a></h2>
+<p>在 C++ 中，如果未指定其他构造函数，默认构造函数会用于初始化基类对象。</p>
 <pre><code class="language-cpp">class Base {
   int x;
 
@@ -428,20 +400,15 @@ public:
 
 class Derived : Base {
 public:
-  // Calls the default constructor for Base
+  // 调用 Base 的默认构造函数
   Derived() {}
 };
 </code></pre>
-<p>Since Rust does not have inheritance, there is no equivalent to this case.
-See the chapter on <a href="../data_modeling/inheritance_and_reuse.html">implementation
-reuse</a> or the section on <a href="https://doc.rust-lang.org/book/ch10-02-traits.html">traits
-in the Rust book</a> for
-alternatives.</p>
+<p>Rust 没有继承，因此没有对应场景。<br />
+可参考<a href="../data_modeling/inheritance_and_reuse.html">实现复用章节</a>或 <a href="https://doc.rust-lang.org/book/ch10-02-traits.html">Rust 书中关于 trait 的部分</a> 了解替代方案。</p>
 <h2 id="stdunique_ptr"><a class="header" href="#stdunique_ptr"><code>std::unique_ptr</code></a></h2>
-<p>There are some additional cases where the <code>Default</code> trait is used in Rust, but
-default constructors are not used for initialization in C++.</p>
-<p>Rust's equivalent of smart pointers implement <code>Default</code> by delegating to the
-<code>Default</code> implementation of the contained type.</p>
+<p>在 Rust 中，<code>Default</code> trait 还有一些 C++ 默认构造函数未涉及的用法。</p>
+<p>Rust 的智能指针类型通过委托被包裹类型的 <code>Default</code> 实现自身的 <code>Default</code>。</p>
 <pre><pre class="playground"><code class="language-rust">#[derive(Default)]
 struct Person {
     age: i32,
@@ -451,29 +418,23 @@ fn main() {
     let b: Box&lt;Person&gt; = Default::default();
     // ...
 }</code></pre></pre>
-<p>This differs from the treatment of <code>std::unique_ptr</code> in C++ because unlike <code>Box</code>,
-<code>std::unique_ptr</code> is nullable, and so the default constructor for
-<code>std:unique_ptr</code> produces a pointer that owns nothing. The equivalent type in
-Rust is <code>Option&lt;Box&lt;Person&gt;&gt;</code>, for which the <code>Default</code> implementation produces
-<code>None</code>.</p>
-<h2 id="other-uses-of-default"><a class="header" href="#other-uses-of-default">Other uses of <code>Default</code></a></h2>
-<p><a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_default"><code>Option::unwrap_or_default</code></a>
-makes use of <code>Default</code>, which makes getting a default value when the <code>Option</code>
-does not contain a value more convenient.</p>
+<p>这与 C++ 的 <code>std::unique_ptr</code> 不同，后者是可空的，默认构造会得到一个空指针。而 Rust 的等价类型是 <code>Option&lt;Box&lt;Person&gt;&gt;</code>，其 <code>Default</code> 实现会生成 <code>None</code>。</p>
+<h2 id="default-的其他用法"><a class="header" href="#default-的其他用法"><code>Default</code> 的其他用法</a></h2>
+<p><a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_default"><code>Option::unwrap_or_default</code></a> 利用 <code>Default</code>，方便地在 <code>Option</code> 为 <code>None</code> 时获取默认值。</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>fn go(x: Option&lt;i32&gt;) {
     let a: i32 = x.unwrap_or_default();
-    // if x was None, then a is 0
+    // 如果 x 是 None，则 a 为 0
 
     // ...
 }
 <span class="boring">}</span></code></pre></pre>
-<p>In C++, <code>std::optional</code> does not have an equivalent method.</p>
-<div class="quiz-placeholder" data-quiz-name="&quot;default_constructors&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;context&quot;:&quot;Rust does not have implicit default initialization like C++ does. Variables must\nbe explicitly initialized before use, or the program will fail to compile.\n&quot;,&quot;id&quot;:&quot;5019323d-1534-4c70-a8e7-b015f87be228&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;It does not compile because `w` is not explicitly initialized before it is used.\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;It does compile.\n&quot;,&quot;It does not compile because `Widget` does not implement the `Default` trait.\n&quot;,&quot;It does not compile because `Widget` does not implement a `new` method.\n&quot;,&quot;It does not compile because `Widget` does not implement both the `Default`\ntrait and a `new` method.\n&quot;],&quot;prompt&quot;:&quot;Does this program compile? If not, why not?\n\n```rust\nstruct Widget {\n    color: String,\n}\n\nfn main() {\n    let w: Widget;\n    println!(\&quot;{}\&quot;, w.color);\n}\n```\n&quot;}},{&quot;context&quot;:&quot;When there is a reasonable default value, it is most idiomatic in Rust to\nprovide [both a `new` method and an implementation of the `Default`\ntrait.](https://rust-lang.github.io/api-guidelines/interoperability.html?highlight=default#types-eagerly-implement-common-traits-c-common-traits)\n&quot;,&quot;id&quot;:&quot;a436177e-821d-45d1-8e46-4fafc3d78cd3&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\npub struct Vec2 {\n    pub x: f64;\n    pub y: f64;\n}\n\nimpl Vec2 {\n     pub fn new() -&gt; Self {\n        Vec2 { x: 0.0, y: 0.0 }\n     }\n}\n\nimpl Default for Vec2 {\n     fn default() -&gt; Self {\n        Self::new()\n     }\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\npub struct Vec2 {\n    pub x: f64;\n    pub y: f64;\n}\n\nimpl Vec2 {\n     pub fn new() -&gt; Self {\n        Vec2 { x: 0.0, y: 0.0 }\n     }\n}\n```\n&quot;,&quot;```rust\npub struct Vec2 {\n    pub x: f64;\n    pub y: f64;\n}\n\nimpl Default for Vec2 {\n     fn default() -&gt; Self {\n        Self::new()\n     }\n}\n```\n&quot;],&quot;prompt&quot;:&quot;Which is the most idiomatic translation of the following C++ program?\n\n```cpp\nstruct Vec2 {\n    double x;\n    double y;\n\n    Vec2() : x(0.0), y(0.0) {}\n};\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
+<p>C++ 的 <code>std::optional</code> 没有等价的方法。</p>
+<div class="quiz-placeholder" data-quiz-name="&quot;default_constructors&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;context&quot;:&quot;Rust 不像 C++ 那样有隐式默认初始化。变量在使用前必须显式初始化，否则程序无法编译。\n&quot;,&quot;id&quot;:&quot;5019323d-1534-4c70-a8e7-b015f87be228&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;不能编译，因为 `w` 在使用前没有被显式初始化。\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;能编译。\n&quot;,&quot;不能编译，因为 `Widget` 没有实现 `Default` trait。\n&quot;,&quot;不能编译，因为 `Widget` 没有实现 `new` 方法。\n&quot;,&quot;不能编译，因为 `Widget` 没有同时实现 `Default` trait 和 `new` 方法。\n&quot;],&quot;prompt&quot;:&quot;这个程序能编译吗？如果不能，原因是什么？\n\n```rust\nstruct Widget {\n    color: String,\n}\n\nfn main() {\n    let w: Widget;\n    println!(\&quot;{}\&quot;, w.color);\n}\n```\n&quot;}},{&quot;context&quot;:&quot;当存在合理的默认值时，Rust 最地道的做法是同时提供 [`new` 方法和实现 `Default` trait。](https://rust-lang.github.io/api-guidelines/interoperability.html?highlight=default#types-eagerly-implement-common-traits-c-common-traits)\n&quot;,&quot;id&quot;:&quot;a436177e-821d-45d1-8e46-4fafc3d78cd3&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\npub struct Vec2 {\n    pub x: f64;\n    pub y: f64;\n}\n\nimpl Vec2 {\n     pub fn new() -&gt; Self {\n        Vec2 { x: 0.0, y: 0.0 }\n     }\n}\n\nimpl Default for Vec2 {\n     fn default() -&gt; Self {\n        Self::new()\n     }\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\npub struct Vec2 {\n    pub x: f64;\n    pub y: f64;\n}\n\nimpl Vec2 {\n     pub fn new() -&gt; Self {\n        Vec2 { x: 0.0, y: 0.0 }\n     }\n}\n```\n&quot;,&quot;```rust\npub struct Vec2 {\n    pub x: f64;\n    pub y: f64;\n}\n\nimpl Default for Vec2 {\n     fn default() -&gt; Self {\n        Self::new()\n     }\n}\n```\n&quot;],&quot;prompt&quot;:&quot;以下 C++ 程序最地道的 Rust 翻译是哪一个？\n\n```cpp\nstruct Vec2 {\n    double x;\n    double y;\n\n    Vec2() : x(0.0), y(0.0) {}\n};\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Default constructors">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=默认构造函数">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>User-defined conversions - C++ to Rust Phrasebook</title>
+        <title>用户自定义转换 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,21 +163,9 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="user-defined-conversions"><a class="header" href="#user-defined-conversions">User-defined conversions</a></h1>
-<p>In C++ user-defined conversions are created using <a href="https://en.cppreference.com/w/cpp/language/converting_constructor">converting
-constructors</a>
-or <a href="https://en.cppreference.com/w/cpp/language/cast_operator">conversion
-functions</a>. Because
-converting constructors are opt-out (via the <code>explicit</code> specifier), implicit
-conversions occur with regularity in C++ code. In the following example both the
-assignments and the function calls make use of implicit conversions as provided
-by a converting constructor.</p>
-<p>Rust makes significantly less use of implicit conversions. Instead most
-conversions are explicit. The
-<a href="https://doc.rust-lang.org/std/convert/index.html"><code>std::convert</code></a> module
-provides several traits for working with user-defined conversions. In Rust, the
-below example makes use of explicit conversions by implementing the <a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From</code>
-trait</a>.</p>
+                        <h1 id="用户自定义类型转换"><a class="header" href="#用户自定义类型转换">用户自定义类型转换</a></h1>
+<p>在 C++ 中，用户自定义类型转换可以通过<a href="https://en.cppreference.com/w/cpp/language/converting_constructor">转换构造函数</a>或<a href="https://en.cppreference.com/w/cpp/language/cast_operator">转换函数</a>实现。由于转换构造函数默认是隐式的（可通过 <code>explicit</code> 关键字禁用），因此在 C++ 代码中隐式转换经常发生。如下例中，赋值和函数调用都利用了转换构造函数提供的隐式转换。</p>
+<p>Rust 极少使用隐式转换，大多数转换都是显式的。<a href="https://doc.rust-lang.org/std/convert/index.html"><code>std::convert</code></a> 模块为用户自定义转换提供了多个 trait。在 Rust 中，下例通过实现 <a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From</code> trait</a>来实现显式转换。</p>
 <div class="comparison">
 <pre><code class="language-cpp">struct Widget {
   Widget(int) {}
@@ -213,31 +201,21 @@ fn process(w: Widget) {}
 
 fn main() {
     let w1: Widget = 1.into();
-    // For construction this is more idiomatic:
+    // 更符合习惯的写法：
     let w1b = Widget::from(1);
 
     let w2: Widget = (4, 5).into();
-    // For construction this is more idiomatic:
+    // 更符合习惯的写法：
     let w2b = Widget::from((4, 5));
 
     process(1.into());
     process((4, 5).into());
 }</code></pre></pre>
 </div>
-<p>The <code>into</code> method used above is provided via a <a href="https://doc.rust-lang.org/book/ch10-02-traits.html#using-trait-bounds-to-conditionally-implement-methods">blanket
-implementations</a>
-for the <a href="https://doc.rust-lang.org/std/convert/trait.Into.html"><code>Into trait</code></a>
-for types that implement the <code>From</code> trait. Because of the existence of the
-<a href="https://doc.rust-lang.org/std/convert/trait.Into.html#impl-Into%3CU%3E-for-T">blanket
-implementation</a>,
-it is generally preferred to implement the <code>From</code> trait instead of the <code>Into</code>
-trait, and let the <code>Into</code> trait be provided by that blanket implementation.</p>
-<h2 id="conversion-functions"><a class="header" href="#conversion-functions">Conversion functions</a></h2>
-<p>C++ conversion functions enable conversions in the other direction, from the
-defined class to another type.</p>
-<p>To achieve the same in Rust, the <code>From</code> trait can be implemented in the other
-direction. At least one of the source type or the target type must be defined in
-the same crate as the trait implementation.</p>
+<p>上例中的 <code>into</code> 方法是通过 <a href="https://doc.rust-lang.org/std/convert/trait.Into.html"><code>Into trait</code></a> 的<a href="https://doc.rust-lang.org/book/ch10-02-traits.html#using-trait-bounds-to-conditionally-implement-methods">通用实现</a>提供的，只要类型实现了 <code>From</code> trait。由于有<a href="https://doc.rust-lang.org/std/convert/trait.Into.html#impl-Into%3CU%3E-for-T">通用实现</a>，通常推荐只实现 <code>From</code> trait，而让 <code>Into</code> trait 由通用实现自动提供。</p>
+<h2 id="转换函数"><a class="header" href="#转换函数">转换函数</a></h2>
+<p>C++ 的转换函数支持将自定义类型转换为其他类型。</p>
+<p>在 Rust 中，可以反向实现 <code>From</code> trait 来达到同样的目的。实现 trait 时，源类型或目标类型至少有一个必须定义在当前 crate 中。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;utility&gt;
 
@@ -283,16 +261,10 @@ fn main() {
     process(p2.into());
 }</code></pre></pre>
 </div>
-<p>Conversion functions are is often used to implement the safe bool pattern in
-C++, <a href="./promotions_and_conversions.html#safe-bools">which is addressed in a different way in
-Rust</a>.</p>
-<h2 id="borrowing-conversions"><a class="header" href="#borrowing-conversions">Borrowing conversions</a></h2>
-<p>The methods in the <code>From</code> and <code>Into</code> traits take ownership of the values to be
-converted. When this is not desired in C++, the conversion function can just
-take and return references.</p>
-<p>To achieve the same in Rust the <a href="https://doc.rust-lang.org/std/convert/trait.AsRef.html"><code>AsRef</code>
-trait</a> or <a href="https://doc.rust-lang.org/std/convert/trait.AsMut.html"><code>AsMut</code>
-trait</a> are used.</p>
+<p>转换函数在 C++ 中常用于实现 safe bool 模式，<a href="./promotions_and_conversions.html#safe-bools">而在 Rust 中有不同的处理方式</a>。</p>
+<h2 id="借用转换"><a class="header" href="#借用转换">借用转换</a></h2>
+<p><code>From</code> 和 <code>Into</code> trait 的方法会取得被转换值的所有权。在 C++ 中，如果不希望转移所有权，可以让转换函数接收和返回引用。</p>
+<p>在 Rust 中，可以使用 <a href="https://doc.rust-lang.org/std/convert/trait.AsRef.html"><code>AsRef</code> trait</a> 或 <a href="https://doc.rust-lang.org/std/convert/trait.AsMut.html"><code>AsMut</code> trait</a> 实现类似功能。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
@@ -339,11 +311,7 @@ fn main() {
     process(alice.as_ref());
 }</code></pre></pre>
 </div>
-<p>It is common to use <code>AsRef</code> or <code>AsMut</code> as a trait bound in function definitions.
-Using generics with an <code>AsRef</code> or <code>AsMut</code> bound allows clients to call the
-functions with anything that can be cheaply viewed as the type that the function
-wants to work with. Using this technique, the above definition of <code>process</code>
-would be defined as in the following example.</p>
+<p>在函数定义中，常用 <code>AsRef</code> 或 <code>AsMut</code> 作为 trait bound。用泛型配合 <code>AsRef</code> 或 <code>AsMut</code>，可以让调用者传入任何可以高效视为目标类型的值。用这种技巧，上例中的 <code>process</code> 可以这样定义：</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">struct Person {
 </span><span class="boring">    name: String,
 </span><span class="boring">}
@@ -365,18 +333,10 @@ fn main() {
 
     process(alice);
 }</code></pre></pre>
-<p>This technique is often used with functions that take file system paths, so that
-literal strings can more easily be used as paths.</p>
-<h2 id="fallible-conversions"><a class="header" href="#fallible-conversions">Fallible conversions</a></h2>
-<p>In C++ when conversions might fail it is possible (though usually discouraged)
-to throw an exception from the converting constructor or converting function.</p>
-<p>Error handling in Rust <a href="./exceptions.html">does not use exceptions</a>. Instead
-the <a href="https://doc.rust-lang.org/std/convert/trait.TryFrom.html"><code>TryFrom</code> trait</a>
-and <a href="https://doc.rust-lang.org/std/convert/trait.TryInto.html"><code>TryInto</code> trait</a>
-are used for fallible conversions. These traits differ from <code>From</code> and <code>Into</code> in
-that they return a <code>Result</code>, which may indicate a failing case. When a
-conversion may fail one should implement <code>TryFrom</code> and rely on the client to
-call <code>unwrap</code> on the result, rather than panic in a <code>From</code> implementation.</p>
+<p>这种技巧常用于处理文件路径的函数，使得字符串字面量也能方便地作为路径传递。</p>
+<h2 id="可失败的转换"><a class="header" href="#可失败的转换">可失败的转换</a></h2>
+<p>在 C++ 中，如果转换可能失败，可以（虽然通常不推荐）在转换构造函数或转换函数中抛出异常。</p>
+<p>Rust 的错误处理<a href="./exceptions.html">不使用异常</a>。对于可失败的转换，使用 <a href="https://doc.rust-lang.org/std/convert/trait.TryFrom.html"><code>TryFrom</code> trait</a> 和 <a href="https://doc.rust-lang.org/std/convert/trait.TryInto.html"><code>TryInto</code> trait</a>。这两个 trait 与 <code>From</code> 和 <code>Into</code> 的区别在于它们返回 <code>Result</code>，可以表示失败情况。如果转换可能失败，应实现 <code>TryFrom</code>，并让调用者决定是否调用 <code>unwrap</code>，而不是在 <code>From</code> 实现中 panic。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;stdexcept&gt;
 #include &lt;string&gt;
@@ -439,26 +399,16 @@ fn main() {
     }
 }</code></pre></pre>
 </div>
-<p>Just like with <code>From</code> and <code>Into</code>, there is a <a href="https://doc.rust-lang.org/std/convert/trait.TryInto.html#impl-TryInto%3CU%3E-for-T">blanket
-implementation</a>
-for <code>TryInto</code> for everything that implements <code>TryFrom</code>.</p>
-<h2 id="implicit-conversions"><a class="header" href="#implicit-conversions">Implicit conversions</a></h2>
-<p>Rust does have one kind of user-defined implicit conversion, called <a href="https://doc.rust-lang.org/std/ops/trait.Deref.html#deref-coercion">deref
-coercions</a>,
-provided by the <a href="https://doc.rust-lang.org/std/ops/trait.Deref.html"><code>Deref</code>
-trait</a> and
-<a href="https://doc.rust-lang.org/std/ops/trait.DerefMut.html"><code>DerefMut</code>trait</a>. These
-coercions exist for making pointer-like types more ergonomic to use.</p>
-<p>An <a href="https://doc.rust-lang.org/book/ch15-02-deref.html">example</a> of implementing
-the traits for a custom pointer-like type is given in the Rust book.</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>A summary of when to use which kind of conversion interface is given in the
-documentation for the <a href="https://doc.rust-lang.org/std/convert/index.html"><code>std::convert</code>
-module</a>.</p>
-<div class="quiz-placeholder" data-quiz-name="&quot;user-defined_conversions&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;context&quot;:&quot;There is a blanket implementation for `TryInto` for every type that implements\n`TryFrom`, so it is better to implement `TryFrom` and rely on the blanket\nimplementation for `TryInto`.\n&quot;,&quot;id&quot;:&quot;d6790d33-5130-47ba-ba96-c6718978131f&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nuse std::convert::TryFrom;\n\npub struct NotNaN {\n    value: f64,\n}\n\nimpl NotNaN {\n    pub fn value(&amp;self) -&gt; f64 {\n        self.value\n    }\n}\n\n#[derive(Clone, Copy, Debug)]\npub struct IsNaN;\n\nimpl TryFrom&lt;f64&gt; for NotNaN {\n    type Error = IsNaN;\n    fn try_from(\n        x: f64,\n    ) -&gt; Result&lt;Self, Self::Error&gt; {\n        if x.is_nan() {\n            Err(IsNaN)\n        } else {\n            Ok(Self { value: x })\n        }\n    }\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\npub struct NotNaN {\n    value: f64,\n}\n\nimpl NotNaN {\n    pub fn value(&amp;self) -&gt; f64 {\n        self.value\n    }\n}\n\nimpl From&lt;f64&gt; for NotNaN {\n    fn from(x: f64) -&gt; Self {\n        if x.is_nan() {\n            panic!(\&quot;Is NaN!\&quot;);\n        }\n        Self { value: x }\n    }\n}\n```\n&quot;,&quot;```rust\nuse std::convert::TryInto;\n\npub struct NotNaN {\n    value: f64,\n}\n\nimpl NotNaN {\n    pub fn value(&amp;self) -&gt; f64 {\n        self.value\n    }\n}\n\n#[derive(Clone, Copy, Debug)]\npub struct IsNaN;\n\nimpl TryInto&lt;NotNaN&gt; for f64 {\n    type Error = IsNaN;\n\n    fn try_into(\n        self,\n    ) -&gt; Result&lt;NotNaN, Self::Error&gt; {\n        if self.is_nan() {\n            Err(IsNaN)\n        } else {\n            Ok(NotNaN { value: self })\n        }\n    }\n}\n```\n&quot;],&quot;prompt&quot;:&quot;Which Rust program is the most idiomatic translation of the following C++\nprogram?\n\n```cpp\n#include &lt;cmath&gt;\n#include &lt;stdexcept&gt;\n\nclass NotNaN {\n  double value;\n\npublic:\n  NotNaN(double x) : value(x) {\n    if (std::isnan(value)) {\n      throw std::domain_error(\&quot;NaN\&quot;);\n    }\n  }\n\n  double getValue() {\n    return value;\n  }\n};\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
+<p>与 <code>From</code> 和 <code>Into</code> 类似，<a href="https://doc.rust-lang.org/std/convert/trait.TryInto.html#impl-TryInto%3CU%3E-for-T">TryInto trait</a> 也有通用实现，适用于所有实现了 <code>TryFrom</code> 的类型。</p>
+<h2 id="隐式转换"><a class="header" href="#隐式转换">隐式转换</a></h2>
+<p>Rust 只有一种用户自定义的隐式转换，称为 <a href="https://doc.rust-lang.org/std/ops/trait.Deref.html#deref-coercion">deref 强制转换</a>，由 <a href="https://doc.rust-lang.org/std/ops/trait.Deref.html"><code>Deref</code> trait</a> 和 <a href="https://doc.rust-lang.org/std/ops/trait.DerefMut.html"><code>DerefMut</code> trait</a> 提供。这种转换让指针类型的使用更加简洁。</p>
+<p>在 Rust 官方书籍中有<a href="https://doc.rust-lang.org/book/ch15-02-deref.html">实现自定义指针类型 deref 的示例</a>。</p>
+<h2 id="总结"><a class="header" href="#总结">总结</a></h2>
+<p>关于各种转换接口的使用场景，可参考 <a href="https://doc.rust-lang.org/std/convert/index.html"><code>std::convert</code> 模块</a>的文档。</p>
+<div class="quiz-placeholder" data-quiz-name="&quot;user-defined_conversions&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;context&quot;:&quot;对于每个实现了 `TryFrom` 的类型，Rust 都有一个通用的 `TryInto` 实现。因此，更推荐实现 `TryFrom`，并依赖于通用的 `TryInto` 实现。\n&quot;,&quot;id&quot;:&quot;d6790d33-5130-47ba-ba96-c6718978131f&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nuse std::convert::TryFrom;\n\npub struct NotNaN {\n    value: f64,\n}\n\nimpl NotNaN {\n    pub fn value(&amp;self) -&gt; f64 {\n        self.value\n    }\n}\n\n#[derive(Clone, Copy, Debug)]\npub struct IsNaN;\n\nimpl TryFrom&lt;f64&gt; for NotNaN {\n    type Error = IsNaN;\n    fn try_from(\n        x: f64,\n    ) -&gt; Result&lt;Self, Self::Error&gt; {\n        if x.is_nan() {\n            Err(IsNaN)\n        } else {\n            Ok(Self { value: x })\n        }\n    }\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\npub struct NotNaN {\n    value: f64,\n}\n\nimpl NotNaN {\n    pub fn value(&amp;self) -&gt; f64 {\n        self.value\n    }\n}\n\nimpl From&lt;f64&gt; for NotNaN {\n    fn from(x: f64) -&gt; Self {\n        if x.is_nan() {\n            panic!(\&quot;Is NaN!\&quot;);\n        }\n        Self { value: x }\n    }\n}\n```\n&quot;,&quot;```rust\nuse std::convert::TryInto;\n\npub struct NotNaN {\n    value: f64,\n}\n\nimpl NotNaN {\n    pub fn value(&amp;self) -&gt; f64 {\n        self.value\n    }\n}\n\n#[derive(Clone, Copy, Debug)]\npub struct IsNaN;\n\nimpl TryInto&lt;NotNaN&gt; for f64 {\n    type Error = IsNaN;\n\n    fn try_into(\n        self,\n    ) -&gt; Result&lt;NotNaN, Self::Error&gt; {\n        if self.is_nan() {\n            Err(IsNaN)\n        } else {\n            Ok(NotNaN { value: self })\n        }\n    }\n}\n```\n&quot;],&quot;prompt&quot;:&quot;以下哪个 Rust 程序是对下述 C++ 程序最地道的翻译？\n\n```cpp\n#include &lt;cmath&gt;\n#include &lt;stdexcept&gt;\n\nclass NotNaN {\n  double value;\n\npublic:\n  NotNaN(double x) : value(x) {\n    if (std::isnan(value)) {\n      throw std::domain_error(\&quot;NaN\&quot;);\n    }\n  }\n\n  double getValue() {\n    return value;\n  }\n};\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=User-defined conversions">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=用户自定义转换">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

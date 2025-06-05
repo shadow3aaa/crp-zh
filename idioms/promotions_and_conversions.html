@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Type promotions and conversions - C++ to Rust Phrasebook</title>
+        <title>类型提升与转换 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,39 +163,34 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="type-promotions-and-conversions"><a class="header" href="#type-promotions-and-conversions">Type promotions and conversions</a></h1>
-<h2 id="lvalue-to-rvalue"><a class="header" href="#lvalue-to-rvalue">lvalue to rvalue</a></h2>
-<p>In C++ lvalues are automatically converted to rvalues when needed.</p>
-<p>In Rust the equivalent of lvalues are "place expressions" (expressions that
-represent memory locations) and the equivalent of rvalues are "value
-expressions". Place expressions are automatically converted to value expressions
-when needed.</p>
+                        <h1 id="类型提升与转换"><a class="header" href="#类型提升与转换">类型提升与转换</a></h1>
+<h2 id="左值到右值"><a class="header" href="#左值到右值">左值到右值</a></h2>
+<p>在 C++ 中，左值在需要时会自动转换为右值。</p>
+<p>在 Rust 中，左值的等价物是“位置表达式”（表示内存位置的表达式），右值的等价物是“值表达式”。位置表达式在需要时会自动转换为值表达式。</p>
 <div class="comparison">
 <pre><code class="language-cpp">int main() {
-  // Local variables are lvalues,
+  // 局部变量是左值，
   int x(0);
-  // and therefore may be assigned to.
+  // 因此可以被赋值。
   x = 42;
 
-  // x is converted to an lvalue when needed.
+  // x 在需要时会被转换为左值。
   int y = x + 1;
 }
 </code></pre>
 <pre><pre class="playground"><code class="language-rust">fn main() {
-    // Local variables are place expressions,
+    // 局部变量是位置表达式，
     let mut x = 0;
-    // and therefore may be assigned to.
+    // 因此可以被赋值。
     x = 42;
 
-    // x is converted to a value expression when
-    // needed.
+    // x 在需要时会被转换为值表达式。
     let y = x + 1;
 }</code></pre></pre>
 </div>
-<h2 id="array-to-pointer"><a class="header" href="#array-to-pointer">Array to pointer</a></h2>
-<p>In C++, arrays are automatically converted to pointers as required.</p>
-<p>The equivalent to this in Rust is the automatic conversion of vector and array
-references to slice references.</p>
+<h2 id="数组到指针"><a class="header" href="#数组到指针">数组到指针</a></h2>
+<p>在 C++ 中，数组会在需要时自动转换为指针。</p>
+<p>在 Rust 中，与此等价的是 vector 和数组的引用会自动转换为切片引用。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;cstring&gt;
 
@@ -203,7 +198,7 @@ int main() {
   char example[6] = "hello";
   char other[6];
 
-  // strncpy takes arguments of type char*
+  // strncpy 的参数类型为 char*
   strncpy(other, example, 6);
 }
 </code></pre>
@@ -219,21 +214,11 @@ fn main() {
     third(&amp;arr);
 }</code></pre></pre>
 </div>
-<p>Because slice references can be easily used in a memory-safe way, it is
-generally recommended in Rust to define functions in terms of slice references
-instead of in terms of references to vectors or arrays, unless vector-specific
-or array-specific functionality is needed.</p>
-<p>Unlike in C++ where the conversion from arrays to pointers is built into the
-language, this is actually a general mechanism provided by the <a href="https://doc.rust-lang.org/std/ops/trait.Deref.html"><code>Deref</code>
-trait</a>, which provides one
-kind of <a href="./user-defined_conversions.html">user-defined conversion</a>.</p>
-<h2 id="function-to-pointer"><a class="header" href="#function-to-pointer">Function to pointer</a></h2>
-<p>In C++ functions and static member functions are automatically converted to
-function pointers.</p>
-<p>Rust performs the same conversion. In addition to functions and members that do
-not take <code>self</code> as an argument, constructors (proper constructors) also have
-function type and can be converted to function pointers. Non-capturing closures
-do not have function type, but can also be converted to function pointers.</p>
+<p>由于切片引用可以安全地用于内存操作，Rust 通常推荐以切片引用作为函数参数，而不是 vector 或数组引用，除非需要特定于 vector 或数组的功能。</p>
+<p>与 C++ 中数组到指针的转换是语言内建机制不同，Rust 这是由 <a href="https://doc.rust-lang.org/std/ops/trait.Deref.html"><code>Deref</code> trait</a> 提供的一般机制，这也是一种<a href="./user-defined_conversions.html">用户自定义转换</a>。</p>
+<h2 id="函数到指针"><a class="header" href="#函数到指针">函数到指针</a></h2>
+<p>在 C++ 中，函数和静态成员函数会自动转换为函数指针。</p>
+<p>Rust 也有类似的转换。除了不带 <code>self</code> 参数的函数和成员外，构造函数（真正的构造函数）也具有函数类型，可以转换为函数指针。非捕获闭包虽然没有函数类型，但也可以转换为函数指针。</p>
 <div class="comparison">
 <pre><code class="language-cpp">int twice(int n) {
   return n * n;
@@ -251,22 +236,19 @@ struct MyPair {
 };
 
 int main() {
-  // convert a function to a function pointer
+  // 函数转换为函数指针
   int (*twicePtr)(int) = twice;
   int result = twicePtr(5);
 
-  // Per C++23 11.4.5.1.6, can't take the address
-  // of a constructor.
+  // C++23 11.4.5.1.6，不允许获取构造函数的地址
   // MyPair (*ctor)(int, int) = MyPair::MyPair;
   // MyPair pair = ctor(10, 20);
 
-  // convert a static method to a function
-  // pointer
+  // 静态方法转换为函数指针
   MyPair (*methodPtr)() = MyPair::make;
   MyPair pair2 = methodPtr();
 
-  // convert a non-capturing closure to a
-  // function pointer
+  // 非捕获闭包转换为函数指针
   int (*closure)(int) = [](int x) -&gt; int {
     return x * 5;
   };
@@ -286,38 +268,26 @@ impl MyPair {
 }
 
 fn main() {
-    // convert a function to a function pointer
+    // 函数转换为函数指针
     let twicePtr: fn(i32) -&gt; i32 = twice;
     let res = twicePtr(5);
 
-    // convert a constructor to a function pointer
+    // 构造函数转换为函数指针
     let ctorPtr: fn(i32, i32) -&gt; MyPair = MyPair;
     let pair = ctorPtr(10, 20);
 
-    // convert a static method to a function
-    // pointer
+    // 静态方法转换为函数指针
     let methodPtr: fn() -&gt; MyPair = MyPair::new;
     let pair2 = methodPtr();
 
-    // convert a non-capturing closure to a
-    // function pointer
+    // 非捕获闭包转换为函数指针
     let closure: fn(i32) -&gt; i32 = |x: i32| x * 5;
     let closureRes = closure(2);
 }</code></pre></pre>
 </div>
-<h2 id="numeric-promotion-and-numeric-conversion"><a class="header" href="#numeric-promotion-and-numeric-conversion">Numeric promotion and numeric conversion</a></h2>
-<p>In C++ there are several kinds of implicit conversions that occur between
-numeric types. The most commonly encountered are numeric promotions, which
-convert numeric types to larger types.</p>
-<p>These lossless conversions are not implicit in Rust. Instead, they must be
-performed explicitly using the <code>Into::into()</code> method. These conversions are
-provided by implementations of the
-<a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From</code></a> and
-<a href="https://doc.rust-lang.org/std/convert/trait.Into.html"><code>Into</code></a> traits. The list
-of conversions provided by the Rust standard library is <a href="https://doc.rust-lang.org/std/convert/trait.From.html#implementors">listed on the
-documentation
-page</a> for
-the trait.</p>
+<h2 id="数值提升与数值转换"><a class="header" href="#数值提升与数值转换">数值提升与数值转换</a></h2>
+<p>在 C++ 中，数值类型之间存在多种隐式转换。最常见的是数值提升，将数值类型转换为更大的类型。</p>
+<p>这些无损转换在 Rust 中不是隐式的，必须显式调用 <code>Into::into()</code> 方法。这些转换由 <a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From</code></a> 和 <a href="https://doc.rust-lang.org/std/convert/trait.Into.html"><code>Into</code></a> trait 的实现提供。标准库支持的转换列表可在 <a href="https://doc.rust-lang.org/std/convert/trait.From.html#implementors">文档页面</a> 查阅。</p>
 <div class="comparison">
 <pre><code class="language-cpp">int main() {
   int x(42);
@@ -335,12 +305,8 @@ the trait.</p>
     let b: f64 = a.into();
 }</code></pre></pre>
 </div>
-<p>There are several implicit conversions that occur in C++ that are not lossless.
-For example, integers can be implicitly converted to unsigned integers in C++.</p>
-<p>In Rust, these conversions are also required to be explicit and are provided by
-the <a href="https://doc.rust-lang.org/std/convert/trait.TryFrom.html"><code>TryFrom</code></a> and
-<a href="https://doc.rust-lang.org/std/convert/trait.TryInto.html"><code>TryInto</code></a> traits
-which require handling the cases where the value does not map to the other type.</p>
+<p>C++ 中还有一些非无损的隐式转换。例如，整数可以隐式转换为无符号整数。</p>
+<p>在 Rust 中，这些转换也必须显式进行，通常通过 <a href="https://doc.rust-lang.org/std/convert/trait.TryFrom.html"><code>TryFrom</code></a> 和 <a href="https://doc.rust-lang.org/std/convert/trait.TryInto.html"><code>TryInto</code></a> trait 实现，需要处理无法转换的情况。</p>
 <div class="comparison">
 <pre><code class="language-cpp">int main() {
   int x(42);
@@ -357,22 +323,13 @@ fn main() {
     let y: u32 = match x.try_into() {
         Ok(x) =&gt; x,
         Err(err) =&gt; {
-            panic!("Can't convert! {:?}", err);
+            panic!("无法转换！{:?}", err);
         }
     };
 }</code></pre></pre>
 </div>
-<p>Some conversions that occur in C++ are supported by neither <code>From</code> nor <code>TryFrom</code>
-because there is not a clear choice of conversion or because they are not
-value-preserving. For example, in C++ <code>int32_t</code> can implicitly be converted to
-<code>float</code> despite <code>float</code> not being able to represent all 32 bit integers
-precisely, but in Rust there is no <code>TryFrom&lt;i32&gt;</code> implementation for <code>f32</code>.</p>
-<p>In Rust the only way to convert from an <code>i32</code> to an <code>f32</code> is with the <a href="https://doc.rust-lang.org/stable/reference/expressions/operator-expr.html#r-expr.as.coercions"><code>as</code>
-operator</a>.
-The operator can actually be used to convert between other primitive types as
-well and does not panic or produce undefined behavior, but may not convert in
-the desired way (e.g., it may use a different rounding mode than desired or it
-may truncate rather than saturate as desired).</p>
+<p>有些 C++ 中的转换既不被 <code>From</code> 也不被 <code>TryFrom</code> 支持，因为没有明确的转换方式，或者不是值保持的。例如，C++ 中 <code>int32_t</code> 可以隐式转换为 <code>float</code>，但 <code>float</code> 并不能精确表示所有 32 位整数，而 Rust 没有 <code>TryFrom&lt;i32&gt;</code> 到 <code>f32</code> 的实现。</p>
+<p>在 Rust 中，<code>i32</code> 到 <code>f32</code> 的转换只能通过 <a href="https://doc.rust-lang.org/stable/reference/expressions/operator-expr.html#r-expr.as.coercions"><code>as</code> 运算符</a> 实现。该运算符也可用于其他原始类型之间的转换，不会 panic 或产生未定义行为，但可能不会按预期方式转换（如舍入方式不同或截断而非饱和）。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;cstdint&gt;
 
@@ -386,33 +343,16 @@ int main() {
     let a: f32 = x as f32;
 }</code></pre></pre>
 </div>
-<h3 id="isize-and-usize"><a class="header" href="#isize-and-usize"><code>isize</code> and <code>usize</code></a></h3>
-<p>In the Rust standard library the <code>isize</code> and <code>usize</code> types are used for values
-intended to used be indices (much like <code>size_t</code> in C++). However, their use for
-other purposes is usually discouraged in favor of using explicitly sized types
-such as <code>u32</code>. This results a situation where values of type <code>u32</code> have to be
-converted to <code>usize</code> for use in indexing, but <code>Into&lt;usize&gt;</code> is not implemented
-for <code>u32</code>.</p>
-<p>In these cases, best practice is to use <code>TryInto</code>, and if further error handling
-of the failure cause is not desired, to call <code>unwrap</code>, creating a panic at the
-point of conversion.</p>
-<p>This is preferred because it prevents the possibility of moving forward with an
-incorrect value. E.g., consider converting a <code>u64</code> to a <code>usize</code> that has a
-32-bit representation with <code>as</code>, which truncates the result. A value that is one
-greater than the <code>u32::MAX</code> will truncate to <code>0</code>, which would probably result in
-successfully retrieving the wrong value from a data structure, thus masking a
-bug and producing unexpected behavior.</p>
-<h3 id="enums"><a class="header" href="#enums">Enums</a></h3>
-<p>In C++ enums can be implicitly converted to integer types.</p>
-<p>In Rust the conversion requires the use of the <code>as</code> operator, and providing
-<code>From</code> and <code>TryFrom</code> implementations to move back and forth between the enum and
-its representation type is recommended. Examples and additional details are
-given in the <a href="./data_modeling/enums.html">chapter on enums</a>.</p>
-<h2 id="qualification-conversion"><a class="header" href="#qualification-conversion">Qualification conversion</a></h2>
-<p>In C++ qualification conversions enable the use of const (or volatile) values
-where the const (or volatile) qualifier is not expected.</p>
-<p>In Rust the equivalent enables the use of <code>mut</code> variables and <code>mut</code> references
-to be used where non-<code>mut</code> variables or references are expected.</p>
+<h3 id="isize-和-usize"><a class="header" href="#isize-和-usize"><code>isize</code> 和 <code>usize</code></a></h3>
+<p>Rust 标准库中的 <code>isize</code> 和 <code>usize</code> 类型用于索引（类似于 C++ 的 <code>size_t</code>）。但在其他场景下，通常建议使用显式大小的类型如 <code>u32</code>。这导致 <code>u32</code> 类型的值在用作索引时需要转换为 <code>usize</code>，但标准库并未为 <code>u32</code> 实现 <code>Into&lt;usize&gt;</code>。</p>
+<p>此时，最佳实践是使用 <code>TryInto</code>，如果不需要进一步处理错误，可以调用 <code>unwrap</code>，在转换失败时 panic。</p>
+<p>这样做可以避免错误值继续传播。例如，将 <code>u64</code> 转换为 32 位的 <code>usize</code> 时，<code>as</code> 会截断结果，<code>u32::MAX + 1</code> 会变成 <code>0</code>，可能导致错误地访问数据结构，掩盖 bug 并产生意外行为。</p>
+<h3 id="枚举"><a class="header" href="#枚举">枚举</a></h3>
+<p>C++ 中枚举可以隐式转换为整数类型。</p>
+<p>Rust 中需要使用 <code>as</code> 运算符进行转换，建议实现 <code>From</code> 和 <code>TryFrom</code> 以便在枚举和其表示类型之间转换。更多示例和细节见<a href="./data_modeling/enums.html">枚举章节</a>。</p>
+<h2 id="限定符转换"><a class="header" href="#限定符转换">限定符转换</a></h2>
+<p>C++ 中限定符转换允许在需要非 const（或 volatile）限定符的地方使用 const（或 volatile）值。</p>
+<p>Rust 中的等价机制允许 <code>mut</code> 变量和 <code>mut</code> 引用在需要非 <code>mut</code> 变量或引用的地方使用。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
@@ -422,10 +362,10 @@ void display(const std::string &amp;msg) {
 }
 
 int main() {
-  // no const qualifier
+  // 无 const 限定符
   std::string message("hello world");
 
-  // used where const expected
+  // 用于需要 const 的地方
   display(message);
 }
 </code></pre>
@@ -439,30 +379,24 @@ fn main() {
     display(message);
 }</code></pre></pre>
 </div>
-<h2 id="integer-literals"><a class="header" href="#integer-literals">Integer literals</a></h2>
-<p>In C++ integer literals with no suffix indicating type have the smallest type in
-which they can fit from <code>int</code>, <code>long int</code>, or <code>long long int</code>. When the literal
-is then assigned to a variable of a different type, an implicit conversion is
-performed.</p>
-<p>In Rust, integer literals have their type inferred depending on context. When
-there is insufficient information to infer a type either <code>i32</code> is assumed or may
-require some type annotation to be given.</p>
+<h2 id="整数字面量"><a class="header" href="#整数字面量">整数字面量</a></h2>
+<p>C++ 中没有类型后缀的整数字面量会选择能容纳它的最小类型（<code>int</code>、<code>long int</code> 或 <code>long long int</code>）。当字面量赋值给不同类型的变量时，会发生隐式转换。</p>
+<p>Rust 中，整数字面量的类型由上下文推断。当无法推断类型时，默认使用 <code>i32</code>，或者需要显式类型标注。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;cstdint&gt;
 #include &lt;iostream&gt;
 
 int main() {
-  // Compiles without error (but with a warning).
+  // 编译不会报错（但有警告）。
   uint32_t x = 4294967296;
 
-  // assumes int
+  // 默认 int
   auto y = 1;
 
-  // literal is given a larger type, so it prints
-  // correctly
+  // 字面量被赋予更大类型，能正确输出
   std::cout &lt;&lt; 4294967296 &lt;&lt; std::endl;
 
-  // these work as expected
+  // 这些也能正常工作
   std::cout &lt;&lt; INT64_C(4294967296) &lt;&lt; std::endl;
 
   uint64_t z = INT64_C(4294967296);
@@ -470,28 +404,25 @@ int main() {
 }
 </code></pre>
 <pre><pre class="playground"><code class="language-rust">fn main() {
-    // error: literal out of range for `u32`
+    // 错误：字面量超出 `u32` 范围
     // let x: u32 = 4294967296;
 
-    // assumes i32
+    // 默认 i32
     let y = 1;
 
-    // fails to compile because it is inferred as i32
+    // 编译失败，因为被推断为 i32
     // print!("{}", 4294967296);
 
-    // These work, though.
+    // 这样可以
     println!("{}", 4294967296u64);
 
     let z: u64 = 4294967296;
     println!("{}", z);
 }</code></pre></pre>
 </div>
-<h2 id="safe-bools"><a class="header" href="#safe-bools">Safe bools</a></h2>
-<p>The safe bool idiom exists to make it possible to use types as conditions. Since
-C++11 this idiom is straightforward to implement.</p>
-<p>In Rust instead of converting the value to a boolean, the normal idiom matches
-on the value instead. Depending on the situation, the mechanism used for
-matching might be <code>match</code>, <code>if let</code>, or <code>let else</code>.</p>
+<h2 id="安全布尔"><a class="header" href="#安全布尔">安全布尔</a></h2>
+<p>安全布尔惯用法用于让类型可以作为条件表达式使用。自 C++11 起，这一惯用法实现起来很直接。</p>
+<p>Rust 中通常不是将值转换为布尔类型，而是直接对值进行匹配。根据场景，可以使用 <code>match</code>、<code>if let</code> 或 <code>let else</code>。</p>
 <div class="comparison">
 <pre><code class="language-cpp">struct Wire {
   bool ready;
@@ -505,9 +436,9 @@ int main() {
   // ...
 
   if (w) {
-    // use w.value
+    // 使用 w.value
   } else {
-    // do something else
+    // 其他处理
   }
 }
 </code></pre>
@@ -523,33 +454,31 @@ fn main() {
     // match
     match wire {
         Wire::Ready(v) =&gt; {
-            // use value v
+            // 使用值 v
         }
         Wire::NotReady =&gt; {
-            // do something else
+            // 其他处理
         }
     }
 
     // if let
     if let Wire::Ready(v) = wire {
-        // use value v
+        // 使用值 v
     }
 
     // let else
     let Wire::Ready(v) = wire else {
-        // do something that doesn't continue,
-        // like early return
+        // 做一些不能继续的操作，比如提前返回
         return;
     };
 }</code></pre></pre>
 </div>
-<h2 id="user-defined-conversions"><a class="header" href="#user-defined-conversions">User-defined conversions</a></h2>
-<p>User-defined conversions are covered in a <a href="./user-defined_conversions.html">separate
-chapter</a>.</p>
-<div class="quiz-placeholder" data-quiz-name="&quot;promotions_and_conversions&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;98badbec-d894-490a-929b-327021cda0c3&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nuse std::convert::TryInto;\n\nfn main() {\n    let x = 4294967296i64;\n\n    match TryInto::&lt;i32&gt;::try_into(x) {\n        Ok(y) =&gt; {\n            // ...\n        }\n        Err(err) =&gt; {\n            // ...\n        }\n    }\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nfn main() {\n    let x = 4294967296i64;\n    if Into::&lt;i64&gt;::into(i32::MIN) &lt; x\n        &amp;&amp; x &lt; Into::&lt;i64&gt;::into(i32::MAX)\n    {\n        let y = x as i32;\n        // ...\n    } else {\n        // ...\n    }\n}\n```\n&quot;,&quot;```rust\nfn main() {\n    let x = 4294967296i64;\n    let y = x as i32;\n    if y as i64 == x {\n        // ...\n    } else {\n        // ...\n    }\n}\n```\n&quot;],&quot;prompt&quot;:&quot;Which Rust program is the most idiomatic translation of the following C++\nprogram?\n\n```cpp\n#include &lt;cstdint&gt;\n#include &lt;limits&gt;\n\nint main() {\n  int64_t x(4294967296);\n\n  if (std::numeric_limits&lt;int32_t&gt;::min() &lt; x &amp;&amp;\n      x &lt; std::numeric_limits&lt;int32_t&gt;::max()) {\n    int32_t y(x);\n    // ...\n  } else {\n    // ...\n  }\n}\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
+<h2 id="用户自定义转换"><a class="header" href="#用户自定义转换">用户自定义转换</a></h2>
+<p>用户自定义转换在<a href="./user-defined_conversions.html">单独章节</a>中介绍。</p>
+<div class="quiz-placeholder" data-quiz-name="&quot;promotions_and_conversions&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;98badbec-d894-490a-929b-327021cda0c3&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nuse std::convert::TryInto;\n\nfn main() {\n    let x = 4294967296i64;\n\n    match TryInto::&lt;i32&gt;::try_into(x) {\n        Ok(y) =&gt; {\n            // ...\n        }\n        Err(err) =&gt; {\n            // ...\n        }\n    }\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nfn main() {\n    let x = 4294967296i64;\n    if Into::&lt;i64&gt;::into(i32::MIN) &lt; x\n        &amp;&amp; x &lt; Into::&lt;i64&gt;::into(i32::MAX)\n    {\n        let y = x as i32;\n        // ...\n    } else {\n        // ...\n    }\n}\n```\n&quot;,&quot;```rust\nfn main() {\n    let x = 4294967296i64;\n    let y = x as i32;\n    if y as i64 == x {\n        // ...\n    } else {\n        // ...\n    }\n}\n```\n&quot;],&quot;prompt&quot;:&quot;以下哪个 Rust 程序是对下列 C++ 程序最地道的翻译？\n\n```cpp\n#include &lt;cstdint&gt;\n#include &lt;limits&gt;\n\nint main() {\n  int64_t x(4294967296);\n\n  if (std::numeric_limits&lt;int32_t&gt;::min() &lt; x &amp;&amp;\n      x &lt; std::numeric_limits&lt;int32_t&gt;::max()) {\n    int32_t y(x);\n    // ...\n  } else {\n    // ...\n  }\n}\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Type promotions and conversions">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=类型提升与转换">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

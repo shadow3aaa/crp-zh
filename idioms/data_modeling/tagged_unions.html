@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Tagged unions and std::variant - C++ to Rust Phrasebook</title>
+        <title>标记联合与 std::variant - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,12 +163,10 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="tagged-unions-and-stdvariant"><a class="header" href="#tagged-unions-and-stdvariant">Tagged unions and <code>std::variant</code></a></h1>
-<h2 id="c-style-tagged-unions"><a class="header" href="#c-style-tagged-unions">C-style tagged unions</a></h2>
-<p>Because unions cannot be used for type punning in C++, they are usually used
-with a tag to discriminate between which variant of the union is active.</p>
-<p>Rust's equivalent to union types are always tagged. They are a generalization of
-Rust enums, where additional data may be associated with the enum variants.</p>
+                        <h1 id="标记联合与-stdvariant"><a class="header" href="#标记联合与-stdvariant">标记联合与 <code>std::variant</code></a></h1>
+<h2 id="c-风格标记联合"><a class="header" href="#c-风格标记联合">C 风格标记联合</a></h2>
+<p>由于 C++ 中的 union 不能用于类型重解释（type punning），它们通常与一个标签（tag）一起使用，用于区分当前激活的是哪个 union 成员。</p>
+<p>Rust 中等价的 union 类型总是带有标签的。它们是 Rust 枚举（enum）的泛化，可以为枚举变体关联额外的数据。</p>
 <div class="comparison">
 <pre><code class="language-cpp">enum Tag { Rectangle, Triangle };
 
@@ -221,16 +219,14 @@ impl Shape {
 }
 <span class="boring">}</span></code></pre></pre>
 </div>
-<p>When matching on an enum, Rust requires that all variants of the enum be
-handled. In situations where <code>default</code> would be used with a C++ <code>switch</code> on the
-tag, a wildcard can be used in the Rust <code>match</code>.</p>
+<p>在对枚举进行匹配时，Rust 要求必须处理所有枚举变体。在 C++ 中使用 <code>switch</code> 时会用 <code>default</code>，在 Rust 的 <code>match</code> 中可以使用通配符 <code>_</code>。</p>
 <div class="comparison">
 <pre><code class="language-cpp"><span class="boring">#include &lt;iostream&gt;
 </span><span class="boring">
 </span><span class="boring">enum Tag { Rectangle, Triangle, Circle };
 </span><span class="boring">
-</span>struct Shape {
-<span class="boring">  Tag tag;
+</span><span class="boring">struct Shape {
+</span><span class="boring">  Tag tag;
 </span><span class="boring">  union {
 </span><span class="boring">    struct {
 </span><span class="boring">      double width;
@@ -281,10 +277,7 @@ tag, a wildcard can be used in the Rust <code>match</code>.</p>
 }
 <span class="boring">}</span></code></pre></pre>
 </div>
-<p>Rust does not support C++-style fallthrough where some behavior can be done
-before falling through to the next case. However, in Rust one can match on
-multiple enum variants simultaneously, so long as the simultaneous match
-patterns bind the same names with the same types.</p>
+<p>Rust 不支持 C++ 风格的 case 穿透（fallthrough），即在进入下一个 case 前可以执行一些操作。但在 Rust 中，可以同时匹配多个枚举变体，只要这些模式绑定的名字和类型一致。</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span><span class="boring">enum Shape {
@@ -304,18 +297,10 @@ patterns bind the same names with the same types.</p>
     }
 }
 <span class="boring">}</span></code></pre></pre>
-<h2 id="accessing-the-value-without-checking-the-discriminant"><a class="header" href="#accessing-the-value-without-checking-the-discriminant">Accessing the value without checking the discriminant</a></h2>
-<p>Unlike with C-style unions, Rust always requires matching on the discriminant
-before accessing the values. If the variant is already known, e.g., due to an
-earlier check, then the code can usually be refactored to encode the knowledge
-in the type so that the second check (and corresponding error handling) can be
-omitted.</p>
-<p>A C++ program like the following requires more restructuring of the types to
-achieve the same goal in Rust.</p>
-<p>The corresponding Rust program requires defining separate types for each variant
-of the <code>Shape</code> enum so that the fact that all of the value are of a given type
-can be expressed in the type system by having an array of <code>Triangle</code> instead of
-an array of <code>Shape</code>.</p>
+<h2 id="不检查判别值直接访问成员"><a class="header" href="#不检查判别值直接访问成员">不检查判别值直接访问成员</a></h2>
+<p>与 C 风格联合不同，Rust 总是要求在访问值前先匹配判别值（discriminant）。如果变体已知（例如之前已经检查过），通常可以通过重构代码，将这种知识编码到类型中，这样就可以省略第二次检查（以及相关的错误处理）。</p>
+<p>如下 C++ 程序，若要在 Rust 中实现同样的目标，需要对类型做更多的重构。</p>
+<p>对应的 Rust 程序需要为 <code>Shape</code> 枚举的每个变体定义单独的类型，这样就可以通过让数组的类型为 <code>Triangle</code> 而不是 <code>Shape</code>，在类型系统中表达所有值都是某一变体。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;ranges&gt;
 #include &lt;vector&gt;
@@ -371,7 +356,7 @@ int main() {
   return 0;
 }
 </code></pre>
-<pre><pre class="playground"><code class="language-rust">// Define a separate struct for each variant.
+<pre><pre class="playground"><code class="language-rust">// 为每个变体定义单独的结构体。
 struct Rectangle { width: f64, height: f64 }
 struct  Triangle { base: f64, height: f64 }
 
@@ -400,12 +385,11 @@ fn get_shapes() -&gt; Vec&lt;Shape&gt; {
 fn main() {
     let shapes = get_shapes();
 
-    // This iterator only iterates over triangles
-    // and demonstrates that by iterating over
-    // the Triangle type instead of the Shape type.
+    // 该迭代器只遍历三角形，
+    // 并且类型就是 Triangle 而不是 Shape。
     let triangles = shapes
         .iter()
-        // Keep only the triangles
+        // 只保留三角形
         .filter_map(|shape| match shape {
             Shape::Triangle(t) =&gt; Some(t),
             _ =&gt; None,
@@ -413,20 +397,16 @@ fn main() {
 
     let mut total_base = 0.0;
     for triangle in triangles {
-        // Because the iterator produces Triangles
-        // instead of Shapes, base can be accessed
-        // directly.
+        // 因为迭代器产生的是 Triangle，
+        // 所以可以直接访问 base 字段。
         total_base += triangle.base;
     }
 }</code></pre></pre>
 </div>
-<p>This kind of use is common enough in Rust that the variants are often designed
-to have their own types from the start.</p>
-<p>This approach is also possible in C++. It is more commonly used along with
-<code>std::variant</code> in C++17 or later.</p>
-<h2 id="stdvariant-since-c17"><a class="header" href="#stdvariant-since-c17"><code>std::variant</code> (since C++17)</a></h2>
-<p>When programming in C++ standards since C++17, <code>std::variant</code> can be used to
-represent a tagged union in a way that has more in common with Rust enums.</p>
+<p>这种用法在 Rust 中很常见，因此变体通常一开始就设计为拥有自己的类型。</p>
+<p>这种做法在 C++ 中同样可行，且在 C++17 及以后版本中常与 <code>std::variant</code> 一起使用。</p>
+<h2 id="stdvariant自-c17-起"><a class="header" href="#stdvariant自-c17-起"><code>std::variant</code>（自 C++17 起）</a></h2>
+<p>在 C++17 及以后标准中，可以用 <code>std::variant</code> 来表示带标签的联合体，这种方式与 Rust 的枚举更为相似。</p>
 <pre><code class="language-cpp">#include &lt;variant&gt;
 
 struct Rectangle {
@@ -454,13 +434,8 @@ double area(const Shape &amp;shape) {
       shape);
 }
 </code></pre>
-<p>Because Rust doesn't depend on templates for this language feature, error
-messages when a variant is missed or when a new variant is added are easier to
-read, which removes one of the barriers to using tagged unions more frequently.
-Compare the errors in C++ (using gcc) and Rust when the <code>Triangle</code> case is
-omitted.</p>
-<p>The following two programs have the same error: each fails to handle a case of
-<code>Shape</code>.</p>
+<p>由于 Rust 不依赖模板实现该语言特性，因此当遗漏变体或新增变体时，错误信息更易读，这消除了使用标记联合体的障碍之一。对比 C++（gcc）和 Rust 在遗漏 <code>Triangle</code> 分支时的错误信息。</p>
+<p>下面两个程序有相同的错误：都没有处理 <code>Shape</code> 的所有情况。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;variant&gt;
 
@@ -503,7 +478,7 @@ impl Shape {
     }
 }</code></pre>
 </div>
-<p>However, the error messages differ significantly.</p>
+<p>但两者的错误信息有很大不同。</p>
 <div class="comparison">
 <pre><code class="language-text">example.cc: In instantiation of ‘area(const Shape&amp;)::&lt;lambda(auto:27&amp;&amp;)&gt; [with auto:27 = const Triangle&amp;]’:
 /usr/include/c++/14.2.1/bits/invoke.h:61:36:   required from ‘constexpr _Res std::__invoke_impl(__invoke_other, _Fn&amp;&amp;, _Args&amp;&amp; ...) [with _Res = double; _Fn = area(const Shape&amp;)::&lt;lambda(auto:27&amp;&amp;)&gt;; _Args = {const Triangle&amp;}]’
@@ -515,21 +490,21 @@ impl Shape {
    97 |                                         std::forward&lt;_Args&gt;(__args)...);
       |                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /usr/include/c++/14.2.1/variant:1060:24:   required from ‘static constexpr decltype(auto) std::__detail::__variant::__gen_vtable_impl&lt;std::__detail::__variant::_Multi_array&lt;_Result_type (*)(_Visitor, _Variants ...)&gt;, std::integer_sequence&lt;long unsigned int, __indices ...&gt; &gt;::__visit_invoke(_Visitor&amp;&amp;, _Variants ...) [with _Result_type = std::__detail::__variant::__deduce_visit_result&lt;double&gt;; _Visitor = area(const Shape&amp;)::&lt;lambda(auto:27&amp;&amp;)&gt;&amp;&amp;; _Variants = {const std::variant&lt;Rectangle, Triangle&gt;&amp;}; long unsigned int ...__indices = {1}]’
- 1060 |           return std::__invoke(std::forward&lt;_Visitor&gt;(__visitor),
+  1060 |           return std::__invoke(std::forward&lt;_Visitor&gt;(__visitor),
       |                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 1061 |               __element_by_index_or_cookie&lt;__indices&gt;(
+  1061 |               __element_by_index_or_cookie&lt;__indices&gt;(
       |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 1062 |                 std::forward&lt;_Variants&gt;(__vars))...);
+  1062 |                 std::forward&lt;_Variants&gt;(__vars))...);
       |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /usr/include/c++/14.2.1/variant:1820:5:   required from ‘constexpr decltype(auto) std::__do_visit(_Visitor&amp;&amp;, _Variants&amp;&amp; ...) [with _Result_type = __detail::__variant::__deduce_visit_result&lt;double&gt;; _Visitor = area(const Shape&amp;)::&lt;lambda(auto:27&amp;&amp;)&gt;; _Variants = {const variant&lt;Rectangle, Triangle&gt;&amp;}]’
- 1820 |                   _GLIBCXX_VISIT_CASE(1)
+  1820 |                   _GLIBCXX_VISIT_CASE(1)
       |                   ^~~~~~~~~~~~~~~~~~~
 /usr/include/c++/14.2.1/variant:1882:34:   required from ‘constexpr std::__detail::__variant::__visit_result_t&lt;_Visitor, _Variants ...&gt; std::visit(_Visitor&amp;&amp;, _Variants&amp;&amp; ...) [with _Visitor = area(const Shape&amp;)::&lt;lambda(auto:27&amp;&amp;)&gt;; _Variants = {const variant&lt;Rectangle, Triangle&gt;&amp;}; __detail::__variant::__visit_result_t&lt;_Visitor, _Variants ...&gt; = double]’
- 1882 |             return std::__do_visit&lt;_Tag&gt;(
+  1882 |             return std::__do_visit&lt;_Tag&gt;(
       |                    ~~~~~~~~~~~~~~~~~~~~~^
- 1883 |               std::forward&lt;_Visitor&gt;(__visitor),
+  1883 |               std::forward&lt;_Visitor&gt;(__visitor),
       |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 1884 |               static_cast&lt;_Vp&gt;(__variants)...);
+  1884 |               static_cast&lt;_Vp&gt;(__variants)...);
       |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 example.cc:17:20:   required from here
    17 |   return std::visit(
@@ -568,7 +543,7 @@ note: `Shape` defined here
 2 |     Rectangle { width: f64, height: f64 },
 3 |     Triangle { base: f64, height: f64 },
   |     -------- not covered
-  = note: the matched value is of type `&amp;Shape`
+= note: the matched value is of type `&amp;Shape`
 help: ensure that all possible cases are being handled by adding a match arm with a wildcard pattern or an explicit pattern as shown
   |
 12~             } =&gt; width * height,
@@ -576,20 +551,9 @@ help: ensure that all possible cases are being handled by adding a match arm wit
   |
 </code></pre>
 </div>
-<h2 id="using-unsafe-rust-to-avoid-checking-the-discriminant"><a class="header" href="#using-unsafe-rust-to-avoid-checking-the-discriminant">Using unsafe Rust to avoid checking the discriminant</a></h2>
-<p>In situations where rewriting code to use the <a href="#accessing-the-value-without-checking-the-discriminant">above
-approach</a> is not
-possible, one can check the discriminant anyway and then use the <a href="https://doc.rust-lang.org/std/macro.unreachable.html"><code>unreachable!</code>
-macro</a> to avoid handling
-the impossible case. However, that still involves actually checking the
-discriminant. If the cost of checking the discriminant must be avoided, then the
-<a href="https://doc.rust-lang.org/std/hint/fn.unreachable_unchecked.html">unsafe function
-<code>unreachable_unchecked</code></a>
-can be used to both avoid handling the case and to indicate to the compiler that
-the optimizer should assume that the case cannot be reached, so the discriminant
-check can be optimized away.</p>
-<p>Much like how in the C++ example accessing an inactive variant is undefined
-behavior, reaching <code>unreachable_unchecked</code> is also undefined behavior.</p>
+<h2 id="使用-unsafe-rust-避免判别值检查"><a class="header" href="#使用-unsafe-rust-避免判别值检查">使用 unsafe Rust 避免判别值检查</a></h2>
+<p>如果无法重构代码采用<a href="#accessing-the-value-without-checking-the-discriminant">上述方式</a>，可以先检查判别值，然后用 <a href="https://doc.rust-lang.org/std/macro.unreachable.html"><code>unreachable!</code> 宏</a> 来避免处理不可能的分支。但这仍然涉及实际的判别值检查。如果必须避免判别值检查的开销，可以使用 <a href="https://doc.rust-lang.org/std/hint/fn.unreachable_unchecked.html">unsafe 函数 <code>unreachable_unchecked</code></a>，既避免了分支处理，也告诉编译器该分支不可达，从而让优化器消除判别值检查。</p>
+<p>类似于 C++ 示例中访问未激活变体是未定义行为，执行到 <code>unreachable_unchecked</code> 也是未定义行为。</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">enum Shape {
 </span><span class="boring">    Rectangle { width: f64, height: f64 },
 </span><span class="boring">    Triangle { base: f64, height: f64 },
@@ -637,10 +601,10 @@ fn main() {
         }
     }
 }</code></pre></pre>
-<div class="quiz-placeholder" data-quiz-name="&quot;tagged_unions&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;8019115c-c84b-4b79-a18d-d2e83ff984da&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nimpl MediaFile {\n    fn size(&amp;self) -&gt; usize {\n        match self {\n            MediaFile::Text { length, .. } =&gt; *length,\n            MediaFile::Image { height, width, .. }\n            | MediaFile::Video { height, width, .. } =&gt; height * width,\n        }\n    }\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nimpl MediaFile {\n    fn size(&amp;self) -&gt; usize {\n        match self {\n            MediaFile::Text { length, .. } =&gt; *length,\n            MediaFile::Image { height, width, .. } =&gt; // fallthrough\n            MediaFile::Video { height, width, .. } =&gt; height * width,\n        }\n    }\n}\n```\n&quot;,&quot;```rust\nimpl MediaFile {\n    fn size(&amp;self) -&gt; usize {\n        match self {\n            MediaFile::Text { length, .. } =&gt; *length,\n            _ =&gt; self.height * self.width,\n        }\n    }\n}\n```\n&quot;],&quot;prompt&quot;:&quot;Which of the following Rust programs is the most idiomatic translation of the\ngiven C++ program?\n\n```c++\n#include &lt;chrono&gt;\n#include &lt;string&gt;\n\nenum class MediaType { Text, Image, Video };\n\nclass MediaFile {\npublic:\n  MediaType type;\n  union {\n    struct {\n      std::string language;\n      size_t length;\n    } text;\n    struct {\n      size_t height;\n      size_t width;\n    } image;\n    struct {\n      size_t height;\n      size_t width;\n      std::chrono::nanoseconds duration;\n    } video;\n  };\n\n  // constructors omitted for brevity\n\n  size_t size() const {\n    switch (type) {\n    case MediaType::Text:\n      return text.length;\n    case MediaType::Image:\n      return image.height * image.width;\n    case MediaType::Video:\n      return video.height * video.width;\n    }\n    // Should not reach here\n    return 0;\n  }\n};\n```\n\nAll of the Rust programs use this definition of `MediaFile`.\n\n```rust\nenum MediaFile {\n    Text {\n        language: String,\n        length: usize,\n    },\n    Image {\n        height: usize,\n        width: usize,\n    },\n    Video {\n        height: usize,\n        width: usize,\n        duration: std::time::Duration,\n    },\n}\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
+<div class="quiz-placeholder" data-quiz-name="&quot;tagged_unions&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;8019115c-c84b-4b79-a18d-d2e83ff984da&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nimpl MediaFile {\n    fn size(&amp;self) -&gt; usize {\n        match self {\n            MediaFile::Text { length, .. } =&gt; *length,\n            MediaFile::Image { height, width, .. }\n            | MediaFile::Video { height, width, .. } =&gt; height * width,\n        }\n    }\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\nimpl MediaFile {\n    fn size(&amp;self) -&gt; usize {\n        match self {\n            MediaFile::Text { length, .. } =&gt; *length,\n            MediaFile::Image { height, width, .. } =&gt; // fallthrough\n            MediaFile::Video { height, width, .. } =&gt; height * width,\n        }\n    }\n}\n```\n&quot;,&quot;```rust\nimpl MediaFile {\n    fn size(&amp;self) -&gt; usize {\n        match self {\n            MediaFile::Text { length, .. } =&gt; *length,\n            _ =&gt; self.height * self.width,\n        }\n    }\n}\n```\n&quot;],&quot;prompt&quot;:&quot;以下哪个 Rust 程序是对给定 C++ 程序最符合惯用写法的翻译？\n```c++\n#include &lt;chrono&gt;\n#include &lt;string&gt;\n\nenum class MediaType { Text, Image, Video };\n\nclass MediaFile {\npublic:\n  MediaType type;\n  union {\n    struct {\n      std::string language;\n      size_t length;\n    } text;\n    struct {\n      size_t height;\n      size_t width;\n    } image;\n    struct {\n      size_t height;\n      size_t width;\n      std::chrono::nanoseconds duration;\n    } video;\n  };\n\n  // 构造函数省略\n\n  size_t size() const {\n    switch (type) {\n    case MediaType::Text:\n      return text.length;\n    case MediaType::Image:\n      return image.height * image.width;\n    case MediaType::Video:\n      return video.height * video.width;\n    }\n    // 不应到达这里\n    return 0;\n  }\n};\n```\n\n所有 Rust 程序都使用如下 `MediaFile` 定义。\n\n```rust\nenum MediaFile {\n    Text {\n        language: String,\n        length: usize,\n    },\n    Image {\n        height: usize,\n        width: usize,\n    },\n    Video {\n        height: usize,\n        width: usize,\n        duration: std::time::Duration,\n    },\n}\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Tagged unions and std::variant">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=标记联合与 std::variant">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

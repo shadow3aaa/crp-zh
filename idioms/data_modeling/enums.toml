@@ -1,8 +1,7 @@
 [[questions]]
 type = "MultipleChoice"
 prompt.prompt="""
-Which of these Rust programs is the most idiomatic translation of the following
-C++ program?
+以下哪一个 Rust 程序是对下面 C++ 程序最地道的翻译？
 
 ```cpp
 #include <cstdint>
@@ -37,7 +36,7 @@ struct Color {
 };
 ```
 
-All of the Rust options start with the following import and definitions.
+所有 Rust 选项都以如下导入和定义开始。
 
 ```rust
 use std::convert::TryFrom;
@@ -55,7 +54,7 @@ struct InvalidColor(u8);
 ```
 """
 prompt.distractors= [
-# Thinking that integer types can be cast to enums, as static_cast does in C++.
+# 认为整数类型可以像 C++ 的 static_cast 一样直接转换为枚举类型。
 """
 ```rust
 impl TryFrom<u8> for Color {
@@ -70,7 +69,7 @@ impl TryFrom<u8> for Color {
 }
 ```
 """,
-# Thinking that enums need a wrapper for methods, like they do in C++.
+# 认为枚举需要像 C++ 那样用结构体包装以添加方法。
 """
 ```rust
 #[derive(Clone, Copy)]

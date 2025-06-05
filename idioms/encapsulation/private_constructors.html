@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Private constructors - C++ to Rust Phrasebook</title>
+        <title>私有构造函数 - C++ to Rust Phrasebook</title>
 
 
         <!-- Custom HTML head -->
@@ -163,17 +163,9 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="private-constructors"><a class="header" href="#private-constructors">Private constructors</a></h1>
-<p>In C++ constructors for classes can be made private by declaring them private,
-or by defining a class using <code>class</code> and using the default private visibility.</p>
-<p>In Rust, constructors (the actual constructors, not <a href="../constructors.html">"constructor
-methods"</a>) for structs are visible from wherever the
-type and all fields are visible. To achieve similar visibility restrictions as
-in the C++ example, an additional private field needs to be added to the struct
-in Rust. Because Rust supports zero-sized types, the additional field can have
-no performance cost. The <a href="https://doc.rust-lang.org/std/primitive.unit.html">unit
-type</a> has zero size and can
-be used for this purpose.</p>
+                        <h1 id="私有构造函数"><a class="header" href="#私有构造函数">私有构造函数</a></h1>
+<p>在 C++ 中，可以通过将构造函数声明为 private，或者使用 <code>class</code> 并利用默认的私有可见性，将类的构造函数设为私有。</p>
+<p>在 Rust 中，结构体的构造函数（真正的构造函数，而不是<a href="../constructors.html">“构造方法”</a>）的可见性取决于类型及其所有字段的可见性。要实现类似 C++ 示例中的可见性限制，需要在 Rust 的结构体中额外添加一个私有字段。由于 Rust 支持零大小类型，这个额外字段不会带来性能损耗。<a href="https://doc.rust-lang.org/std/primitive.unit.html">单元类型</a> 就是零大小类型，可以用于此目的。</p>
 <div class="comparison">
 <pre><code class="language-cpp">#include &lt;string&gt;
 
@@ -186,10 +178,10 @@ private:
 };
 
 int main() {
-  // fails to compile, Person::Person() private
+  // 编译失败，Person::Person() 是私有的
   // Person nobody;
 
-  // fails to compile since C++20
+  // 从 C++20 起编译失败
   // Person alice{"Alice", 42};
   return 0;
 }
@@ -218,16 +210,15 @@ int main() {
 use person::*;
 
 fn main() {
-    // field `_private` of struct `person::Person`
-    // is private
+    // 结构体 person::Person 的字段 `_private`
+    // 是私有的
     // let alice = Person {
     //     name: "Alice".to_string(),
     //     age: 42,
     //     _private: (),
     // };
 
-    // cannot construct `person::Person` with
-    // struct literal syntax due to private fields
+    // 由于存在私有字段，无法用结构体字面量语法构造 person::Person
     // let bob = Person {
     //     name: "Bob".to_string(),
     //     age: 55,
@@ -235,17 +226,12 @@ fn main() {
 
     let carol =
         Person::new("Carol".to_string(), 20);
-    // Can match on the public fields, and then
-    // use .. to ignore the remaning ones.
+    // 可以匹配公开字段，剩余字段用 .. 忽略
     let Person { name, age, .. } = carol;
 }</code></pre></pre>
 </div>
-<h2 id="enums"><a class="header" href="#enums">Enums</a></h2>
-<p>Unlike C++ unions, but like <code>std::variant</code>, Rust enums do not have direct
-control over the visibility of their variants or the fields of their variants.
-In the following example, the <code>circle</code> variant of the <code>Shape</code> union is not
-public, so it can only be accessed from within the definition of <code>Shape</code>, as it
-is by the <code>make_circle</code> static method.</p>
+<h2 id="枚举"><a class="header" href="#枚举">枚举</a></h2>
+<p>与 C++ 的 union 不同，但类似于 <code>std::variant</code>，Rust 的枚举无法直接控制其变体或变体字段的可见性。在下例中，<code>Shape</code> union 的 <code>circle</code> 变体不是 public，因此只能在 <code>Shape</code> 的定义内部访问，比如通过 <code>make_circle</code> 静态方法。</p>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
 struct Triangle {
@@ -276,15 +262,14 @@ int main() {
   triangle.triangle = Triangle{1.0, 2.0};
   Shape circle = Shape::make_circle(1.0);
 
-  // fails to compile
+  // 编译失败
   // circle.circle = Circle{1.0};
 
-  // fails to compile
+  // 编译失败
   // std::cout &lt;&lt; shape.circle.radius;
 }
 </code></pre>
-<p>In Rust visibility modifiers cannot be applied to individual enum variants or
-their fields.</p>
+<p>在 Rust 中，无法对单个枚举变体或其字段应用可见性修饰符。</p>
 <pre><pre class="playground"><code class="language-rust">mod shape {
     pub enum Shape {
         Triangle { base: f64, height: f64 },
@@ -295,7 +280,7 @@ their fields.</p>
 use shape::*;
 
 fn main() {
-    // Variant constructor is accesssible despite not being marked pub.
+    // 变体构造器可访问，即使未标记为 pub
     let triangle = Shape::Triangle {
         base: 1.0,
         height: 2.0,
@@ -303,20 +288,17 @@ fn main() {
 
     let circle = Shape::Circle { radius: 1.0 };
 
-    // Fields accessbile despite not being marked pub.
+    // 字段可访问，即使未标记为 pub
     match circle {
         Shape::Triangle { base, height } =&gt; {
             println!("Triangle: {}, {}", base, height);
         }
         Shape::Circle { radius } =&gt; {
-            println!("Circle {}", radius);
+            println!("Circle: {}", radius);
         }
     }
 }</code></pre></pre>
-<p>Instead, to control construction of and pattern matching on the enum
-implementation, one of two approaches can be taken. The first controls
-construction of and access to the fields, but not inspection of which variant is
-active.</p>
+<p>要控制枚举的构造和模式匹配，有两种常见做法。第一种做法可以控制字段的构造和访问，但不能限制变体的判别。</p>
 <pre><pre class="playground"><code class="language-rust">mod shape {
     pub struct Triangle {
         pub base: f64,
@@ -366,8 +348,7 @@ fn main() {
         }
     }
 }</code></pre></pre>
-<p>The second places the enum in a struct with a private field, preventing both
-construction and inspection from outside of the module.</p>
+<p>第二种做法是将枚举放入带有私有字段的结构体中，从而阻止模块外部的构造和判别。</p>
 <pre><pre class="playground"><code class="language-rust">mod shape {
     enum ShapeKind {
         Triangle { base: f64, height: f64 },
@@ -404,32 +385,26 @@ fn main() {
     let triangle = Shape::new_triangle(1.0, 2.0);
     let circle = Shape::new_circle(1.0);
 
-    // Does not compile because Shape has private fields.
+    // 编译失败，因为 Shape 有私有字段
     // match circle {
     //   Shape(_) -&gt; {}
     // }
 
     circle.print();
 }</code></pre></pre>
-<p>If the purpose of making the variants private is to ensure that invariants are
-met, then it can be useful to expose the implementing enum (<code>ShapeKind</code>) but not
-the field of the wrapping struct (<code>Shape</code>), with the invariants only being
-guaranteed when the wrapping struct is used. In this case, it is necessary to
-make the field private and define a getter function, since otherwise the field
-would be modifiable, possibly violating the invariant that the wrapping struct
-represents.</p>
+<p>如果让变体私有的目的是为了保证不变量成立，那么可以将实现枚举（如 <code>ShapeKind</code>）公开，但不公开包装结构体（如 <code>Shape</code>）的字段，仅当使用包装结构体时才能保证不变量。在这种情况下，需要将字段设为私有并定义 getter 方法，否则字段可被修改，可能破坏包装结构体所代表的不变量。</p>
 <pre><pre class="playground"><code class="language-rust">mod shape {
     pub enum ShapeKind {
         Triangle { base: f64, height: f64 },
         Circle { radius: f64 },
     }
 
-    // The field of Shape is private.
+    // Shape 的字段是私有的
     pub struct Shape(ShapeKind);
 
     impl Shape {
         pub fn new(kind: ShapeKind) -&gt; Option&lt;Shape&gt; {
-            // ... check invariants ...
+            // ... 检查不变量 ...
             Some(Shape(kind))
         }
 
@@ -450,7 +425,7 @@ fn main() {
         return;
     };
 
-    // Does not compile because Shape has private fields.
+    // 编译失败，因为 Shape 有私有字段
     // match circle {
     //   Shape(c) =&gt; {}
     // };
@@ -464,19 +439,10 @@ fn main() {
         }
     }
 }</code></pre></pre>
-<p>The situation in Rust resembles the situation in C++ when using <code>std::variant</code>,
-for which it is not possible to make the variants themselves private. Instead
-either the constructors for the types that form the variants can be made private
-or the variant can be wrapped in a class with appropriate visibility controls.</p>
-<h2 id="rusts-non_exhaustive-annotation"><a class="header" href="#rusts-non_exhaustive-annotation">Rust's <code>#[non_exhaustive]</code> annotation</a></h2>
-<p>If a struct or enum is intended to be public within a
-<a href="https://doc.rust-lang.org/book/ch07-01-packages-and-crates.html">crate</a>, but
-should not be constructed outside of the crate, then the <code>#[non_exhaustive]</code>
-attribute can be used to constrain construction. The attribute can be applied to
-both structs and to individual enum variants with the same effect as adding a
-private field.</p>
-<p>However, the attribute applies the constraint at the level of the crate, not at
-the level of a module.</p>
+<p>Rust 的这种情况类似于 C++ 使用 <code>std::variant</code> 时的情形，此时无法让变体本身为私有。可以让组成变体的类型的构造函数为私有，或者用带有合适可见性控制的类包装 variant。</p>
+<h2 id="rust-的-non_exhaustive-注解"><a class="header" href="#rust-的-non_exhaustive-注解">Rust 的 <code>#[non_exhaustive]</code> 注解</a></h2>
+<p>如果结构体或枚举希望在<a href="https://doc.rust-lang.org/book/ch07-01-packages-and-crates.html">crate</a> 内部公开，但不希望在 crate 外部被构造，可以使用 <code>#[non_exhaustive]</code> 属性来限制构造。该属性可用于结构体和单个枚举变体，效果与添加私有字段类似。</p>
+<p>但该属性的约束作用在 crate 级别，而不是模块级别。</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[non_exhaustive]
@@ -492,21 +458,12 @@ pub enum Shape {
     Circle { radius: f64 },
 }
 <span class="boring">}</span></code></pre></pre>
-<p>The attribute is more typically used to force clients of a library to include
-the wildcard when matching on the struct fields, making it so that adding
-additional fields to a struct is not breaking change (i.e., that it does not
-<a href="https://doc.rust-lang.org/cargo/reference/semver.html">require the increase of the major version component when using semantic
-versioning</a>).</p>
-<p>Applying the <code>#[non_exhasutive]</code> attribute to the enum itself makes it as if one
-of the variants were private, requiring a wildcard when matching on the variant
-itself. This has the same effect in terms of versioning as when used on a struct
-but is less advantageous. In most cases, code failing to compile when a new enum
-variant is added is desirable, since that indicates a new case that requires
-handling logic.</p>
+<p>该属性更常用于强制库的使用者在匹配结构体字段时包含通配符，这样在结构体新增字段时不会造成破坏性变更（即不需要<a href="https://doc.rust-lang.org/cargo/reference/semver.html">增加主版本号</a>）。</p>
+<p>将 <code>#[non_exhaustive]</code> 属性应用于枚举本身，相当于让某个变体为私有，要求在匹配变体时使用通配符。这在版本控制上与用于结构体时效果相同，但实际意义较小。大多数情况下，新增枚举变体导致代码无法编译是有益的，因为这表明需要处理新的分支逻辑。</p>
 <div class="quiz-placeholder" data-quiz-name="&quot;private_constructors&quot;" data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;62d1037a-740b-4f66-a195-741fa73f59fc&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:[&quot;`Person` can be constructed in `test_method`.\n&quot;,&quot;`_private` can be accessed in `test_method`.\n&quot;,&quot;`name` can be accessed in `test_method`.\n&quot;,&quot;`name` can be accessed in `main`.\n&quot;]},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;`Person` can be constructed in `main`.\n&quot;,&quot;`_private` can be accessed in `main`.\n&quot;,&quot;Values of type `Person` are larger than values of type `Pet`.\n&quot;],&quot;prompt&quot;:&quot;Which statements are true about the following Rust program?\n\n```rust\nmod people {\n    pub struct Person {\n        pub name: String,\n        pub age: i32,\n        _private: (),\n    }\n\n    pub struct Pet {\n        pub name: String,\n        pub age: i32,\n    }\n\n    fn test_method() {\n      // ...\n    }\n}\n\nuse people::*;\n\nfn main() {\n    // ...\n}\n```\n&quot;}},{&quot;id&quot;:&quot;df42cbcd-d5c0-486d-9509-371d05bc2145&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;```rust\nmod vec {\n    pub struct Vec2 {\n        x: f64,\n        y: f64,\n    }\n\n    impl Vec2 {\n        pub fn new() -&gt; Vec2 {\n            Vec2 { x: 0.0, y: 0.0 }\n        }\n    }\n}\n```\n&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;```rust\npub struct Vec2 {\n    x: f64,\n    y: f64,\n}\n\nimpl Vec2 {\n    pub fn new() -&gt; Vec2 {\n        Vec2 { x: 0.0 , y: 0.0 }\n    }\n}\n```\n&quot;,&quot;```rust\nmod vec {\n    pub struct Vec2 {\n        x: f64,\n        y: f64,\n        _private: (),\n    }\n\n    impl Vec2 {\n        fn new() -&gt; Vec2 {\n            Vec2 { x: 0.0, y: 0.0 }\n        }\n    }\n}\n```\n&quot;],&quot;prompt&quot;:&quot;Which is the most idiomatic translation of the following C++ program?\n\n```cpp\nclass Vec2 {\n  double x;\n  double y;\n\npublic:\n  Vec2() : x(0.0), y(0.0) {}\n};\n```\n&quot;}}]}" data-quiz-fullscreen="true" data-quiz-initial-text="&quot;Check your understanding&quot;"></div>
 <script type="text/javascript" src="../../quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="../../quiz/style.css">
 
-                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=Private constructors">Click here to leave us feedback about this page.</a>
+                        <a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLScoygeNlygODY2owQ-HvU8VGx3hi50aic7ZlKCyhJ0VktjiCg/viewform?usp=pp_url&entry.1450251950=私有构造函数">Click here to leave us feedback about this page.</a>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
